@@ -1,8 +1,8 @@
 package com.laptrinhjava.ShoppingCart.service.impl;
 
 import com.laptrinhjava.ShoppingCart.entity.User;
-import com.laptrinhjava.ShoppingCart.reponsitory.UserRepository;
-import com.laptrinhjava.ShoppingCart.service.UserService;
+import com.laptrinhjava.ShoppingCart.reponsitory.IUserRepository;
+import com.laptrinhjava.ShoppingCart.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements IUserService {
     @Autowired
-    private UserRepository userRepository;
+    private IUserRepository userRepository;
 
 
     @Override

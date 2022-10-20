@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
-public interface AmazonClient {
+public interface IAmazonClient {
     String uploadFile(MultipartFile multipartFile);
     void deleteFile(String fileName);
 }

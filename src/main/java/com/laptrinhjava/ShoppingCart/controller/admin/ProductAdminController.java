@@ -2,8 +2,8 @@ package com.laptrinhjava.ShoppingCart.controller.admin;
 
 import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
 import com.laptrinhjava.ShoppingCart.entity.Product;
-import com.laptrinhjava.ShoppingCart.service.AmazonClient;
-import com.laptrinhjava.ShoppingCart.service.ProductService;
+import com.laptrinhjava.ShoppingCart.service.IAmazonClient;
+import com.laptrinhjava.ShoppingCart.service.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,13 +14,13 @@ import javax.ws.rs.Consumes;
 
 @RestController
 @RequestMapping("api/admin/product")
-public class ProductController {
+public class ProductAdminController {
 
     @Autowired
-    private ProductService productService;
+    private IProductService productService;
 
     @Autowired
-    private AmazonClient amazonClient;
+    private IAmazonClient amazonClient;
 
     @PostMapping("/save")
     @Consumes("multipart/form-data")

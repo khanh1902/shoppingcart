@@ -2,7 +2,7 @@ package com.laptrinhjava.ShoppingCart.controller.admin;
 
 import com.laptrinhjava.ShoppingCart.entity.Category;
 import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
-import com.laptrinhjava.ShoppingCart.service.CategoryService;
+import com.laptrinhjava.ShoppingCart.service.ICategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api/admin/category")
-public class CategoryController {
+public class CategoryAdminController {
     @Autowired
-    private CategoryService categoryService;
+    private ICategoryService categoryService;
 
     @PostMapping("/save")
     public ResponseEntity<ResponseObject> save(@RequestBody Category category){

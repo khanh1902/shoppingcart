@@ -1,15 +1,15 @@
 package com.laptrinhjava.ShoppingCart.service.impl;
 
 import com.laptrinhjava.ShoppingCart.entity.Category;
-import com.laptrinhjava.ShoppingCart.reponsitory.CategoryRepository;
-import com.laptrinhjava.ShoppingCart.service.CategoryService;
+import com.laptrinhjava.ShoppingCart.reponsitory.ICategoryRepository;
+import com.laptrinhjava.ShoppingCart.service.ICategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CategoryServiceImpl implements CategoryService {
+public class CategoryServiceImpl implements ICategoryService {
     @Autowired
-    private CategoryRepository categoryRepository;
+    private ICategoryRepository categoryRepository;
 
     @Override
     public Category save(Category category) {

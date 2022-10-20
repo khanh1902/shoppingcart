@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public interface ProductService {
+public interface IProductService {
     List<Product> fillAll();
     Product save(Product product);
     Product findProductById(Long id);

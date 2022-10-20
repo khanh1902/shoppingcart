@@ -9,8 +9,8 @@ import com.laptrinhjava.ShoppingCart.entity.Role;
 import com.laptrinhjava.ShoppingCart.entity.User;
 import com.laptrinhjava.ShoppingCart.security.jwt.JwtUtils;
 import com.laptrinhjava.ShoppingCart.security.service.UserDetailsImpl;
-import com.laptrinhjava.ShoppingCart.service.RoleService;
-import com.laptrinhjava.ShoppingCart.service.UserService;
+import com.laptrinhjava.ShoppingCart.service.IRoleService;
+import com.laptrinhjava.ShoppingCart.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,10 +38,10 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private UserService userService;
+    private IUserService userService;
 
     @Autowired
-    private RoleService roleService;
+    private IRoleService roleService;
 
     @Autowired
     PasswordEncoder encoder;

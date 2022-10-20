@@ -1,15 +1,15 @@
 package com.laptrinhjava.ShoppingCart.service.impl;
 
 import com.laptrinhjava.ShoppingCart.entity.Discount;
-import com.laptrinhjava.ShoppingCart.reponsitory.DiscountRepository;
-import com.laptrinhjava.ShoppingCart.service.DiscountService;
+import com.laptrinhjava.ShoppingCart.reponsitory.IDiscountRepository;
+import com.laptrinhjava.ShoppingCart.service.IDiscountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DiscountServiceImpl implements DiscountService {
+public class DiscountServiceImpl implements IDiscountService {
     @Autowired
-    private DiscountRepository discountRepository;
+    private IDiscountRepository discountRepository;
 
     @Override
     public Discount save(Discount discount) {

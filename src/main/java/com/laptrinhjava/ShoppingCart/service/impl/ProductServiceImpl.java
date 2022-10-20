@@ -1,18 +1,18 @@
 package com.laptrinhjava.ShoppingCart.service.impl;
 
 import com.laptrinhjava.ShoppingCart.entity.Product;
-import com.laptrinhjava.ShoppingCart.reponsitory.ProductRepository;
-import com.laptrinhjava.ShoppingCart.service.ProductService;
+import com.laptrinhjava.ShoppingCart.reponsitory.IProductRepository;
+import com.laptrinhjava.ShoppingCart.service.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class ProductServiceImpl implements ProductService {
+public class ProductServiceImpl implements IProductService {
 
     @Autowired
-    private ProductRepository productRepository;
+    private IProductRepository productRepository;
 
     @Override
     public List<Product> fillAll() {

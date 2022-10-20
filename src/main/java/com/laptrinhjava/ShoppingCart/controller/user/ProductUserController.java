@@ -1,7 +1,7 @@
 package com.laptrinhjava.ShoppingCart.controller.user;
 
 import com.laptrinhjava.ShoppingCart.entity.Product;
-import com.laptrinhjava.ShoppingCart.service.ProductService;
+import com.laptrinhjava.ShoppingCart.service.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +13,7 @@ import java.util.List;
 @RequestMapping("/api/product")
 public class ProductUserController {
     @Autowired
-    private ProductService productService;
+    private IProductService productService;
 
     @GetMapping("/findAll")
     public List<Product> findAll(){

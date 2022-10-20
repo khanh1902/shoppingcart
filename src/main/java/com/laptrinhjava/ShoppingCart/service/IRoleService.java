@@ -7,6 +7,6 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public interface RoleService {
+public interface IRoleService {
     Optional<Role> findByName(ERole name);
 }
