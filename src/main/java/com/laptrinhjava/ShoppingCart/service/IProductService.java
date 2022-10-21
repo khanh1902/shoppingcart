@@ -12,4 +12,5 @@ public interface IProductService {
     Product findProductById(Long id);
     Product findByName(String name);
     void delete(Long id);
+    Product update(Product newProduct, Long id);
 }

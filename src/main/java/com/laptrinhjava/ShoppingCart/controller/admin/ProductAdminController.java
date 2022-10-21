@@ -50,4 +50,25 @@ public class ProductAdminController {
                     new ResponseObject("FAILED", "Delete failed!", "")
             );
     }
+
+    /**
+     * Method: Update Product
+     * **/
+    @PutMapping("/{id}")
+    public ResponseEntity<ResponseObject> updateProduct(@RequestParam("name") String name,
+                                                        @RequestParam("price") Long price,
+                                                        @RequestParam("file") MultipartFile file,
+                                                        @RequestParam("categoryId") Long categoryId,
+                                                        @RequestParam("discountId") Long discountId,
+                                                        @PathVariable Long id) {
+        Product findById = productService.findProductById(id);
+        if(findById != null) {
+            amazonClient.deleteFile(findById.getImageUrl());
+        }
+        String imageUrl = amazonClient.uploadFile(file);
+        Product newProduct = new Product(name, price, imageUrl, categoryId, discountId);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject("OK", "Update Successfully!", productService.update(newProduct, id))
+        );
+    }
 }

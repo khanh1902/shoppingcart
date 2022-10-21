@@ -101,4 +101,11 @@ public class AmazonClientImpl implements IAmazonClient {
         String key = Split(fileName);
         amazonS3.deleteObject(bucketName, key);
     }
+
+    @Override
+    public String updateFile(String fileName, String newFile) {
+        String key = Split(fileName);
+        amazonS3.putObject(bucketName, key, new File(newFile));
+        return fileName;
+    }
 }
