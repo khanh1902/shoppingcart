@@ -22,20 +22,30 @@ public class ProductAdminController {
     @Autowired
     private IAmazonClient amazonClient;
 
+    /**
+     * Method: Save Product
+     * **/
     @PostMapping("/save")
     @Consumes("multipart/form-data")
     public ResponseEntity<ResponseObject> save(@RequestParam("name") String name,
                                                @RequestParam("price") Long price,
-                                               @RequestParam("file") MultipartFile file,
+                                               @RequestParam("file") MultipartFile[] files,
                                                @RequestParam("categoryId") Long categoryId,
                                                @RequestParam("discountId") Long discountId) {
-        String imageUrl = amazonClient.uploadFile(file);
-        Product product = new Product(name, price, imageUrl, categoryId, discountId);
+        StringBuffer imageUrl = new StringBuffer();
+        for(MultipartFile file : files){
+            String url = amazonClient.uploadFile(file);
+            imageUrl.append(url + ", "); // ngan cach cac imageUrl bang dau phay
+        }
+        Product product = new Product(name, price, imageUrl.toString(), categoryId, discountId);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("OK", "Save Successfully!", productService.save(product))
         );
     }
 
+    /**
+     * Method: Delete Product
+     * **/
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseObject> delete(@PathVariable Long id) {
         Product findById = productService.findProductById(id);
@@ -57,7 +67,7 @@ public class ProductAdminController {
     @PutMapping("/{id}")
     public ResponseEntity<ResponseObject> updateProduct(@RequestParam("name") String name,
                                                         @RequestParam("price") Long price,
-                                                        @RequestParam("file") MultipartFile file,
+                                                        @RequestParam("file") MultipartFile[] files,
                                                         @RequestParam("categoryId") Long categoryId,
                                                         @RequestParam("discountId") Long discountId,
                                                         @PathVariable Long id) {
@@ -65,8 +75,13 @@ public class ProductAdminController {
         if(findById != null) {
             amazonClient.deleteFile(findById.getImageUrl());
         }
-        String imageUrl = amazonClient.uploadFile(file);
-        Product newProduct = new Product(name, price, imageUrl, categoryId, discountId);
+        StringBuffer imageUrl = new StringBuffer();
+        for(MultipartFile file : files){
+            String url = amazonClient.uploadFile(file);
+            imageUrl.append(url + ", ");
+        }
+
+        Product newProduct = new Product(name, price, imageUrl.toString(), categoryId, discountId);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("OK", "Update Successfully!", productService.update(newProduct, id))
         );

@@ -15,6 +15,9 @@ public class CategoryUserController {
     @Autowired
     ICategoryService categoryService;
 
+    /**
+     * Method: Find All Category
+     * **/
     @GetMapping("/findall")
     public List<Category> findAll(){
         return categoryService.findAll();

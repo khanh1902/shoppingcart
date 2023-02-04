@@ -15,6 +15,9 @@ public class DiscountUserController {
     @Autowired
     IDiscountService discountService;
 
+    /**
+     * Method: Find All Discount
+     * **/
     @GetMapping("/findall")
     public List<Discount> findAll() {
         return discountService.findAll();

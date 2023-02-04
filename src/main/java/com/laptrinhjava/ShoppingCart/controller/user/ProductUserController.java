@@ -15,6 +15,9 @@ public class ProductUserController {
     @Autowired
     private IProductService productService;
 
+    /**
+     * Method: Find All Product
+     * **/
     @GetMapping("/findAll")
     public List<Product> findAll(){
         return productService.fillAll();

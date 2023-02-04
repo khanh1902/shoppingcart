@@ -1,10 +1,17 @@
 package com.laptrinhjava.ShoppingCart.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "product")
+@Getter
+@Setter
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,10 +36,18 @@ public class Product {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "createddate", nullable = false)
     private Date createdDate;
+
     @PrePersist
-    private void onCreated(){
+    private void onCreated() {
         createdDate = new Date();
     }
+
+    //    @JsonIgnore
+//    @ManyToMany(mappedBy = "products", fetch = FetchType.LAZY)
+//    private List<CartDetails> cards = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<CartItems> cartItems;
 
     public Product() {
     }
@@ -43,61 +58,5 @@ public class Product {
         this.imageUrl = imageUrl;
         this.categoryId = categoryId;
         this.discountId = discountId;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Long getPrice() {
-        return price;
-    }
-
-    public void setPrice(Long price) {
-        this.price = price;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public Long getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public Long getDiscountId() {
-        return discountId;
-    }
-
-    public void setDiscountId(Long discountId) {
-        this.discountId = discountId;
-    }
-
-    public Date getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Date createdDate) {
-        this.createdDate = createdDate;
     }
 }

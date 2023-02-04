@@ -1,7 +1,12 @@
 package com.laptrinhjava.ShoppingCart.payload.request;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.validation.constraints.NotBlank;
 
+@Getter
+@Setter
 public class SigninRequest {
 
     /*
@@ -13,21 +18,4 @@ public class SigninRequest {
 
     @NotBlank
     private String password;
-
-    // getter and setter
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }

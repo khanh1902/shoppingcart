@@ -30,7 +30,6 @@ public class CategoryAdminController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseObject> deleteCategory(@PathVariable Long id) {
-//        Category findCategory = categoryService.findCategoryById(id);
         if (categoryService.findCategoryById(id) != null) {
             categoryService.delete(id);
             return ResponseEntity.status(HttpStatus.OK).body(

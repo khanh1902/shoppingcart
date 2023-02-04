@@ -1,7 +1,12 @@
 package com.laptrinhjava.ShoppingCart.payload.response;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
+@Getter
+@Setter
 public class JwtResponse {
     private String token;
     private String type = "Bearer";
@@ -19,48 +24,6 @@ public class JwtResponse {
         this.fullName = fullName;
         this.id = id;
         this.userName = userName;
-        this.roles = roles;
-    }
-
-    // getter and setter
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public List<String> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(List<String> roles) {
         this.roles = roles;
     }
 }

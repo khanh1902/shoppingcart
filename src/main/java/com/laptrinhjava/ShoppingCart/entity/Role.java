@@ -1,6 +1,8 @@
 package com.laptrinhjava.ShoppingCart.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -8,6 +10,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "role")
+@Getter
+@Setter
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,22 +32,6 @@ public class Role {
     }
 
     public Role(ERole name) {
-        this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public ERole getName() {
-        return name;
-    }
-
-    public void setName(ERole name) {
         this.name = name;
     }
 }

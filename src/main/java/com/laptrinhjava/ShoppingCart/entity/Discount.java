@@ -1,10 +1,15 @@
 package com.laptrinhjava.ShoppingCart.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
 @Table(name = "discount")
+@Getter
+@Setter
 public class Discount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,8 +27,9 @@ public class Discount {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "createddate", nullable = false)
     private Date createdDate;
+
     @PrePersist
-    private void onCreated(){
+    private void onCreated() {
         createdDate = new Date();
     }
 
@@ -34,46 +40,6 @@ public class Discount {
         this.name = name;
         this.description = description;
         this.discountPercent = discountPercent;
-        this.createdDate = createdDate;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Long getDiscountPercent() {
-        return discountPercent;
-    }
-
-    public void setDiscountPercent(Long discountPercent) {
-        this.discountPercent = discountPercent;
-    }
-
-    public Date getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
     }
 }

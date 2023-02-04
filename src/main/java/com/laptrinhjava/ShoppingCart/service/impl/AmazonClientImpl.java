@@ -19,6 +19,7 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 
 @Service
@@ -91,21 +92,33 @@ public class AmazonClientImpl implements IAmazonClient {
     }
 
     // tách url lấy keyname
-    public String Split(String imageUrl){
-        String[] str = imageUrl.split("/");
-        return str[str.length - 1];
+//    public String Split(String imageUrl){
+//        String[] str = imageUrl.split("/");
+//        return str[str.length - 1];
+//    }
+    public ArrayList<String> split (String imageUrl){
+        ArrayList<String> fileNames = new ArrayList<>(); // luu danh sach key sau khi tach chuoi
+        String[] str = imageUrl.split(", " ); // tach rieng tung url
+        for(String s : str){
+            String[] fileName = s.split("/"); // lay key cua tung chuoi sau khi tach
+            fileNames.add(fileName[fileName.length -1]);
+        }
+        return fileNames;
     }
 
     @Override
-    public void deleteFile(String fileName) {
-        String key = Split(fileName);
-        amazonS3.deleteObject(bucketName, key);
+    public void deleteFile(String fileNames) {
+        ArrayList<String> keys = split(fileNames);
+        for(String key: keys){
+            amazonS3.deleteObject(bucketName, key);
+        }
     }
 
     @Override
     public String updateFile(String fileName, String newFile) {
-        String key = Split(fileName);
-        amazonS3.putObject(bucketName, key, new File(newFile));
-        return fileName;
+//        String key = Split(fileName);
+//        amazonS3.putObject(bucketName, key, new File(newFile));
+//        return fileName;
+        return null;
     }
 }
