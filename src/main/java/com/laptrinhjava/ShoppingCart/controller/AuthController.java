@@ -59,11 +59,11 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<ResponseObject> authenticateUser(@Valid @RequestBody SigninRequest signinRequest) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(signinRequest.getUserName(), signinRequest.getPassword()));
+                new UsernamePasswordAuthenticationToken(signinRequest.getEmail(), signinRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateToken(authentication);
 
-        User user = userService.findByUserName(signinRequest.getUserName()); // get fullName
+        User user = userService.findByEmail(signinRequest.getEmail()); // get fullName
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
@@ -73,7 +73,6 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("ok", "Login successfully!", new JwtResponse(jwt,
                         userDetails.getId(),
-                        userDetails.getUsername(),
                         user.getFullName(),
                         user.getEmail(),
                         roles))
@@ -84,7 +83,7 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<ResponseObject> signup(@Valid @RequestBody SignupRequest signupRequest) {
         // kiểm tra trùng tên đăng nhập
-        if (userService.existsByUserName(signupRequest.getUserName())) {
+        if (userService.existsByEmail(signupRequest.getEmail())) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
                     new ResponseObject("failed", "Username is already taken!", "")
             );
@@ -97,8 +96,7 @@ public class AuthController {
             );
         }
 
-        User user = new User(signupRequest.getUserName(),
-                encoder.encode(signupRequest.getPassword()),
+        User user = new User(encoder.encode(signupRequest.getPassword()),
                 signupRequest.getFullName(),
                 signupRequest.getEmail());
 
@@ -117,8 +115,8 @@ public class AuthController {
                             .orElseThrow(() -> new RuntimeException("Role is not found!"));
                     roles.add(adminRole);
                 }
-                if (role.equals("user")) {
-                    Role userRole = roleService.findByName(ERole.ROLE_USER)
+                if (role.equals("customer")) {
+                    Role userRole = roleService.findByName(ERole.ROLE_CUSTOMER)
                             .orElseThrow(() -> new RuntimeException("Role is not found!"));
                     roles.add(userRole);
 
@@ -132,14 +130,14 @@ public class AuthController {
 
         // tao gio hang cho user
         user.getRoles().forEach(role -> {
-            if (role.getName().equals(ERole.ROLE_USER)) {
+            if (role.getName().equals(ERole.ROLE_CUSTOMER)) {
                 cartService.save(new Cart(user.getId(), user.getId(), null));
             }
         });
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("ok", "User registered successfully!",
-                        new UserResponse(user.getId(), user.getUserName(), user.getFullName(), user.getEmail(), user.getRoles()))
+                        new UserResponse(user.getId(), user.getFullName(), user.getEmail(), user.getRoles()))
         );
     }
 }

@@ -1,7 +1,7 @@
 package com.laptrinhjava.ShoppingCart.service.impl;
 
-import com.laptrinhjava.ShoppingCart.entity.Cart;
 import com.laptrinhjava.ShoppingCart.entity.CartItems;
+import com.laptrinhjava.ShoppingCart.entity.Product;
 import com.laptrinhjava.ShoppingCart.reponsitory.ICartItemsRepository;
 import com.laptrinhjava.ShoppingCart.service.ICartItemsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,12 @@ public class CartItemsServiceImpl implements ICartItemsService {
     }
 
     @Override
-    public void deleteByCart(Cart cart) {
-        cartItemsRepository.deleteByCart(cart);
+    public void deleteByProduct(Product product) {
+        cartItemsRepository.deleteByProduct(product);
+    }
+
+    @Override
+    public void deleteByProductId(Long id) {
+        cartItemsRepository.deleteByProductId(id);
     }
 }

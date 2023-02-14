@@ -11,9 +11,6 @@ import java.util.Set;
 public class SignupRequest {
 
     @NotBlank
-    private String userName;
-
-    @NotBlank
     private String password;
 
     @NotBlank

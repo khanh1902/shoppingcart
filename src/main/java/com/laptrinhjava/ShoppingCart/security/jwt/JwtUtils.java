@@ -21,9 +21,9 @@ public class JwtUtils {
     private final String jwtSecret = "khanh";
 
     // Thời gian có hiệu lực của chuỗi jwt
-    private final long jwtExpiration = 604800000L;
+    private final long jwtExpiration = 1800000L;  //hạn chuỗi jwt 30p
 
-    // Tạo ra thông tin từ user
+    // Tạo jwt
     public String generateToken(Authentication authentication) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         Date now = new Date(); // thời gian tạo
@@ -47,17 +47,20 @@ public class JwtUtils {
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
             return true;
-        } catch (SignatureException e) {
-            logger.error("Invalid JWT signature: {}", e.getMessage());
-        } catch (MalformedJwtException e) {
-            logger.error("Invalid JWT token: {}", e.getMessage());
-        } catch (ExpiredJwtException e) {
-            logger.error("JWT token is expired: {}", e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            logger.error("JWT token is unsupported: {}", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            logger.error("JWT claims string is empty: {}", e.getMessage());
+        } catch (Exception e) {
+            logger.error(e.getMessage());
         }
+//        catch (SignatureException e) {
+//            logger.error("Invalid JWT signature: {}", e.getMessage());
+//        } catch (MalformedJwtException e) {
+//            logger.error("Invalid JWT token: {}", e.getMessage());
+//        } catch (ExpiredJwtException e) {
+//            logger.error("JWT token is expired: {}", e.getMessage());
+//        } catch (UnsupportedJwtException e) {
+//            logger.error("JWT token is unsupported: {}", e.getMessage());
+//        } catch (IllegalArgumentException e) {
+//            logger.error("JWT claims string is empty: {}", e.getMessage());
+//        }
         return false;
     }
 }

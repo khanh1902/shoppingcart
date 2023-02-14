@@ -14,7 +14,7 @@ public class SigninRequest {
         bỏ hết khoảng trắng thừa ở đầu và cuối của String).
     */
     @NotBlank
-    private String userName;
+    private String email;
 
     @NotBlank
     private String password;

@@ -15,7 +15,7 @@ public class UserDetailsImpl implements UserDetails {
     private static final long serialVersionUID = 1L;
     private Long id;
 
-    private String userName;
+    private String email;
 
     @JsonIgnore
     private String password;
@@ -23,10 +23,10 @@ public class UserDetailsImpl implements UserDetails {
     private Collection<? extends GrantedAuthority> authorities;
 
     // constructor
-    public UserDetailsImpl(Long id, String userName, String password,
+    public UserDetailsImpl(Long id, String email, String password,
                            Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
-        this.userName = userName;
+        this.email = email;
         this.password = password;
         this.authorities = authorities;
     }
@@ -38,7 +38,7 @@ public class UserDetailsImpl implements UserDetails {
                 .collect(Collectors.toList()); // collect thực hiện -> map mới được thực hiện
         return new UserDetailsImpl(
                 user.getId(),
-                user.getUserName(),
+                user.getEmail(),
                 user.getPassword(),
                 authorities);
     }
@@ -55,7 +55,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getUsername() {
-        return userName;
+        return email;
     }
 
     @Override

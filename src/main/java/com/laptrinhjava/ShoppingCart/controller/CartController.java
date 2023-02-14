@@ -15,10 +15,12 @@ import com.laptrinhjava.ShoppingCart.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/cart")
@@ -138,19 +140,19 @@ public class CartController {
     /**
      * Method: Delete Cart
      **/
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ResponseObject> deleteById(@PathVariable Long id) {
-        Cart cart = cartService.findById(id);
-        if (cart != null) {
-            cartService.deleteById(id);
-            return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject("OK", "Delete Successfully!", "")
-            );
-        } else
-            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                    new ResponseObject("FAILED", "Delete Does Not Successfully!", "")
-            );
-    }
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<ResponseObject> deleteById(@PathVariable Long id) {
+//        Cart cart = cartService.findById(id);
+//        if (cart != null) {
+//            cartService.deleteById(id);
+//            return ResponseEntity.status(HttpStatus.OK).body(
+//                    new ResponseObject("OK", "Delete Successfully!", "")
+//            );
+//        } else
+//            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+//                    new ResponseObject("FAILED", "Delete Does Not Successfully!", "")
+//            );
+//    }
 
     /**
      * Method: Add 1 Item To Cart
@@ -192,5 +194,27 @@ public class CartController {
                                 cartItemsResponses,
                                 cart.getCreatedDate()))
         );
+    }
+
+    /**
+     * Method: Delete 1 Items
+     **/
+    @DeleteMapping("/{id}")
+//    @Transactional(rollbackFor = {Exception.class, Throwable.class})
+    public ResponseEntity<ResponseObject> deleteItems(@PathVariable Long id,
+                                                      @RequestParam("productId") Long productId) {
+        Cart cart = cartService.findById(id);
+        Product product = productService.findProductById(productId);
+        if(cart != null){
+            for(CartItems c : cart.getCartItems()) {
+                if (c.getProduct().equals(product)) {
+                    cartItemsService.deleteByProductId(product.getId());
+                    return ResponseEntity.status(HttpStatus.OK).body(
+                            new ResponseObject("OK", "Delete Successfully!", "")
+                    );
+                }
+            }
+        }
+        return null;
     }
 }

@@ -82,8 +82,8 @@ public class CartServiceImpl implements ICartService {
 
     private Long getUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userName = authentication.getName();
-        User findByUserName = userRepository.findByUserName(userName);
+        String email = authentication.getName();
+        User findByUserName = userRepository.findByEmail(email);
         if (findByUserName != null)
             return findByUserName.getId();
         else

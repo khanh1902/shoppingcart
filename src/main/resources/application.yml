@@ -6,3 +6,12 @@ amazonProperties:
 spring:
   main:
     web-application-type=none:
+
+## google auth
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 69682817150-5goult898gf0halj5r4lag70cpla5v43.apps.googleusercontent.com
+            client-secret: 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

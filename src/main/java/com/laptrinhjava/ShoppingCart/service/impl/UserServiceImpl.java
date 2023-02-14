@@ -16,23 +16,18 @@ public class UserServiceImpl implements IUserService {
 
 
     @Override
-    public User findByUserName(String userName) {
-        return userRepository.findByUserName(userName);
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     @Override
-    public Optional<User> findUserName(String userName) {
-        return Optional.ofNullable(userRepository.findByUserName(userName));
+    public Optional<User> findEmail(String email) {
+        return Optional.ofNullable(userRepository.findByEmail(email));
     }
 
     @Override
-    public List<User> findALlByUserName(String userName) {
-        return userRepository.findAllByUserName(userName);
-    }
-
-    @Override
-    public Boolean existsByUserName(String userName) {
-        return userRepository.existsByUserName(userName);
+    public List<User> findALlByEmail(String email) {
+        return userRepository.findAllByEmail(email);
     }
 
     @Override

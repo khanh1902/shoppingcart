@@ -8,10 +8,9 @@ import java.util.Optional;
 
 @Service
 public interface IUserService {
-    User findByUserName(String userName);
-    Optional<User> findUserName(String userName);
-    List<User> findALlByUserName(String userName);
-    Boolean existsByUserName(String userName);
+    User findByEmail(String email);
+    Optional<User> findEmail(String email);
+    List<User> findALlByEmail(String email);
     Boolean existsByEmail(String email);
     User save(User user);
 }

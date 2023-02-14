@@ -18,8 +18,8 @@ public class User {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "username")
-    private String userName;
+//    @Column(name = "username")
+//    private String userName;
 
     @Column(name = "password")
     private String password;
@@ -43,8 +43,8 @@ public class User {
     public User() {
     }
 
-    public User(String userName, String password, String fullName, String email) {
-        this.userName = userName;
+    public User(String password, String fullName, String email) {
+//        this.userName = userName;
         this.password = password;
         this.fullName = fullName;
         this.email = email;
