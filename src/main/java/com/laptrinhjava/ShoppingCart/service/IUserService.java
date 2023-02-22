@@ -1,6 +1,7 @@
 package com.laptrinhjava.ShoppingCart.service;
 
 import com.laptrinhjava.ShoppingCart.entity.User;
+import com.laptrinhjava.ShoppingCart.security.oauth2.CustomOAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,4 +14,5 @@ public interface IUserService {
     List<User> findALlByEmail(String email);
     Boolean existsByEmail(String email);
     User save(User user);
+    void processOAuthPostLogin(CustomOAuth2User user);
 }

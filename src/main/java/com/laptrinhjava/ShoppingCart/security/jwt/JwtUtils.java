@@ -1,5 +1,6 @@
 package com.laptrinhjava.ShoppingCart.security.jwt;
 
+import com.laptrinhjava.ShoppingCart.entity.User;
 import com.laptrinhjava.ShoppingCart.security.service.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
@@ -31,6 +32,20 @@ public class JwtUtils {
         // Tạo chuỗi json web token từ userName của user.
         return Jwts.builder()
                 .setSubject(userDetails.getUsername()) // cấp phát jwt cho user
+                .setIssuedAt(now) // thời gian cấp
+                .setExpiration(expiryDate) // thời gian hết hạn
+                .signWith(SignatureAlgorithm.HS512, jwtSecret) //ký tên
+                .compact(); // thực thi
+    }
+
+    public String generateTokenForOAuth2(User user) {
+        Claims claims = Jwts.claims().setSubject(user.getEmail());
+
+        Date now = new Date(); // thời gian tạo
+        Date expiryDate = new Date(now.getTime() + jwtExpiration); // thời gian hết hạn
+
+        return Jwts.builder()
+                .setSubject(user.getEmail()) // cấp phát jwt cho user
                 .setIssuedAt(now) // thời gian cấp
                 .setExpiration(expiryDate) // thời gian hết hạn
                 .signWith(SignatureAlgorithm.HS512, jwtSecret) //ký tên

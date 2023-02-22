@@ -1,13 +1,10 @@
 package com.laptrinhjava.ShoppingCart.controller;
 
-import com.laptrinhjava.ShoppingCart.entity.Cart;
+import com.laptrinhjava.ShoppingCart.entity.*;
 import com.laptrinhjava.ShoppingCart.payload.request.SigninRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.SignupRequest;
 import com.laptrinhjava.ShoppingCart.payload.response.JwtResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
-import com.laptrinhjava.ShoppingCart.entity.ERole;
-import com.laptrinhjava.ShoppingCart.entity.Role;
-import com.laptrinhjava.ShoppingCart.entity.User;
 import com.laptrinhjava.ShoppingCart.payload.response.UserResponse;
 import com.laptrinhjava.ShoppingCart.security.jwt.JwtUtils;
 import com.laptrinhjava.ShoppingCart.security.service.UserDetailsImpl;
@@ -34,7 +31,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("api/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     @Autowired
@@ -115,8 +112,8 @@ public class AuthController {
                             .orElseThrow(() -> new RuntimeException("Role is not found!"));
                     roles.add(adminRole);
                 }
-                if (role.equals("customer")) {
-                    Role userRole = roleService.findByName(ERole.ROLE_CUSTOMER)
+                if (role.equals("user")) {
+                    Role userRole = roleService.findByName(ERole.ROLE_USER)
                             .orElseThrow(() -> new RuntimeException("Role is not found!"));
                     roles.add(userRole);
 
@@ -124,13 +121,14 @@ public class AuthController {
 
             });
         }
-
+        
+        user.setProvider(EProvider.LOCAL);
         user.setRoles(roles);
         userService.save(user);
 
         // tao gio hang cho user
         user.getRoles().forEach(role -> {
-            if (role.getName().equals(ERole.ROLE_CUSTOMER)) {
+            if (role.getName().equals(ERole.ROLE_USER)) {
                 cartService.save(new Cart(user.getId(), user.getId(), null));
             }
         });

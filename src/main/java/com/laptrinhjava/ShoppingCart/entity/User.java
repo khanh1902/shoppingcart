@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 @Getter
 @Setter
 public class User {
@@ -18,17 +18,18 @@ public class User {
     @Column(name = "id")
     private Long id;
 
-//    @Column(name = "username")
-//    private String userName;
-
-    @Column(name = "password")
+    @Column(name = "password", nullable = true)
     private String password;
 
-    @Column(name = "fullname")
+    @Column(name = "fullname", nullable = true)
     private String fullName;
 
     @Column(name = "email")
     private String email;
+
+    @Column(name = "provider")
+    @Enumerated(EnumType.STRING)
+    private EProvider provider;
 
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -44,7 +45,6 @@ public class User {
     }
 
     public User(String password, String fullName, String email) {
-//        this.userName = userName;
         this.password = password;
         this.fullName = fullName;
         this.email = email;
