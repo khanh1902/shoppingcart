@@ -91,8 +91,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                .antMatchers("/api/**").authenticated()
                 .anyRequest().authenticated()
                 .and()
-                .httpBasic()//login basic
-                .and()
+//                .authorizeHttpRequests()
+//                .httpBasic()//login basic
+//                .and()
                 .oauth2Login()
                 .redirectionEndpoint()
                 .baseUri("/oauth2/callback/*")
