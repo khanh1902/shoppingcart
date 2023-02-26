@@ -85,7 +85,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .cors().and().csrf().disable() // chặn request từ một domain khác
                 .authorizeRequests()
-                .antMatchers("/", "/login", "/api/auth/**", "/oauth/**").permitAll() // cho phép tất cả truy cập
+                .antMatchers("/", "/login", "/api/auth/**", "/oauth/**", "/api/product/**").permitAll() // cho phép tất cả truy cập
 //                .antMatchers("/api/admin/**").hasRole("ADMIN")
 //                .antMatchers("/api/**").hasAnyRole("USER", "ADMIN")
 //                .antMatchers("/api/**").authenticated()
