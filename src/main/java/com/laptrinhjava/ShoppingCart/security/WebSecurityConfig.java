@@ -88,8 +88,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/", "/login", "/api/auth/**", "/oauth/**").permitAll() // cho phép tất cả truy cập
 //                .antMatchers("/api/admin/**").hasRole("ADMIN")
 //                .antMatchers("/api/**").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/api/**").authenticated()
-//                .anyRequest().authenticated()
+//                .antMatchers("/api/**").authenticated()
+                .anyRequest().authenticated()
                 .and()
                 .httpBasic()//login basic
                 .and()
