@@ -71,7 +71,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://shopping-cart-ofji.onrender.com"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setExposedHeaders(Arrays.asList("Authorization", "content-type"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "content-type"));
@@ -86,16 +86,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors().and().csrf().disable() // chặn request từ một domain khác
                 .authorizeRequests()
                 .antMatchers("/", "/login", "/api/auth/**", "/oauth/**", "/api/product/**").permitAll() // cho phép tất cả truy cập
-                .anyRequest().authenticated()
-//                .and()
-//                .authorizeHttpRequests()
-//                .httpBasic()//login basic
+//                .antMatchers("/api/admin/**").hasRole("ADMIN")
+//                .antMatchers("/api/**").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/api/**").authenticated()
+//                .anyRequest().authenticated()
                 .and()
-                .formLogin().loginPage("/login").permitAll()
+                .httpBasic()//login basic
                 .and()
-                .oauth2Login().loginPage("/login").authorizationEndpoint()
-                .baseUri("/oauth2/authorize")
-                .and().redirectionEndpoint()
+                .oauth2Login()
+                .redirectionEndpoint()
                 .baseUri("/oauth2/callback/*")
                 .and()
                 .userInfoEndpoint()
