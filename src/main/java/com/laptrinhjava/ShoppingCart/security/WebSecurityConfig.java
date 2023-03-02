@@ -117,7 +117,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/", "/login", "/api/auth/**", "/oauth/**", "/api/product/**").permitAll() // cho phép tất cả truy cập
                 .antMatchers("/api/admin/**").hasRole("ADMIN")
                 .antMatchers("/api/**").hasRole("USER")
-                .anyRequest().authenticated(); // Tất cả các request khác đều cần phải xác thực mới được truy cập
+                .anyRequest().authenticated() // Tất cả các request khác đều cần phải xác thực mới được truy cập
+                .and()
+                .oauth2Login()
+                .redirectionEndpoint()
+                .baseUri("/oauth2/callback/*")
+                .and()
+                .userInfoEndpoint()
+                    .userService(oauthUserService)
+                .and()
+                .successHandler(oAuth2LoginSuccessHandle);
 
         // Thêm một lớp Filter kiểm tra jwt
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
