@@ -21,6 +21,9 @@ public class Category {
     @Column(name = "code")
     private String code;
 
+    @Column(name = "imageurl")
+    private String imageUrl;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "createddate", nullable = false)
     private Date createdDate;
@@ -32,8 +35,9 @@ public class Category {
     public Category() {
     }
 
-    public Category(String name, String code) {
+    public Category(String name, String code, String imageUrl) {
         this.name = name;
         this.code = code;
+        this.imageUrl = imageUrl;
     }
 }

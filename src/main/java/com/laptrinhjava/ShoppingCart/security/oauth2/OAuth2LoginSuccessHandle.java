@@ -39,7 +39,7 @@ public class OAuth2LoginSuccessHandle extends SimpleUrlAuthenticationSuccessHand
                 .collect(Collectors.toList());
 
 
-        String redirectionUrl = UriComponentsBuilder.fromUriString("https://shopping-cart-ofji.onrender.com /api/product/findAll")
+        String redirectionUrl = UriComponentsBuilder.fromUriString("http://localhost:3000")
                 .queryParam("auth_token", jwt)
                 .build().toUriString();
         getRedirectStrategy().sendRedirect(request, response, redirectionUrl);

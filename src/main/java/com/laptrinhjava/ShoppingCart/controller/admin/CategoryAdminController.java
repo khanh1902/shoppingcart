@@ -2,11 +2,13 @@ package com.laptrinhjava.ShoppingCart.controller.admin;
 
 import com.laptrinhjava.ShoppingCart.entity.Category;
 import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
+import com.laptrinhjava.ShoppingCart.service.IAmazonClient;
 import com.laptrinhjava.ShoppingCart.service.ICategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("api/admin/category")
@@ -14,10 +16,22 @@ public class CategoryAdminController {
     @Autowired
     private ICategoryService categoryService;
 
-    @PostMapping("/save")
-    public ResponseEntity<ResponseObject> save(@RequestBody Category category) {
+    @Autowired
+    private IAmazonClient amazonClient;
+
+    @PostMapping()
+    public ResponseEntity<ResponseObject> save (@RequestParam("name") String name,
+                                                @RequestParam("code") String code,
+                                                @RequestParam("file")MultipartFile[] files){
+        StringBuilder imageUrl = new StringBuilder();
+        for(MultipartFile file : files){
+            String url = amazonClient.uploadFile(file);
+            imageUrl.append(url + ", "); // ngan cach cac imageUrl bang dau phay
+        }
+
+        Category category = new Category(name, code, imageUrl.toString());
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("OK", "Save successfully!", categoryService.save(category))
+                new ResponseObject("OK", "Save Successfully!", categoryService.save(category))
         );
     }
 

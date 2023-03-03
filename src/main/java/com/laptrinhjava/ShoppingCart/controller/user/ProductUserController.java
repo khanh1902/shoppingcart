@@ -18,8 +18,10 @@ public class ProductUserController {
     /**
      * Method: Find All Product
      * **/
-    @GetMapping("/findAll")
+    @GetMapping()
     public List<Product> findAll(){
         return productService.fillAll();
     }
+
+
 }
