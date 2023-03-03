@@ -13,8 +13,8 @@ spring:
       client:
         registration:
           google:
-            client-id: 69682817150-uj1a5m4tue0gp6jrkbad21d25i3gh832.apps.googleusercontent.com
-            client-secret: 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
+            client-id: 69682817150-gsogi2c7kp2ctmd0m7lho189cr991kj3.apps.googleusercontent.com
+            client-secret: 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
             redirect-uri: https://shopping-cart-ofji.onrender.com/oauth2/callback/google
             scope:
               - email

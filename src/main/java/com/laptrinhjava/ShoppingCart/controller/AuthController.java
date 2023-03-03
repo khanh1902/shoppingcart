@@ -11,6 +11,7 @@ import com.laptrinhjava.ShoppingCart.security.service.UserDetailsImpl;
 import com.laptrinhjava.ShoppingCart.service.ICartService;
 import com.laptrinhjava.ShoppingCart.service.IRoleService;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,13 +55,13 @@ public class AuthController {
 
     // đăng nhập
     @PostMapping("/signin")
-    public ResponseEntity<ResponseObject> authenticateUser(@Valid @RequestBody SigninRequest signinRequest) {
+    public ResponseEntity<ResponseObject> authenticateUser(@Valid @RequestBody @NotNull SigninRequest signinRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(signinRequest.getEmail(), signinRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateToken(authentication);
 
-        User user = userService.findByEmail(signinRequest.getEmail()); // get fullName
+        User user = userService.findByEmail(signinRequest.getEmail());
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
