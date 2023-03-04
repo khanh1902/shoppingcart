@@ -24,11 +24,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private UserDetailsServiceImpl userDetailsService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        try{
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+        try {
             String jwt = parseJwt(request); // Lấy jwt từ request
 
-            if(jwt != null && jwtUtils.validateJwtToken(jwt)){
+            if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
                 // Lấy username từ chuỗi jwt
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);
 
@@ -44,7 +45,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("Cannot set user authentication: {}", e);
         }
         filterChain.doFilter(request, response);

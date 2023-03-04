@@ -32,7 +32,7 @@ public class User {
     private EProvider provider;
 
     @JsonIgnore
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     // quan hệ n-n với đối tượng ở dưới (Role) (1 user có nhiều quyền)
     // LAZY để tránh việc truy xuất dữ liệu không cần thiết. Lúc nào cần thì mới query
     @JoinTable(name = "user_roles",

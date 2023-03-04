@@ -1,4 +1,4 @@
-package com.laptrinhjava.ShoppingCart.controller.admin;
+package com.laptrinhjava.ShoppingCart.controller;
 
 import com.laptrinhjava.ShoppingCart.entity.Category;
 import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
@@ -7,19 +7,31 @@ import com.laptrinhjava.ShoppingCart.service.ICategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("api/admin/category")
-public class CategoryAdminController {
+@RequestMapping("/api/category")
+public class CategoryController {
     @Autowired
     private ICategoryService categoryService;
 
     @Autowired
     private IAmazonClient amazonClient;
 
+    /**
+     * Method: Find All Category
+     * **/
+    @GetMapping()
+    public List<Category> findAll(){
+        return categoryService.findAll();
+    }
+
     @PostMapping()
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> save (@RequestParam("name") String name,
                                                 @RequestParam("code") String code,
                                                 @RequestParam("file")MultipartFile[] files){
@@ -35,7 +47,9 @@ public class CategoryAdminController {
         );
     }
 
+
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> updateCategory(@RequestBody Category newCategory, @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("OK", "Update Successfully!", categoryService.update(newCategory, id))
@@ -43,6 +57,7 @@ public class CategoryAdminController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> deleteCategory(@PathVariable Long id) {
         if (categoryService.findCategoryById(id) != null) {
             categoryService.delete(id);

@@ -21,8 +21,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Arrays;
 
@@ -47,11 +45,23 @@ public class WebSecurityConfig{
     @Autowired
     private OAuth2LoginSuccessHandle oAuth2LoginSuccessHandle;
 
+    // fix cros
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://shopping-cart-ofji.onrender.com"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
         return new AuthTokenFilter();
     }
-
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -70,44 +80,21 @@ public class WebSecurityConfig{
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // Password encoder, để Spring Security sử dụng mã hóa mật khẩu người dùng
         return new BCryptPasswordEncoder();
     }
-
-    // fix cros
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://shopping-cart-ofji.onrender.com"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        configuration.setAllowCredentials(true);
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
-
-//    @Bean
-//    public WebMvcConfigurer corsConfigurer() {
-//        return new WebMvcConfigurer() {
-//            @Override
-//            public void addCorsMappings(CorsRegistry registry) {
-//                registry.addMapping("/**").allowedMethods("*");
-//            }
-//        };
-//    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-                .authorizeRequests().antMatchers("/", "/login", "/api/auth/**", "/oauth/**", "/api/product/**").permitAll()
-                .antMatchers("/api/admin/**").hasRole("ADMIN")
-                .antMatchers("/api/**").hasAnyRole("USER", "ADMIN")
+//                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .authorizeRequests().antMatchers("/api/auth/**", "/login").permitAll()
+                .antMatchers("/api/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .oauth2Login()
                 .redirectionEndpoint()
-                .baseUri("/oauth2/callback/**")
+                .baseUri("/oauth2/callback/*")
                 .and()
                 .userInfoEndpoint()
                     .userService(oauthUserService)
@@ -128,10 +115,9 @@ public class WebSecurityConfig{
         http.authenticationProvider(authenticationProvider());
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
-
-
     //https://www.devglan.com/spring-security/spring-boot-security-google-oauth
     //https://www.devglan.com/spring-security/spring-security-oauth2-user-registration
 }

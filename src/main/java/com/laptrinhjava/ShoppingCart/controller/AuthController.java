@@ -5,13 +5,11 @@ import com.laptrinhjava.ShoppingCart.payload.request.SigninRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.SignupRequest;
 import com.laptrinhjava.ShoppingCart.payload.response.JwtResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
-import com.laptrinhjava.ShoppingCart.payload.response.UserResponse;
 import com.laptrinhjava.ShoppingCart.security.jwt.JwtUtils;
 import com.laptrinhjava.ShoppingCart.security.service.UserDetailsImpl;
 import com.laptrinhjava.ShoppingCart.service.ICartService;
 import com.laptrinhjava.ShoppingCart.service.IRoleService;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,13 +53,15 @@ public class AuthController {
 
     // đăng nhập
     @PostMapping("/signin")
-    public ResponseEntity<ResponseObject> authenticateUser(@Valid @RequestBody @NotNull SigninRequest signinRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody SigninRequest loginRequest) {
+
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(signinRequest.getEmail(), signinRequest.getPassword()));
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateToken(authentication);
 
-        User user = userService.findByEmail(signinRequest.getEmail());
+        User user = userService.findByEmail(loginRequest.getEmail());
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
@@ -70,10 +70,10 @@ public class AuthController {
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("ok", "Login successfully!", new JwtResponse(jwt,
-                        userDetails.getId(),
-                        user.getFullName(),
-                        user.getEmail(),
-                        roles))
+                                                                                userDetails.getId(),
+                                                                                userDetails.getUsername(),
+                                                                                user.getEmail(),
+                                                                                roles))
         );
     }
 
@@ -135,8 +135,7 @@ public class AuthController {
         });
 
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("ok", "User registered successfully!",
-                        new UserResponse(user.getId(), user.getFullName(), user.getEmail(), user.getRoles()))
+                new ResponseObject("ok", "User registered successfully!"," ")
         );
     }
 }

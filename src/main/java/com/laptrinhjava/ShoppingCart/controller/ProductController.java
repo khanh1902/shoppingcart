@@ -1,4 +1,4 @@
-package com.laptrinhjava.ShoppingCart.controller.admin;
+package com.laptrinhjava.ShoppingCart.controller;
 
 import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
 import com.laptrinhjava.ShoppingCart.entity.Product;
@@ -7,14 +7,16 @@ import com.laptrinhjava.ShoppingCart.service.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.ws.rs.Consumes;
+import java.util.List;
 
 @RestController
-@RequestMapping("api/admin/product")
-public class ProductAdminController {
+@RequestMapping("/api/product")
+public class ProductController {
 
     @Autowired
     private IProductService productService;
@@ -23,9 +25,18 @@ public class ProductAdminController {
     private IAmazonClient amazonClient;
 
     /**
+     * Method: Find All Product
+     * **/
+    @GetMapping()
+    public List<Product> findAll(){
+        return productService.fillAll();
+    }
+
+    /**
      * Method: Save Product
      * **/
-    @PostMapping("/save")
+    @PostMapping()
+    @PreAuthorize("hasRole('ADMIN')")
     @Consumes("multipart/form-data")
     public ResponseEntity<ResponseObject> save(@RequestParam("name") String name,
                                                @RequestParam("price") Long price,
@@ -47,6 +58,7 @@ public class ProductAdminController {
      * Method: Delete Product
      * **/
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> delete(@PathVariable Long id) {
         Product findById = productService.findProductById(id);
         if (findById != null) {
@@ -65,6 +77,7 @@ public class ProductAdminController {
      * Method: Update Product
      * **/
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> updateProduct(@RequestParam("name") String name,
                                                         @RequestParam("price") Long price,
                                                         @RequestParam("file") MultipartFile[] files,

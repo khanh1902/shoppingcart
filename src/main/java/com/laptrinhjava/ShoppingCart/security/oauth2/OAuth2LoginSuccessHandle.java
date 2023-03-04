@@ -39,10 +39,10 @@ public class OAuth2LoginSuccessHandle extends SimpleUrlAuthenticationSuccessHand
                 .collect(Collectors.toList());
 
 
-        String redirectionUrl = UriComponentsBuilder.fromUriString("http://localhost:3000")
+        String redirectionUrl = UriComponentsBuilder.fromUriString("http://localhost:8080/api/product")
                 .queryParam("auth_token", jwt)
                 .build().toUriString();
-        getRedirectStrategy().sendRedirect(request, response, redirectionUrl);
+        getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000");
 
         System.out.println("Email : "  + email);
         System.out.println("Token : "  + jwt);

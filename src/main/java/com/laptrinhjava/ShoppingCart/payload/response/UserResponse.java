@@ -4,7 +4,7 @@ import com.laptrinhjava.ShoppingCart.entity.Role;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -13,9 +13,9 @@ public class UserResponse {
     private String email;
     private String fullName;
 
-    private Set<Role> roles;
+    private List<Role> roles;
 
-    public UserResponse(Long id, String fullName, String email, Set<Role> roles) {
+    public UserResponse(Long id, String fullName, String email, List<Role> roles) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
