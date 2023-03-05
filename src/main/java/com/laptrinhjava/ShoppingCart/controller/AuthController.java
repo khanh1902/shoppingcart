@@ -80,12 +80,6 @@ public class AuthController {
     // signup: dang ky
     @PostMapping("/signup")
     public ResponseEntity<ResponseObject> signup(@Valid @RequestBody SignupRequest signupRequest) {
-        // kiểm tra trùng tên đăng nhập
-        if (userService.existsByEmail(signupRequest.getEmail())) {
-            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                    new ResponseObject("failed", "Username is already taken!", "")
-            );
-        }
 
         // kiểm tra trùng email
         if (userService.existsByEmail(signupRequest.getEmail())) {

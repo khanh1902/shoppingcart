@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -38,11 +39,12 @@ public class OAuth2LoginSuccessHandle extends SimpleUrlAuthenticationSuccessHand
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
-
-        String redirectionUrl = UriComponentsBuilder.fromUriString("http://localhost:8080/api/product")
-                .queryParam("auth_token", jwt)
-                .build().toUriString();
+        Cookie cookie = new Cookie("auth_token", jwtUtils.generateTokenForOAuth2(user));
+        cookie.setMaxAge(60 * 60 * 24);
+        cookie.setPath("/");
+        response.addCookie(cookie);
         getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000");
+
 
         System.out.println("Email : "  + email);
         System.out.println("Token : "  + jwt);
