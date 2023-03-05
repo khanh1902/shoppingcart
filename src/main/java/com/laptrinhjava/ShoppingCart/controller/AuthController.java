@@ -23,9 +23,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -53,28 +56,47 @@ public class AuthController {
 
     // đăng nhập
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody SigninRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody SigninRequest loginRequest, HttpServletResponse response) {
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+        User findUser = userService.findByEmail(loginRequest.getEmail());
+        if (findUser == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    new ResponseObject("failed", "Email not exists!", null
+                    ));
+        }
+        else if (!encoder.matches(loginRequest.getPassword(), findUser.getPassword())){
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+                    new ResponseObject("failed", "Password not match!", null)
+            );
+        }
+        else {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateToken(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = jwtUtils.generateToken(authentication);
 
-        User user = userService.findByEmail(loginRequest.getEmail());
+            User user = userService.findByEmail(loginRequest.getEmail());
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
-                .collect(Collectors.toList());
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            List<String> roles = userDetails.getAuthorities().stream()
+                    .map(item -> item.getAuthority())
+                    .collect(Collectors.toList());
 
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("ok", "Login successfully!", new JwtResponse(jwt,
-                                                                                userDetails.getId(),
-                                                                                userDetails.getUsername(),
-                                                                                user.getEmail(),
-                                                                                roles))
-        );
+
+            Cookie cookie = new Cookie("auth_token", jwt);
+            cookie.setMaxAge(60 * 60 * 24);
+            cookie.setPath("/");
+            response.addCookie(cookie);
+
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("ok", "Login successfully!", new JwtResponse(jwt,
+                            userDetails.getId(),
+                            userDetails.getUsername(),
+                            user.getEmail(),
+                            roles))
+            );
+        }
     }
 
     // signup: dang ky
@@ -84,7 +106,7 @@ public class AuthController {
         // kiểm tra trùng email
         if (userService.existsByEmail(signupRequest.getEmail())) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                    new ResponseObject("failed", "Email is already taken!", "")
+                    new ResponseObject("failed", "Email is already taken!", null)
             );
         }
 
@@ -98,7 +120,7 @@ public class AuthController {
 
         if (rolesRequest == null) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                    new ResponseObject("failed", "Role is empty!", "")
+                    new ResponseObject("failed", "Role is empty!", null)
             );
         } else {
             rolesRequest.forEach(role -> {
@@ -116,7 +138,7 @@ public class AuthController {
 
             });
         }
-        
+
         user.setProvider(EProvider.LOCAL);
         user.setRoles(roles);
         userService.save(user);
@@ -129,7 +151,7 @@ public class AuthController {
         });
 
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("ok", "User registered successfully!"," ")
+                new ResponseObject("ok", "User registered successfully!", " ")
         );
     }
 }

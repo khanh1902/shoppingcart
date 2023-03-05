@@ -2,8 +2,7 @@ package com.laptrinhjava.ShoppingCart.security;
 
 import com.laptrinhjava.ShoppingCart.security.jwt.AuthEntryPointJwt;
 import com.laptrinhjava.ShoppingCart.security.jwt.AuthTokenFilter;
-import com.laptrinhjava.ShoppingCart.security.oauth2.CustomOAuth2UserService;
-import com.laptrinhjava.ShoppingCart.security.oauth2.OAuth2LoginSuccessHandle;
+import com.laptrinhjava.ShoppingCart.security.oauth2.*;
 import com.laptrinhjava.ShoppingCart.security.service.UserDetailsServiceImpl;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +15,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -29,7 +30,7 @@ import java.util.Arrays;
         // securedEnabled = true,
         // jsr250Enabled = true,
         prePostEnabled = true)
-public class WebSecurityConfig{
+public class WebSecurityConfig {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
@@ -44,6 +45,12 @@ public class WebSecurityConfig{
 
     @Autowired
     private OAuth2LoginSuccessHandle oAuth2LoginSuccessHandle;
+
+    @Autowired
+    private OAuth2AuthenticationFailureHandler auth2AuthenticationFailureHandler;
+
+    @Autowired
+    private CustomOAuth2AuthenticationEntryPoint authenticationEntryPoint;
 
     // fix cros
     @Bean
@@ -86,26 +93,32 @@ public class WebSecurityConfig{
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-//                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests().antMatchers("/api/auth/**", "/login").permitAll()
                 .antMatchers("/api/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
+
                 .oauth2Login()
+                .authorizationEndpoint()
+                    .baseUri("/oauth2/authorize")
+                    .and()
+
                 .redirectionEndpoint()
-                .baseUri("/oauth2/callback/*")
-                .and()
+                    .baseUri("/oauth2/callback/*")
+                    .and()
+
                 .userInfoEndpoint()
                     .userService(oauthUserService)
-                .and()
-                .successHandler(oAuth2LoginSuccessHandle);
+                    .and()
 
-
-        http.formLogin((form) -> form
-                .loginPage("/login")
-                .permitAll())
-        ;
+                .successHandler(oAuth2LoginSuccessHandle)
+                .failureHandler(auth2AuthenticationFailureHandler).and()
+                .exceptionHandling()
+                    .defaultAuthenticationEntryPointFor(new CustomOAuth2AuthenticationEntryPoint(), new AntPathRequestMatcher("/oauth2/**"))
+                    .and()
+                    .formLogin()
+                    .loginPage("/oauth/login")
+                    .permitAll();
 
         http
                 .logout(l -> l
