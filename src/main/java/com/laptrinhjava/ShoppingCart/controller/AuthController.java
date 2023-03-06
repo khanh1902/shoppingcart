@@ -85,10 +85,11 @@ public class AuthController {
                     .map(item -> item.getAuthority())
                     .collect(Collectors.toList());
 
-            ResponseCookie cookie = ResponseCookie.from("auth-token", jwt) // key & value
-                    .httpOnly(true)
+            ResponseCookie cookie = ResponseCookie.from("auth_token", jwt) // key & value
+                    .httpOnly(false)
                     .secure(true)
                     .path("/")
+                    .domain("/")
                     .maxAge(60 * 60 * 24)
                     .sameSite("None")
                     .build();
