@@ -13,9 +13,9 @@ public class UserResponse {
     private String email;
     private String fullName;
 
-    private List<Role> roles;
+    private List<String> roles;
 
-    public UserResponse(Long id, String fullName, String email, List<Role> roles) {
+    public UserResponse(Long id, String fullName, String email, List<String> roles) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;

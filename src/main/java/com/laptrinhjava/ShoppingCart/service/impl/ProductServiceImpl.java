@@ -1,6 +1,5 @@
 package com.laptrinhjava.ShoppingCart.service.impl;
 
-import com.laptrinhjava.ShoppingCart.entity.Discount;
 import com.laptrinhjava.ShoppingCart.entity.Product;
 import com.laptrinhjava.ShoppingCart.reponsitory.IProductRepository;
 import com.laptrinhjava.ShoppingCart.service.IProductService;

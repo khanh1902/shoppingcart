@@ -5,6 +5,7 @@ import com.laptrinhjava.ShoppingCart.payload.request.SigninRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.SignupRequest;
 import com.laptrinhjava.ShoppingCart.payload.response.JwtResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
+import com.laptrinhjava.ShoppingCart.payload.response.UserResponse;
 import com.laptrinhjava.ShoppingCart.security.jwt.JwtUtils;
 import com.laptrinhjava.ShoppingCart.security.service.UserDetailsImpl;
 import com.laptrinhjava.ShoppingCart.service.ICartService;
@@ -20,10 +21,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -89,7 +87,6 @@ public class AuthController {
                     .httpOnly(false)
                     .secure(true)
                     .path("/")
-                    .domain("/")
                     .maxAge(60 * 60 * 24)
                     .sameSite("None")
                     .build();
@@ -161,4 +158,23 @@ public class AuthController {
                 new ResponseObject("ok", "User registered successfully!", " ")
         );
     }
+
+    @GetMapping("/get-me")
+    public ResponseEntity<ResponseObject> getInformation(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(item -> item.getAuthority())
+                .collect(Collectors.toList());
+        String email = userDetails.getUsername();
+        User user = userService.findByEmail(email);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject("ok", "Login successfully!", new UserResponse(
+                        user.getId(),
+                        user.getEmail(),
+                        user.getFullName(),
+                        roles))
+        );
+    }
+
 }
