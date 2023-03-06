@@ -11,7 +11,9 @@ import com.laptrinhjava.ShoppingCart.service.ICartService;
 import com.laptrinhjava.ShoppingCart.service.IRoleService;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -84,10 +86,20 @@ public class AuthController {
                     .collect(Collectors.toList());
 
 
-            Cookie cookie = new Cookie("auth_token", jwt);
-            cookie.setMaxAge(60 * 60 * 24);
-            cookie.setPath("/");
-            response.addCookie(cookie);
+//            Cookie cookie = new Cookie("auth_token", jwt);
+//            cookie.setMaxAge(60 * 60 * 24);
+//            cookie.setPath("/");
+//            response.addCookie(cookie);
+
+            ResponseCookie cookie = ResponseCookie.from("auth-token", jwt) // key & value
+                    .httpOnly(true)
+                    .secure(false)
+                    .path("/")      // path
+                    .maxAge(60 * 60 * 24)
+                    .sameSite("None")  // sameSite
+                    .build();
+
+            response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("ok", "Login successfully!", new JwtResponse(jwt,

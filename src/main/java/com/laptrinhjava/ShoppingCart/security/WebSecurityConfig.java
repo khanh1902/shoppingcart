@@ -114,11 +114,11 @@ public class WebSecurityConfig {
                 .successHandler(oAuth2LoginSuccessHandle)
                 .failureHandler(auth2AuthenticationFailureHandler).and()
                 .exceptionHandling()
-                    .defaultAuthenticationEntryPointFor(new CustomOAuth2AuthenticationEntryPoint(), new AntPathRequestMatcher("/oauth2/**"))
-                    .and()
-                    .formLogin()
-                    .loginPage("/oauth/login")
-                    .permitAll();
+                    .defaultAuthenticationEntryPointFor(authenticationEntryPoint, new AntPathRequestMatcher("/oauth2/**"));
+//                    .and()
+//                    .formLogin()
+//                    .loginPage("/oauth/login")
+//                    .permitAll();
 
         http
                 .logout(l -> l
