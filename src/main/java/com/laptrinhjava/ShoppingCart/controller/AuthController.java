@@ -88,9 +88,9 @@ public class AuthController {
             ResponseCookie cookie = ResponseCookie.from("auth-token", jwt) // key & value
                     .httpOnly(true)
                     .secure(true)
-                    .path("/")      // path
+                    .path("/")
                     .maxAge(60 * 60 * 24)
-                    .sameSite("None")  // sameSite
+                    .sameSite("None")
                     .build();
 
             response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
