@@ -100,9 +100,9 @@ public class AuthController {
                     .from("auth_token", jwt)
                     .secure(true)
                     .httpOnly(false)
-                    .path("/auth")
+                    .path("/")
                     .maxAge(12345)
-                    .sameSite("Lax")
+                    .sameSite("None")
                     .build();
             response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
 
