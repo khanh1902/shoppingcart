@@ -88,15 +88,15 @@ public class AuthController {
 //                    .sameSite("None")
 //                    .build();
 //            response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
-            Cookie cookie = new Cookie("auth_token", jwt);
-            cookie.setMaxAge(60 * 60 * 24);
-            cookie.setPath("/");
-            cookie.setHttpOnly(false);
-            cookie.setSecure(true);
-            response.addCookie(cookie);
-
-            System.out.println("Secure :" + cookie.getSecure());
-            System.out.println("httpOnly :" + cookie.isHttpOnly());
+//            Cookie cookie = new Cookie("auth_token", jwt);
+//            cookie.setMaxAge(60 * 60 * 24);
+//            cookie.setPath("/");
+//            cookie.setHttpOnly(false);
+//            cookie.setSecure(true);
+//            response.addCookie(cookie);
+//
+//            System.out.println("Secure :" + cookie.getSecure());
+//            System.out.println("httpOnly :" + cookie.isHttpOnly());
 
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("ok", "Login successfully!", new JwtResponse(jwt,
@@ -164,22 +164,22 @@ public class AuthController {
         );
     }
 
-    @GetMapping("/get-me")
-    public ResponseEntity<ResponseObject> getInformation(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
-                .collect(Collectors.toList());
-        String email = userDetails.getUsername();
-        User user = userService.findByEmail(email);
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("ok", "Login successfully!", new UserResponse(
-                        user.getId(),
-                        user.getEmail(),
-                        user.getFullName(),
-                        roles))
-        );
-    }
+//    @GetMapping("/get-me")
+//    public ResponseEntity<ResponseObject> getInformation(){
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+//        List<String> roles = userDetails.getAuthorities().stream()
+//                .map(item -> item.getAuthority())
+//                .collect(Collectors.toList());
+//        String email = userDetails.getUsername();
+//        User user = userService.findByEmail(email);
+//        return ResponseEntity.status(HttpStatus.OK).body(
+//                new ResponseObject("ok", "Login successfully!", new UserResponse(
+//                        user.getId(),
+//                        user.getEmail(),
+//                        user.getFullName(),
+//                        roles))
+//        );
+//    }
 
 }
