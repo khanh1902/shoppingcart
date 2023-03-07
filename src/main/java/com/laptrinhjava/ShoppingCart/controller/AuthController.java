@@ -11,7 +11,9 @@ import com.laptrinhjava.ShoppingCart.service.ICartService;
 import com.laptrinhjava.ShoppingCart.service.IRoleService;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -82,21 +84,30 @@ public class AuthController {
                     .map(item -> item.getAuthority())
                     .collect(Collectors.toList());
 
-//            final ResponseCookie responseCookie = ResponseCookie
-//                    .from("auth_token", jwt)
-//                    .sameSite("None")
-//                    .build();
-//            response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
-            Cookie cookie = new Cookie("auth_token", jwt);
-            cookie.setMaxAge(60 * 60 * 24);
-            cookie.setPath("/");
-            cookie.setHttpOnly(false);
-            cookie.setSecure(true);
-            response.addCookie(cookie);
-            response.setHeader("Set-Cookie", "key=value; HttpOnly; SameSite=none");
+////            final ResponseCookie responseCookie = ResponseCookie
+////                    .from("auth_token", jwt)
+////                    .sameSite("None")
+////                    .build();
+////            response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
+//            Cookie cookie = new Cookie("auth_token", jwt);
+//            cookie.setMaxAge(60 * 60 * 24);
+//            cookie.setPath("/");
+//            cookie.setHttpOnly(false);
+//            cookie.setSecure(true);
+//            response.addCookie(cookie);
+//            response.setHeader("Set-Cookie", "key=value; HttpOnly; SameSite=none");
+            final ResponseCookie responseCookie = ResponseCookie
+                    .from("auth_token", jwt)
+                    .secure(true)
+                    .httpOnly(false)
+                    .path("/auth")
+                    .maxAge(12345)
+                    .sameSite("Lax")
+                    .build();
+            response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
 
-            System.out.println("Secure :" + cookie.getSecure());
-            System.out.println("httpOnly :" + cookie.isHttpOnly());
+//            System.out.println("Secure :" + cookie.getSecure());
+//            System.out.println("httpOnly :" + cookie.isHttpOnly());
 
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("ok", "Login successfully!", new JwtResponse(jwt,

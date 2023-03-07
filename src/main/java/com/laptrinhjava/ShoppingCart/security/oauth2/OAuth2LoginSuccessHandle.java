@@ -45,7 +45,6 @@ public class OAuth2LoginSuccessHandle extends SimpleUrlAuthenticationSuccessHand
         cookie.setPath("/");
 
         response.addCookie(cookie);
-        response.setHeader("Set-Cookie", "key=value; HttpOnly; SameSite=none");
 
         getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000");
 
