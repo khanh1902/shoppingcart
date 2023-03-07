@@ -86,7 +86,7 @@ public class AuthController {
 
             final ResponseCookie responseCookie = ResponseCookie
                     .from("auth_token", jwt)
-                    .secure(true)
+                    .secure(false)
                     .httpOnly(false)
                     .path("/")
                     .maxAge(24 * 60 * 60)
