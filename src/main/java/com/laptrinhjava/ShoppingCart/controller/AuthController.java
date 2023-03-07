@@ -83,17 +83,20 @@ public class AuthController {
                     .map(item -> item.getAuthority())
                     .collect(Collectors.toList());
 
-            final ResponseCookie responseCookie = ResponseCookie
-                    .from("auth_token", jwt)
-                    .sameSite("None")
-                    .build();
-            response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
+//            final ResponseCookie responseCookie = ResponseCookie
+//                    .from("auth_token", jwt)
+//                    .sameSite("None")
+//                    .build();
+//            response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
             Cookie cookie = new Cookie("auth_token", jwt);
             cookie.setMaxAge(60 * 60 * 24);
             cookie.setPath("/");
             cookie.setHttpOnly(false);
             cookie.setSecure(true);
             response.addCookie(cookie);
+
+            System.out.println("Secure :" + cookie.getSecure());
+            System.out.println("httpOnly :" + cookie.isHttpOnly());
 
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("ok", "Login successfully!", new JwtResponse(jwt,
