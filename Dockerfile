@@ -10,6 +10,6 @@ RUN mvn clean package
 #
 FROM openjdk:17-slim
 COPY --from=build /target/ShoppingCart-0.0.1-SNAPSHOT.jar ShoppingCart.jar
-# ENV PORT=8080
+ENV PORT=8080
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","ShoppingCart.jar"]
