@@ -5,6 +5,8 @@ import com.laptrinhjava.ShoppingCart.security.jwt.JwtUtils;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
 import org.apache.http.protocol.HttpService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -40,11 +42,15 @@ public class OAuth2LoginSuccessHandle extends SimpleUrlAuthenticationSuccessHand
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
-        Cookie cookie = new Cookie("auth_token", jwtUtils.generateTokenForOAuth2(user));
-        cookie.setMaxAge(60 * 60 * 24);
-        cookie.setPath("/");
-
-        response.addCookie(cookie);
+        final ResponseCookie responseCookie = ResponseCookie
+                .from("auth_token", jwt)
+                .secure(true)
+                .httpOnly(false)
+                .path("/")
+                .maxAge(12345)
+                .sameSite("None")
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
 
         getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000");
 

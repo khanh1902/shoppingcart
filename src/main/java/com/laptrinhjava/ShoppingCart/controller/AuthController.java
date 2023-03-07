@@ -106,8 +106,7 @@ public class AuthController {
                     .build();
             response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
 
-//            System.out.println("Secure :" + cookie.getSecure());
-//            System.out.println("httpOnly :" + cookie.isHttpOnly());
+            System.out.println(responseCookie);
 
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("ok", "Login successfully!", new JwtResponse(jwt,
