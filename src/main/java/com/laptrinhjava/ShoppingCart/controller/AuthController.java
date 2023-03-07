@@ -84,24 +84,12 @@ public class AuthController {
                     .map(item -> item.getAuthority())
                     .collect(Collectors.toList());
 
-////            final ResponseCookie responseCookie = ResponseCookie
-////                    .from("auth_token", jwt)
-////                    .sameSite("None")
-////                    .build();
-////            response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
-//            Cookie cookie = new Cookie("auth_token", jwt);
-//            cookie.setMaxAge(60 * 60 * 24);
-//            cookie.setPath("/");
-//            cookie.setHttpOnly(false);
-//            cookie.setSecure(true);
-//            response.addCookie(cookie);
-//            response.setHeader("Set-Cookie", "key=value; HttpOnly; SameSite=none");
             final ResponseCookie responseCookie = ResponseCookie
                     .from("auth_token", jwt)
                     .secure(true)
                     .httpOnly(false)
                     .path("/")
-                    .maxAge(12345)
+                    .maxAge(24 * 60 * 60)
                     .sameSite("None")
                     .build();
             response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());

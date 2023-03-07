@@ -47,7 +47,7 @@ public class OAuth2LoginSuccessHandle extends SimpleUrlAuthenticationSuccessHand
                 .secure(true)
                 .httpOnly(false)
                 .path("/")
-                .maxAge(12345)
+                .maxAge(24 * 60 * 60)
                 .sameSite("None")
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
