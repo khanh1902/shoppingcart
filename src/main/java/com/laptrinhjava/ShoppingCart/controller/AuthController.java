@@ -87,7 +87,7 @@ public class AuthController {
                     .httpOnly(false)
                     .secure(true)
                     .path("/")
-                    .maxAge(60 * 60 * 24) //24h
+                    .maxAge(60 * 60 * 24)
                     .sameSite("None")
                     .build();
 
