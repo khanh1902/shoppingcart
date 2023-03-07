@@ -3,6 +3,7 @@ package com.laptrinhjava.ShoppingCart.security.oauth2;
 import com.laptrinhjava.ShoppingCart.entity.User;
 import com.laptrinhjava.ShoppingCart.security.jwt.JwtUtils;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
+import org.apache.http.protocol.HttpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -13,6 +14,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,7 +43,10 @@ public class OAuth2LoginSuccessHandle extends SimpleUrlAuthenticationSuccessHand
         Cookie cookie = new Cookie("auth_token", jwtUtils.generateTokenForOAuth2(user));
         cookie.setMaxAge(60 * 60 * 24);
         cookie.setPath("/");
+
         response.addCookie(cookie);
+        response.setHeader("Set-Cookie", "key=value; HttpOnly; SameSite=none");
+
         getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000");
 
 

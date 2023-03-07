@@ -93,6 +93,7 @@ public class AuthController {
             cookie.setHttpOnly(false);
             cookie.setSecure(true);
             response.addCookie(cookie);
+            response.setHeader("Set-Cookie", "key=value; HttpOnly; SameSite=none");
 
             System.out.println("Secure :" + cookie.getSecure());
             System.out.println("httpOnly :" + cookie.isHttpOnly());
