@@ -83,15 +83,15 @@ public class AuthController {
                     .map(item -> item.getAuthority())
                     .collect(Collectors.toList());
 
-            final ResponseCookie responseCookie = ResponseCookie
-                    .from("auth_token", jwt)
-                    .secure(true)
-                    .httpOnly(false)
-                    .path("/")
-                    .maxAge(60 * 60 * 24)
-                    .sameSite("None")
-                    .build();
-            response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
+//            final ResponseCookie responseCookie = ResponseCookie
+//                    .from("auth_token", jwt)
+//                    .secure(true)
+//                    .httpOnly(false)
+//                    .path("/")
+//                    .maxAge(60 * 60 * 24)
+//                    .sameSite("None")
+//                    .build();
+//            response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
 
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("ok", "Login successfully!", new JwtResponse(jwt,
