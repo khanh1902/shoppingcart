@@ -84,23 +84,11 @@ public class AuthController {
                     .sameSite("None")
                     .secure(true)
                     .path("/")
-                    .domain("localhost:3000")
                     .maxAge(24 * 60 * 60)
                     .build();
             response.addHeader("Set-Cookie", resCookie.toString());
-            System.out.println(resCookie);
 
-//            Cookie cookie = new Cookie("auth_token", jwt);
-//            cookie.setMaxAge(24 * 60 * 60);
-//            cookie.setPath("/");
-//            cookie.setSecure(true);
-//            cookie.setHttpOnly(true);
-//            response.addCookie(cookie);
-            if (response == null) {
-                ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject("ok", "failed", null
-                        ));
-            }
+            System.out.println(resCookie);
 
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("ok", "Login successfully!", new JwtResponse(jwt,
