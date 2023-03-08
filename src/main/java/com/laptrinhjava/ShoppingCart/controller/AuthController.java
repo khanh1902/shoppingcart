@@ -84,7 +84,7 @@ public class AuthController {
                     .sameSite("None")
                     .secure(true)
                     .path("/")
-                    .domain("minimogshop.vercel.app")
+                    .domain("shopping-cart-demo.herokuapp.com")
                     .maxAge(24 * 60 * 60)
                     .build();
             response.addHeader("Set-Cookie", resCookie.toString());
