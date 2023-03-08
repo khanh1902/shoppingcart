@@ -84,7 +84,7 @@ public class AuthController {
                     .sameSite("None")
                     .secure(true)
                     .path("/")
-                    .domain("shopping-cart-demo.herokuapp.com")
+                    .domain("localhost:3000")
                     .maxAge(24 * 60 * 60)
                     .build();
             response.addHeader("Set-Cookie", resCookie.toString());
