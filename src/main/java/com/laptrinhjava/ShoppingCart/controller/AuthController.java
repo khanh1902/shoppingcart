@@ -54,7 +54,6 @@ public class AuthController {
 
     // đăng nhập
     @PostMapping("/signin")
-    @CrossOrigin(allowCredentials = "true")
     public ResponseEntity<ResponseObject> authenticateUser(@Valid @RequestBody SigninRequest loginRequest, HttpServletResponse response) {
 
         User findUser = userService.findByEmail(loginRequest.getEmail());
