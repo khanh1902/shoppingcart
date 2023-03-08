@@ -87,6 +87,7 @@ public class AuthController {
                     .maxAge(24 * 60 * 60)
                     .build();
             response.addHeader("Set-Cookie", resCookie.toString());
+            System.out.println(resCookie);
 
 //            Cookie cookie = new Cookie("auth_token", jwt);
 //            cookie.setMaxAge(24 * 60 * 60);
