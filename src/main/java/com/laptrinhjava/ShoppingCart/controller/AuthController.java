@@ -79,13 +79,13 @@ public class AuthController {
                     .map(item -> item.getAuthority())
                     .collect(Collectors.toList());
 
-             ResponseCookie resCookie = ResponseCookie.from("au_token", jwt)
-            .httpOnly(true)
-            .sameSite("None")
-            .secure(true)
-            .path("/")
-            .maxAge(24 * 60 * 60)
-            .build();
+            ResponseCookie resCookie = ResponseCookie.from("auth_token", jwt)
+                    .httpOnly(true)
+                    .sameSite("None")
+                    .secure(true)
+                    .path("/")
+                    .maxAge(24 * 60 * 60)
+                    .build();
             response.addHeader("Set-Cookie", resCookie.toString());
 
 //            Cookie cookie = new Cookie("auth_token", jwt);
@@ -94,10 +94,10 @@ public class AuthController {
 //            cookie.setSecure(true);
 //            cookie.setHttpOnly(true);
 //            response.addCookie(cookie);
-            if(response == null){
+            if (response == null) {
                 ResponseEntity.status(HttpStatus.OK).body(
                         new ResponseObject("ok", "failed", null
-                ));
+                        ));
             }
 
             return ResponseEntity.status(HttpStatus.OK).body(
