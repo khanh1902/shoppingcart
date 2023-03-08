@@ -84,6 +84,7 @@ public class AuthController {
                     .sameSite("None")
                     .secure(true)
                     .path("/")
+                    .domain("https://minimogshop.vercel.app")
                     .maxAge(24 * 60 * 60)
                     .build();
             response.addHeader("Set-Cookie", resCookie.toString());
