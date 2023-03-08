@@ -54,20 +54,18 @@ public class AuthController {
 
     // đăng nhập
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody SigninRequest loginRequest, HttpServletResponse response) {
+    public ResponseEntity<ResponseObject> authenticateUser(@Valid @RequestBody SigninRequest loginRequest, HttpServletResponse response) {
 
         User findUser = userService.findByEmail(loginRequest.getEmail());
         if (findUser == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     new ResponseObject("failed", "Email not exists!", null
                     ));
-        }
-        else if (!encoder.matches(loginRequest.getPassword(), findUser.getPassword())){
+        } else if (!encoder.matches(loginRequest.getPassword(), findUser.getPassword())) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
                     new ResponseObject("failed", "Password not match!", null)
             );
-        }
-        else {
+        } else {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
@@ -81,17 +79,26 @@ public class AuthController {
                     .map(item -> item.getAuthority())
                     .collect(Collectors.toList());
 
-            final ResponseCookie responseCookie = ResponseCookie
-                    .from("auth_token", jwt)
-                    .secure(true)
-                    .httpOnly(true)
-                    .path("/")
-                    .maxAge(24 * 60 * 60)
-                    .sameSite("None")
-                    .build();
-            response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
+             ResponseCookie resCookie = ResponseCookie.from("au_token", jwt)
+            .httpOnly(true)
+            .sameSite("None")
+            .secure(true)
+            .path("/")
+            .maxAge(24 * 60 * 60)
+            .build();
+            response.addHeader("Set-Cookie", resCookie.toString());
 
-            System.out.println(responseCookie);
+//            Cookie cookie = new Cookie("auth_token", jwt);
+//            cookie.setMaxAge(24 * 60 * 60);
+//            cookie.setPath("/");
+//            cookie.setSecure(true);
+//            cookie.setHttpOnly(true);
+//            response.addCookie(cookie);
+            if(response == null){
+                ResponseEntity.status(HttpStatus.OK).body(
+                        new ResponseObject("ok", "failed", null
+                ));
+            }
 
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("ok", "Login successfully!", new JwtResponse(jwt,
@@ -100,6 +107,8 @@ public class AuthController {
                             user.getEmail(),
                             roles))
             );
+
+
         }
     }
 
@@ -158,5 +167,4 @@ public class AuthController {
                 new ResponseObject("ok", "User registered successfully!", " ")
         );
     }
-
 }

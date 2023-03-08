@@ -16,4 +16,5 @@ public class ResponseObject {
         this.message = message;
         this.data = data;
     }
+
 }
