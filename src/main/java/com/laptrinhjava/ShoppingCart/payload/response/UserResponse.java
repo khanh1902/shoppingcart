@@ -1,6 +1,5 @@
 package com.laptrinhjava.ShoppingCart.payload.response;
 
-import com.laptrinhjava.ShoppingCart.entity.Role;
 import lombok.Getter;
 import lombok.Setter;
 
