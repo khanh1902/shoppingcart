@@ -20,10 +20,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.session.web.http.DefaultCookieSerializer;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashSet;
@@ -89,7 +90,25 @@ public class AuthController {
                     .build();
             response.addHeader("Set-Cookie", resCookie.toString());
 
-            System.out.println(resCookie);
+//            DefaultCookieSerializer defaultCookieSerializer = new DefaultCookieSerializer();
+//            defaultCookieSerializer.setCookieName("CUSTOMSESSIONID");
+//            defaultCookieSerializer.setUseHttpOnlyCookie(true);
+//            defaultCookieSerializer.setCookiePath("/");
+//            defaultCookieSerializer.setUseSecureCookie(true);
+//            defaultCookieSerializer.setSameSite("None");
+////            CookieHttpSessionStrategy cookieHttpSessionStrategy = new CookieHttpSessionStrategy();
+////            cookieHttpSessionStrategy.setCookieSerializer(cookieSerializer);
+
+//            System.out.println(defaultCookieSerializer);
+//            Cookie[] cookies = request.getCookies();
+//            for (Cookie cookie : cookies){
+//                if (cookie.getName().equals("JSESSIONID")){
+//                    cookie.setHttpOnly(true);
+//                    cookie.setSecure(true);
+//                    cookie.setPath("/");
+//                    response.addCookie(cookie);
+//                }
+//            }
 
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("ok", "Login successfully!", new JwtResponse(jwt,
