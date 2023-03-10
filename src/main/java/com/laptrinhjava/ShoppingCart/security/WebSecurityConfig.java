@@ -85,26 +85,26 @@ public class WebSecurityConfig {
         http.cors().and().csrf().disable()
                 .authorizeRequests().antMatchers("/api/auth/**", "/login").permitAll()
                 .antMatchers("/api/**").permitAll()
-                .anyRequest().authenticated()
-                .and()
+                .anyRequest().authenticated();
+//                .and()
 
-                .oauth2Login()
-                .authorizationEndpoint()
-                    .baseUri("/oauth2/authorize")
-                    .and()
-
-                .redirectionEndpoint()
-                    .baseUri("/oauth2/callback/*")
-                    .and()
-
-                .userInfoEndpoint()
-                    .userService(oauthUserService)
-                    .and()
-
-                .successHandler(oAuth2LoginSuccessHandle)
-                .failureHandler(auth2AuthenticationFailureHandler).and()
-                .exceptionHandling()
-                    .defaultAuthenticationEntryPointFor(new CustomOAuth2AuthenticationEntryPoint(), new AntPathRequestMatcher("/oauth2/**"));
+//                .oauth2Login()
+//                .authorizationEndpoint()
+//                    .baseUri("/oauth2/authorize")
+//                    .and()
+//
+//                .redirectionEndpoint()
+//                    .baseUri("/oauth2/callback/*")
+//                    .and()
+//
+//                .userInfoEndpoint()
+//                    .userService(oauthUserService)
+//                    .and()
+//
+//                .successHandler(oAuth2LoginSuccessHandle)
+//                .failureHandler(auth2AuthenticationFailureHandler).and()
+//                .exceptionHandling()
+//                    .defaultAuthenticationEntryPointFor(new CustomOAuth2AuthenticationEntryPoint(), new AntPathRequestMatcher("/oauth2/**"));
 
         http
                 .logout(l -> l

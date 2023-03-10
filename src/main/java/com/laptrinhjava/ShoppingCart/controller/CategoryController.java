@@ -24,27 +24,33 @@ public class CategoryController {
 
     /**
      * Method: Find All Category
-     * **/
+     **/
     @GetMapping()
-    public List<Category> findAll(){
+    public List<Category> findAll() {
         return categoryService.findAll();
     }
 
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseObject> save (@RequestParam("name") String name,
-                                                @RequestParam("code") String code,
-                                                @RequestParam("file")MultipartFile[] files){
-        StringBuilder imageUrl = new StringBuilder();
-        for(MultipartFile file : files){
-            String url = amazonClient.uploadFile(file);
-            imageUrl.append(url + ", "); // ngan cach cac imageUrl bang dau phay
-        }
+    public ResponseEntity<ResponseObject> save(@RequestParam("name") String name,
+                                               @RequestParam("code") String code,
+                                               @RequestParam("file") MultipartFile[] files) {
+        try {
+            StringBuilder imageUrl = new StringBuilder();
+            for (MultipartFile file : files) {
+                String url = amazonClient.uploadFile(file);
+                imageUrl.append(url + " "); // ngan cach cac imageUrl bang dau phay
+            }
 
-        Category category = new Category(name, code, imageUrl.toString());
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("OK", "Save Successfully!", categoryService.save(category))
-        );
+            Category category = new Category(name, code, imageUrl.toString());
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("OK", "Save Successfully!", categoryService.save(category))
+            );
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("FAILED", "Error!", e.getMessage())
+            );
+        }
     }
 
 
