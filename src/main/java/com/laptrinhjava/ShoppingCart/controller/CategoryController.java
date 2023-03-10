@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.ws.rs.Consumes;
 import java.util.List;
 
 @RestController
@@ -26,12 +27,21 @@ public class CategoryController {
      * Method: Find All Category
      **/
     @GetMapping()
-    public List<Category> findAll() {
-        return categoryService.findAll();
+    public ResponseEntity<ResponseObject> findAll() {
+        List<Category> findAll = categoryService.findAll();
+        if (findAll.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    new ResponseObject("FAILED", "Is Empty!", null)
+            );
+        } else
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("OK", "Successfully!", findAll)
+            );
     }
 
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN')")
+    @Consumes("multipart/form-data")
     public ResponseEntity<ResponseObject> save(@RequestParam("name") String name,
                                                @RequestParam("code") String code,
                                                @RequestParam("file") MultipartFile[] files) {
@@ -46,7 +56,7 @@ public class CategoryController {
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("OK", "Save Successfully!", categoryService.save(category))
             );
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("FAILED", "Error!", e.getMessage())
             );
