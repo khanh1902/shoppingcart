@@ -42,9 +42,9 @@ public class CategoryController {
 //            );
 //    }
     @GetMapping
-    public ResponseEntity<ResponseObject> findAll(@RequestParam(name = "offset") Integer offset,
-                                                  @RequestParam(name = "limit") Integer limit,
-                                                  @RequestParam(name = "sortBy") String sortBy) {
+    public ResponseEntity<ResponseObject> findAll(@RequestParam(required = false, name = "offset", defaultValue = "0") Integer offset,
+                                                  @RequestParam(required = false, name = "limit", defaultValue = "5") Integer limit,
+                                                  @RequestParam(required = false, name = "sortBy", defaultValue = "id") String sortBy) {
         Page<Category> categoryList = categoryService.findAllCategories(offset, limit, sortBy);
         Map<String, Object> response = new HashMap<>();
         response.put("categories", categoryList);
