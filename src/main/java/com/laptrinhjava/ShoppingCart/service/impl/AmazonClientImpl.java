@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class AmazonClientImpl implements IAmazonClient {
@@ -98,7 +99,7 @@ public class AmazonClientImpl implements IAmazonClient {
 //    }
     public ArrayList<String> split (String imageUrl){
         ArrayList<String> fileNames = new ArrayList<>(); // luu danh sach key sau khi tach chuoi
-        String[] str = imageUrl.split(", " ); // tach rieng tung url
+        String[] str = imageUrl.split("," ); // tach rieng tung url
         for(String s : str){
             String[] fileName = s.split("/"); // lay key cua tung chuoi sau khi tach
             fileNames.add(fileName[fileName.length -1]);

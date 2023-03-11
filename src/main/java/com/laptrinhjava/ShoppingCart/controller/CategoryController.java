@@ -102,13 +102,6 @@ public class CategoryController {
                                                          @RequestParam(required = false, name = "file") Optional<MultipartFile[]> files,
                                                          @PathVariable Long id) {
         StringBuilder imageUrl = new StringBuilder();
-//            if(files.isPresent()) {
-//
-//                for (MultipartFile file : files) {
-//                    String url = amazonClient.uploadFile(file);
-//                    imageUrl.append(url + ","); // ngan cach cac imageUrl bang dau phay
-//                }
-//            }
         for (MultipartFile file : files.orElse(new MultipartFile[0])) {
             String url = amazonClient.uploadFile(file);
                     imageUrl.append(url + " "); // ngan cach cac imageUrl bang dau phay
@@ -122,19 +115,22 @@ public class CategoryController {
 
     @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseObject> deleteCategory(@RequestParam Long[] ids) {
-        for (Long id : ids) {
-            if (categoryService.findCategoryById(id) != null) {
-                categoryService.delete(id);
+    public ResponseEntity<ResponseObject> delete(@RequestParam(name = "ids") List<Long> ids) {
+        try {
+            for (Long id : ids) {
+                Category findCategory = categoryService.findCategoryById(id);
+                if (findCategory != null) {
+//                    amazonClient.deleteFile(findCategory.getImageUrl());
+                    categoryService.delete(id);
+                }
             }
-//            } else {
-//                return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-//                        new ResponseObject("Failed", "Category Not Found!", "")
-//                );
-//            }
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("OK", "Delete Successfully!", "")
+            );
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+                    new ResponseObject("Failed", "Error!", e.getMessage() )
+            );
         }
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("OK", "Delete Successfully!", "")
-        );
     }
 }
