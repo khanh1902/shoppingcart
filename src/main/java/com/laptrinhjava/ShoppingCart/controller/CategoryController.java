@@ -16,6 +16,7 @@ import javax.ws.rs.Consumes;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/category")
@@ -27,20 +28,8 @@ public class CategoryController {
     private IAmazonClient amazonClient;
 
     /**
-     * Method: Find All Category
+     * Method: Find All Category with sort and paging
      **/
-//    @GetMapping()
-//    public ResponseEntity<ResponseObject> findAll() {
-//        List<Category> findAll = categoryService.findAll();
-//        if (findAll.isEmpty()) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-//                    new ResponseObject("FAILED", "Is Empty!", null)
-//            );
-//        } else
-//            return ResponseEntity.status(HttpStatus.OK).body(
-//                    new ResponseObject("OK", "Successfully!", findAll)
-//            );
-//    }
     @GetMapping
     public ResponseEntity<ResponseObject> findAll(@RequestParam(required = false, name = "offset", defaultValue = "0") Integer offset,
                                                   @RequestParam(required = false, name = "limit", defaultValue = "5") Integer limit,
@@ -77,12 +66,15 @@ public class CategoryController {
         }
     }
 
+//    @GetMapping("/filter")
+//    public ResponseEntity<ResponseObject> filter (@RequestBody )
+
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Consumes("multipart/form-data")
-    public ResponseEntity<ResponseObject> save(@RequestParam("name") String name,
-                                               @RequestParam("code") String code,
-                                               @RequestParam("file") MultipartFile[] files) {
+    public ResponseEntity<ResponseObject> save(@RequestParam(required = false, name = "name") String name,
+                                               @RequestParam(required = false, name = "code") String code,
+                                               @RequestParam(required = false, name = "file") MultipartFile[] files) {
         try {
             StringBuilder imageUrl = new StringBuilder();
             for (MultipartFile file : files) {
@@ -105,17 +97,24 @@ public class CategoryController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Consumes("multipart/form-data")
-    public ResponseEntity<ResponseObject> updateCategory(@RequestParam("name") String name,
-                                                         @RequestParam("code") String code,
-                                                         @RequestParam("file") MultipartFile[] files,
+    public ResponseEntity<ResponseObject> updateCategory(@RequestParam(required = false, name = "name") String name,
+                                                         @RequestParam(required = false, name = "code") String code,
+                                                         @RequestParam(required = false, name = "file") Optional<MultipartFile[]> files,
                                                          @PathVariable Long id) {
-            StringBuilder imageUrl = new StringBuilder();
-            for (MultipartFile file : files) {
-                String url = amazonClient.uploadFile(file);
-                imageUrl.append(url + ","); // ngan cach cac imageUrl bang dau phay
-            }
+        StringBuilder imageUrl = new StringBuilder();
+//            if(files.isPresent()) {
+//
+//                for (MultipartFile file : files) {
+//                    String url = amazonClient.uploadFile(file);
+//                    imageUrl.append(url + ","); // ngan cach cac imageUrl bang dau phay
+//                }
+//            }
+        for (MultipartFile file : files.orElse(new MultipartFile[0])) {
+            String url = amazonClient.uploadFile(file);
+                    imageUrl.append(url + " "); // ngan cach cac imageUrl bang dau phay
+        }
 
-            Category newCategory = new Category(name, code, imageUrl.toString());
+        Category newCategory = new Category(name, code, imageUrl.toString());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("OK", "Update Successfully!", categoryService.update(newCategory, id))
         );
@@ -124,7 +123,7 @@ public class CategoryController {
     @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> deleteCategory(@RequestParam Long[] ids) {
-        for(Long id : ids){
+        for (Long id : ids) {
             if (categoryService.findCategoryById(id) != null) {
                 categoryService.delete(id);
             }

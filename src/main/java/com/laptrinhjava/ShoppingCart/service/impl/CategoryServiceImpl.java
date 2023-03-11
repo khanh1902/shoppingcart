@@ -42,14 +42,14 @@ public class CategoryServiceImpl implements ICategoryService {
 
         Category category = categoryRepository.findCategoryById(id);
         if (category != null) {
-            if (!newCategory.getName().isEmpty()) category.setName(category.getName());
-            else category.setName(newCategory.getName());
+            if (!newCategory.getName().isEmpty()) category.setName(newCategory.getName());
+            else category.setName(category.getName());
 
-            if (!newCategory.getCode().isEmpty()) category.setCode(category.getCode());
-            else category.setCode(newCategory.getCode());
+            if (!newCategory.getCode().isEmpty()) category.setCode(newCategory.getCode());
+            else category.setCode(category.getCode());
 
-            if (!newCategory.getImageUrl().isEmpty()) category.setImageUrl(category.getImageUrl());
-            else category.setImageUrl(newCategory.getImageUrl());
+            if (!newCategory.getImageUrl().isEmpty()) category.setImageUrl(newCategory.getImageUrl());
+            else category.setImageUrl(category.getImageUrl());
 
             categoryRepository.save(category);
         } else {
@@ -73,7 +73,7 @@ public class CategoryServiceImpl implements ICategoryService {
     @Override
     public Page<Category> searchWithFilter(Integer offset, Integer limit, String sortBy, String name) {
         Pageable paging = PageRequest.of(offset, limit, Sort.by(sortBy).descending());
-        Page<Category> pagedResult = categoryRepository.findByNameContaining(name, paging);
+        Page<Category> pagedResult = categoryRepository.findByNameContainingIgnoreCase(name, paging);
         if (pagedResult.hasContent()) {
             return pagedResult;
         }
