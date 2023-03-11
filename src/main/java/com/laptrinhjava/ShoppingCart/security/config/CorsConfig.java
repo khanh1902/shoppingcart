@@ -1,4 +1,4 @@
-package com.laptrinhjava.ShoppingCart.security.oauth2;
+package com.laptrinhjava.ShoppingCart.security.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

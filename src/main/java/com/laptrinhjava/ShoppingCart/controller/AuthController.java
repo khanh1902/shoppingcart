@@ -90,26 +90,6 @@ public class AuthController {
                     .build();
             response.addHeader("Set-Cookie", resCookie.toString());
 
-//            DefaultCookieSerializer defaultCookieSerializer = new DefaultCookieSerializer();
-//            defaultCookieSerializer.setCookieName("CUSTOMSESSIONID");
-//            defaultCookieSerializer.setUseHttpOnlyCookie(true);
-//            defaultCookieSerializer.setCookiePath("/");
-//            defaultCookieSerializer.setUseSecureCookie(true);
-//            defaultCookieSerializer.setSameSite("None");
-////            CookieHttpSessionStrategy cookieHttpSessionStrategy = new CookieHttpSessionStrategy();
-////            cookieHttpSessionStrategy.setCookieSerializer(cookieSerializer);
-
-//            System.out.println(defaultCookieSerializer);
-//            Cookie[] cookies = request.getCookies();
-//            for (Cookie cookie : cookies){
-//                if (cookie.getName().equals("JSESSIONID")){
-//                    cookie.setHttpOnly(true);
-//                    cookie.setSecure(true);
-//                    cookie.setPath("/");
-//                    response.addCookie(cookie);
-//                }
-//            }
-
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("ok", "Login successfully!", new JwtResponse(jwt,
                             userDetails.getId(),
@@ -156,9 +136,7 @@ public class AuthController {
                     Role userRole = roleService.findByName(ERole.ROLE_USER)
                             .orElseThrow(() -> new RuntimeException("Role is not found!"));
                     roles.add(userRole);
-
                 }
-
             });
         }
 

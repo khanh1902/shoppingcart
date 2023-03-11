@@ -4,10 +4,13 @@ import com.laptrinhjava.ShoppingCart.entity.Category;
 import com.laptrinhjava.ShoppingCart.reponsitory.ICategoryRepository;
 import com.laptrinhjava.ShoppingCart.service.ICategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class CategoryServiceImpl implements ICategoryService {
@@ -36,16 +39,44 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     public Category update(Category newCategory, Long id) {
-        return categoryRepository.findById(id).map(
-                category -> {
-                    category.setCode(newCategory.getCode());
-                    category.setName(newCategory.getName());
-                    category.setCreatedDate(new Date());
-                    return categoryRepository.save(category);
-                }).orElseGet(() -> {
-                    newCategory.setId(id);
-                    return categoryRepository.save(newCategory);
-                }
-        );
+
+        Category category = categoryRepository.findCategoryById(id);
+        if (category != null) {
+            if (!newCategory.getName().isEmpty()) category.setName(category.getName());
+            else category.setName(newCategory.getName());
+
+            if (!newCategory.getCode().isEmpty()) category.setCode(category.getCode());
+            else category.setCode(newCategory.getCode());
+
+            if (!newCategory.getImageUrl().isEmpty()) category.setImageUrl(category.getImageUrl());
+            else category.setImageUrl(newCategory.getImageUrl());
+
+            categoryRepository.save(category);
+        } else {
+            newCategory.setId(id);
+            categoryRepository.save(newCategory);
+        }
+        return categoryRepository.findCategoryById(id);
+    }
+
+    @Override
+    public Page<Category> findAllCategories(Integer offset, Integer limit, String sortBy) {
+        Pageable paging = PageRequest.of(offset, limit, Sort.by(sortBy).descending()); // sort giảm dần
+
+        Page<Category> pagedResult = categoryRepository.findAll(paging);
+        if (pagedResult.hasContent()) {
+            return pagedResult;
+        } else
+            return null;
+    }
+
+    @Override
+    public Page<Category> searchWithFilter(Integer offset, Integer limit, String sortBy, String name) {
+        Pageable paging = PageRequest.of(offset, limit, Sort.by(sortBy).descending());
+        Page<Category> pagedResult = categoryRepository.findByNameContaining(name, paging);
+        if (pagedResult.hasContent()) {
+            return pagedResult;
+        }
+        return null;
     }
 }

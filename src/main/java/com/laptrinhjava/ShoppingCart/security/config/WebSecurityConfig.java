@@ -1,4 +1,4 @@
-package com.laptrinhjava.ShoppingCart.security;
+package com.laptrinhjava.ShoppingCart.security.config;
 
 import com.laptrinhjava.ShoppingCart.security.jwt.AuthEntryPointJwt;
 import com.laptrinhjava.ShoppingCart.security.jwt.AuthTokenFilter;
@@ -21,14 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.session.web.http.CookieSerializer;
 import org.springframework.session.web.http.DefaultCookieSerializer;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-
-import java.util.Arrays;
 
 @Configuration
 @EnableGlobalMethodSecurity(

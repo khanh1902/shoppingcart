@@ -54,7 +54,7 @@ public class JwtUtils {
 
     // Lấy thông tin user từ jwt
     public String getUserNameFromJwtToken(String token) {
-        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJwt(token).getBody().getSubject();
+        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
     }
 
     // xác thực jwt
