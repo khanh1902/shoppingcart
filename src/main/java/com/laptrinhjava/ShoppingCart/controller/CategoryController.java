@@ -2,8 +2,10 @@ package com.laptrinhjava.ShoppingCart.controller;
 
 import com.laptrinhjava.ShoppingCart.entity.Category;
 import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
+import com.laptrinhjava.ShoppingCart.reponsitory.ICategoryRepository;
 import com.laptrinhjava.ShoppingCart.service.IAmazonClient;
 import com.laptrinhjava.ShoppingCart.service.ICategoryService;
+import com.sun.istack.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -25,49 +27,52 @@ public class CategoryController {
     private ICategoryService categoryService;
 
     @Autowired
+    private ICategoryRepository categoryRepository;
+
+    @Autowired
     private IAmazonClient amazonClient;
+
+
+    @GetMapping("/all")
+    public ResponseEntity<ResponseObject> findAll() {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject("OK", "Successfully!", categoryRepository.findAll())
+        );
+    }
 
     /**
      * Method: Find All Category with sort and paging
      **/
+//    @GetMapping
+//    public ResponseEntity<ResponseObject> findWithPageAndSort(@RequestParam(required = false, name = "offset", defaultValue = "0") Integer offset,
+//                                                              @RequestParam(required = false, defaultValue = "100", name = "limit") Integer limit,
+//                                                              @RequestParam(required = false, name = "sortBy", defaultValue = "id") String sortBy) {
+//        Page<Category> categoryList = categoryService.findAllCategories(offset, limit, sortBy);
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("categories", categoryList);
+//        response.put("currentPage", categoryList.getNumber());
+//        response.put("totalItems", categoryList.getTotalElements());
+//        response.put("totalPages", categoryList.getTotalPages());
+//        return ResponseEntity.status(HttpStatus.OK).body(
+//                new ResponseObject("OK", "Successfully!", response)
+//        );
+//    }
     @GetMapping
-    public ResponseEntity<ResponseObject> findAll(@RequestParam(required = false, name = "offset", defaultValue = "0") Integer offset,
-                                                  @RequestParam(required = false, name = "limit", defaultValue = "5") Integer limit,
-                                                  @RequestParam(required = false, name = "sortBy", defaultValue = "id") String sortBy) {
-        Page<Category> categoryList = categoryService.findAllCategories(offset, limit, sortBy);
-        Map<String, Object> response = new HashMap<>();
-        response.put("categories", categoryList);
-        response.put("currentPage", categoryList.getNumber());
-        response.put("totalItems", categoryList.getTotalElements());
-        response.put("totalPages", categoryList.getTotalPages());
+    public ResponseEntity<ResponseObject> searchWithFilter(@RequestParam(required = false, name = "offset", defaultValue = "0") Integer offset,
+                                                           @RequestParam(required = false, name = "limit", defaultValue = "5") Integer limit,
+                                                           @RequestParam(required = false, name = "sortBy", defaultValue = "id") String sortBy,
+                                                           @RequestParam(required = false, name = "name") String name) {
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+                new ResponseObject("OK", "Save Successfully!",
+                        categoryService.findWithFilterAndPageAndSort(offset, limit, sortBy, name)));
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<ResponseObject> filter(@RequestParam(name = "name") String name) {
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("OK", "Successfully!", response)
+                new ResponseObject("OK", "Successfully!", categoryRepository.findByNameLike(name.toLowerCase()))
         );
     }
-
-    @GetMapping("/search")
-    public ResponseEntity<ResponseObject> searchWithFilter(@RequestParam(name = "offset") Integer offset,
-                                                           @RequestParam(name = "limit") Integer limit,
-                                                           @RequestParam(name = "sortBy") String sortBy,
-                                                           @RequestBody String name) {
-        try {
-            Page<Category> categoryList = categoryService.searchWithFilter(offset, limit, sortBy, name);
-            Map<String, Object> response = new HashMap<>();
-            response.put("categories", categoryList);
-            response.put("currentPage", categoryList.getNumber());
-            response.put("totalItems", categoryList.getTotalElements());
-            response.put("totalPages", categoryList.getTotalPages());
-            return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject("OK", "Successfully!", response)
-            );
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                    new ResponseObject("Failed", "Error!", e.getMessage()));
-        }
-    }
-
-//    @GetMapping("/filter")
-//    public ResponseEntity<ResponseObject> filter (@RequestBody )
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -104,7 +109,7 @@ public class CategoryController {
         StringBuilder imageUrl = new StringBuilder();
         for (MultipartFile file : files.orElse(new MultipartFile[0])) {
             String url = amazonClient.uploadFile(file);
-                    imageUrl.append(url + " "); // ngan cach cac imageUrl bang dau phay
+            imageUrl.append(url + " "); // ngan cach cac imageUrl bang dau phay
         }
 
         Category newCategory = new Category(name, code, imageUrl.toString());
@@ -120,16 +125,16 @@ public class CategoryController {
             for (Long id : ids) {
                 Category findCategory = categoryService.findCategoryById(id);
                 if (findCategory != null) {
-//                    amazonClient.deleteFile(findCategory.getImageUrl());
+                    amazonClient.deleteFile(findCategory.getImageUrl());
                     categoryService.delete(id);
                 }
             }
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject("OK", "Delete Successfully!", "")
+                    new ResponseObject("OK", "Delete Successfully!", null)
             );
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                    new ResponseObject("Failed", "Error!", e.getMessage() )
+                    new ResponseObject("Failed", "Error!", e.getMessage())
             );
         }
     }

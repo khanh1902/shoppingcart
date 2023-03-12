@@ -26,15 +26,15 @@ public class ProductController {
 
     /**
      * Method: Find All Product
-     * **/
+     **/
     @GetMapping()
-    public List<Product> findAll(){
+    public List<Product> findAll() {
         return productService.fillAll();
     }
 
     /**
      * Method: Save Product
-     * **/
+     **/
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN')")
     @Consumes("multipart/form-data")
@@ -44,9 +44,9 @@ public class ProductController {
                                                @RequestParam("categoryId") Long categoryId,
                                                @RequestParam("discountId") Long discountId) {
         StringBuffer imageUrl = new StringBuffer();
-        for(MultipartFile file : files){
+        for (MultipartFile file : files) {
             String url = amazonClient.uploadFile(file);
-            imageUrl.append(url + ", "); // ngan cach cac imageUrl bang dau phay
+            imageUrl.append(url + ","); // ngan cach cac imageUrl bang dau phay
         }
         Product product = new Product(name, price, imageUrl.toString(), categoryId, discountId);
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -56,26 +56,33 @@ public class ProductController {
 
     /**
      * Method: Delete Product
-     * **/
+     **/
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> delete(@PathVariable Long id) {
-        Product findById = productService.findProductById(id);
-        if (findById != null) {
-            productService.delete(id);
-            amazonClient.deleteFile(findById.getImageUrl());
-            return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject("OK", "Delete successfully!", "")
-            );
-        } else
+        try {
+            Product findById = productService.findProductById(id);
+            if (findById != null) {
+                amazonClient.deleteFile(findById.getImageUrl());
+                productService.delete(id);
+                return ResponseEntity.status(HttpStatus.OK).body(
+                        new ResponseObject("OK", "Delete successfully!", null)
+                );
+            } else
+                return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+                        new ResponseObject("FAILED", "Delete failed!", null)
+                );
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                    new ResponseObject("FAILED", "Delete failed!", "")
+                    new ResponseObject("Failed", "Error!", e.getMessage())
             );
+        }
+
     }
 
     /**
      * Method: Update Product
-     * **/
+     **/
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> updateProduct(@RequestParam("name") String name,
@@ -85,11 +92,11 @@ public class ProductController {
                                                         @RequestParam("discountId") Long discountId,
                                                         @PathVariable Long id) {
         Product findById = productService.findProductById(id);
-        if(findById != null) {
+        if (findById != null) {
             amazonClient.deleteFile(findById.getImageUrl());
         }
         StringBuffer imageUrl = new StringBuffer();
-        for(MultipartFile file : files){
+        for (MultipartFile file : files) {
             String url = amazonClient.uploadFile(file);
             imageUrl.append(url + ", ");
         }

@@ -1,9 +1,12 @@
 package com.laptrinhjava.ShoppingCart.service;
 
 import com.laptrinhjava.ShoppingCart.entity.Category;
+import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ICategoryService {
     List<Category> findAll();
@@ -11,6 +14,6 @@ public interface ICategoryService {
     Category findCategoryById(Long id);
     void delete(Long id);
     Category update(Category newCategory, Long id);
-    Page<Category> findAllCategories(Integer offset, Integer limit, String sortBy);
-    Page<Category> searchWithFilter(Integer offset, Integer limit, String sortBy, String name);
+    Page<Category> findWithPageAndSort(Integer offset, Integer limit, String sortBy);
+    Map<String, Object> findWithFilterAndPageAndSort (Integer offset, Integer limit, String sortBy, String name);
 }
