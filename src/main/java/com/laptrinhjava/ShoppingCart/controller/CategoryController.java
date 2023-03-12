@@ -62,8 +62,8 @@ public class CategoryController {
                                                            @RequestParam(required = false, name = "limit", defaultValue = "5") Integer limit,
                                                            @RequestParam(required = false, name = "sortBy", defaultValue = "id") String sortBy,
                                                            @RequestParam(required = false, name = "name") String name) {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                new ResponseObject("OK", "Save Successfully!",
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject("OK", "Successfully!",
                         categoryService.findWithFilterAndPageAndSort(offset, limit, sortBy, name)));
     }
 
