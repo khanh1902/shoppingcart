@@ -68,6 +68,7 @@ public class CategoryController {
     }
 
     @GetMapping("/filter")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ResponseObject> filter(@RequestParam(name = "name") String name) {
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("OK", "Successfully!", categoryRepository.findByNameLike(name.toLowerCase()))
