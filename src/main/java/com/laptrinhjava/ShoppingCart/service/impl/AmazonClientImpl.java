@@ -8,9 +8,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.laptrinhjava.ShoppingCart.service.IAmazonClient;
-import com.laptrinhjava.ShoppingCart.service.IProductService;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,12 +19,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Service
 public class AmazonClientImpl implements IAmazonClient {
-    @Autowired
-    private IProductService productService;
+//    @Autowired
+//    private IProductService productService;
 
     private AmazonS3 amazonS3;
 

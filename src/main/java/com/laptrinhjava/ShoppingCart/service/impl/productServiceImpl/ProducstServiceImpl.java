@@ -1,8 +1,8 @@
-package com.laptrinhjava.ShoppingCart.service.impl;
+package com.laptrinhjava.ShoppingCart.service.impl.productServiceImpl;
 
-import com.laptrinhjava.ShoppingCart.entity.Product;
-import com.laptrinhjava.ShoppingCart.reponsitory.IProductRepository;
-import com.laptrinhjava.ShoppingCart.service.IProductService;
+import com.laptrinhjava.ShoppingCart.entity.Products;
+import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.IProductRepository;
+import com.laptrinhjava.ShoppingCart.service.productService.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,28 +10,28 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class ProductServiceImpl implements IProductService {
+public class ProducstServiceImpl implements IProductService {
 
     @Autowired
     private IProductRepository productRepository;
 
     @Override
-    public List<Product> fillAll() {
+    public List<Products> fillAll() {
         return productRepository.findAll();
     }
 
     @Override
-    public Product save(Product product) {
+    public Products save(Products product) {
         return productRepository.save(product);
     }
 
     @Override
-    public Product findProductById(Long id) {
+    public Products findProductById(Long id) {
         return productRepository.findProductById(id);
     }
 
     @Override
-    public Product findByName(String name) {
+    public Products findByName(String name) {
         return productRepository.findByName(name);
     }
 
@@ -41,14 +41,11 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public Product update(Product newProduct, Long id) {
+    public Products update(Products newProduct, Long id) {
         return productRepository.findById(id).map(
                 product -> {
                     product.setName(newProduct.getName());
-                    product.setPrice(newProduct.getPrice());
                     product.setImageUrl(newProduct.getImageUrl());
-                    product.setCategoryId(newProduct.getCategoryId());
-                    product.setDiscountId(newProduct.getDiscountId());
                     product.setCreatedDate(new Date());
                     return productRepository.save(product);
                 }

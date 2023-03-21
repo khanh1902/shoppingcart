@@ -1,17 +1,18 @@
 package com.laptrinhjava.ShoppingCart.controller;
 
-import com.laptrinhjava.ShoppingCart.entity.*;
+import com.laptrinhjava.ShoppingCart.entity.EProvider;
+import com.laptrinhjava.ShoppingCart.entity.ERole;
+import com.laptrinhjava.ShoppingCart.entity.Role;
+import com.laptrinhjava.ShoppingCart.entity.User;
 import com.laptrinhjava.ShoppingCart.payload.request.SigninRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.SignupRequest;
 import com.laptrinhjava.ShoppingCart.payload.response.JwtResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
 import com.laptrinhjava.ShoppingCart.security.jwt.JwtUtils;
 import com.laptrinhjava.ShoppingCart.security.service.UserDetailsImpl;
-import com.laptrinhjava.ShoppingCart.service.ICartService;
 import com.laptrinhjava.ShoppingCart.service.IRoleService;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -20,11 +21,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.session.web.http.DefaultCookieSerializer;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashSet;
@@ -51,8 +52,8 @@ public class AuthController {
     @Autowired
     private JwtUtils jwtUtils;
 
-    @Autowired
-    private ICartService cartService;
+//    @Autowired
+//    private ICartService cartService;
 
     // đăng nhập
     @PostMapping("/signin")
@@ -144,12 +145,12 @@ public class AuthController {
         user.setRoles(roles);
         userService.save(user);
 
-        // tao gio hang cho user
-        user.getRoles().forEach(role -> {
-            if (role.getName().equals(ERole.ROLE_USER)) {
-                cartService.save(new Cart(user.getId(), user.getId(), null));
-            }
-        });
+//        // tao gio hang cho user
+//        user.getRoles().forEach(role -> {
+//            if (role.getName().equals(ERole.ROLE_USER)) {
+//                cartService.save(new Cart(user.getId(), user.getId(), null));
+//            }
+//        });
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("ok", "User registered successfully!", " ")

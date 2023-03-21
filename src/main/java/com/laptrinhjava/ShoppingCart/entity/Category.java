@@ -1,13 +1,15 @@
 package com.laptrinhjava.ShoppingCart.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
-@Table(name = "category")
+@Table(name = "categories")
 @Getter
 @Setter
 public class Category {
@@ -31,6 +33,10 @@ public class Category {
     private void onCreated(){
         createdDate = new Date();
     }
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    private List<Products> products;
 
     public Category() {
     }
