@@ -24,14 +24,18 @@ public class ProductVariants {
     @Column(name = "price", nullable = true)
     private Long price;
 
+    @Column(name = "quantity")
+    private Long quantity;
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "product_id") // thông qua khóa ngoại address_id
     private Products products;
 
-    public ProductVariants(String skuId, Long price, Products products) {
+    public ProductVariants(String skuId, Long price, Products products, Long quantity) {
         this.skuId = skuId;
         this.price = price;
         this.products = products;
+        this.quantity = quantity;
     }
 }

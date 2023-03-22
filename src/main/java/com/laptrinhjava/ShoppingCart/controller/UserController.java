@@ -1,6 +1,6 @@
 package com.laptrinhjava.ShoppingCart.controller;
 
-import com.laptrinhjava.ShoppingCart.entity.User;
+import com.laptrinhjava.ShoppingCart.entity.Users;
 import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
 import com.laptrinhjava.ShoppingCart.payload.response.UserResponse;
 import com.laptrinhjava.ShoppingCart.security.jwt.JwtUtils;
@@ -10,8 +10,6 @@ import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,7 +46,7 @@ public class UserController {
             List<String> roles = userDetails.getAuthorities().stream()
                     .map(item -> item.getAuthority())
                     .collect(Collectors.toList());
-            User user = userService.findByEmail(userDetails.getUsername());
+            Users user = userService.findByEmail(userDetails.getUsername());
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("ok", "Successfully!", new UserResponse(
                             user.getId(),

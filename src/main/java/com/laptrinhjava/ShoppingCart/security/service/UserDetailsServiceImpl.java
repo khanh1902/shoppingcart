@@ -1,7 +1,7 @@
 package com.laptrinhjava.ShoppingCart.security.service;
 
 
-import com.laptrinhjava.ShoppingCart.entity.User;
+import com.laptrinhjava.ShoppingCart.entity.Users;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,7 +23,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         // user not found -> get message
-        User user = userService.findEmail(email).
+        Users user = userService.findEmail(email).
                 orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
         return UserDetailsImpl.build(user);
     }

@@ -77,13 +77,11 @@ public class CategoryServiceImpl implements ICategoryService {
     @Override
     public Map<String, Object> findWithFilterAndPageAndSort(Integer offset, Integer limit, String sortBy, String name) {
         try {
-            Pageable paging = null;
+            Pageable paging = PageRequest.of(offset, limit, Sort.by(sortBy).descending());
             Page<Category> pagedResult = null;
             if (name == null) {
-                paging = PageRequest.of(offset, limit, Sort.by(sortBy).descending()); // sort giảm dần
                 pagedResult = categoryRepository.findAll(paging);
             } else {
-                paging = PageRequest.of(offset, limit, Sort.by(sortBy).descending());
                 pagedResult = categoryRepository.findByNameContainingIgnoreCase(name, paging);
             }
 

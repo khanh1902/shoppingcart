@@ -6,13 +6,14 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
-public class User {
+public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -32,6 +33,10 @@ public class User {
     private EProvider provider;
 
     @JsonIgnore
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL)
+    private List<Products> products;
+
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER)
     // quan hệ n-n với đối tượng ở dưới (Role) (1 user có nhiều quyền)
     // LAZY để tránh việc truy xuất dữ liệu không cần thiết. Lúc nào cần thì mới query
@@ -41,10 +46,10 @@ public class User {
     private Set<Role> roles = new HashSet<>();
 
     // constructor
-    public User() {
+    public Users() {
     }
 
-    public User(String password, String fullName, String email) {
+    public Users(String password, String fullName, String email) {
         this.password = password;
         this.fullName = fullName;
         this.email = email;

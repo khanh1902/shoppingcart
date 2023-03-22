@@ -1,21 +1,22 @@
 package com.laptrinhjava.ShoppingCart.controller;
 
-import com.amazonaws.services.apigateway.model.Op;
 import com.laptrinhjava.ShoppingCart.entity.*;
 import com.laptrinhjava.ShoppingCart.payload.TypeOptionsDetail;
 import com.laptrinhjava.ShoppingCart.payload.request.OptionsDetailRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.OptionsRequest;
 import com.laptrinhjava.ShoppingCart.payload.TypeOptions;
-import com.laptrinhjava.ShoppingCart.payload.response.OptionDetailResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
 import com.laptrinhjava.ShoppingCart.service.IAmazonClient;
 import com.laptrinhjava.ShoppingCart.service.ICategoryService;
-import com.laptrinhjava.ShoppingCart.service.impl.productServiceImpl.ProductVariantsService;
+import com.laptrinhjava.ShoppingCart.service.IUserService;
 import com.laptrinhjava.ShoppingCart.service.productService.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -51,13 +52,30 @@ public class ProductController {
     @Autowired
     private IOptionsService optionsService;
 
+    @Autowired
+    private IUserService userService;
+
     /**
-     * Method: Find All Product
+     * Method: Find All Product with paging, sort and filter
      **/
-//    @GetMapping()
-//    public List<Products> findAll() {
-//        return productService.fillAll();
-//    }
+    @GetMapping
+    public ResponseEntity<ResponseObject> searchWithFilter(@RequestParam(required = false, name = "offset", defaultValue = "0") Integer offset,
+                                                           @RequestParam(required = false, name = "limit", defaultValue = "5") Integer limit,
+                                                           @RequestParam(required = false, name = "sortBy", defaultValue = "id") String sortBy,
+                                                           @RequestParam(required = false, name = "name") String name) {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject("OK", "Successfully!",
+                        productService.findWithFilterAndPageAndSort(offset, limit, sortBy, name)));
+    }
+
+
+    public String getUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            return authentication.getName();
+        }
+        return null;
+    }
 
     /**
      * Method: Save Product
@@ -70,18 +88,18 @@ public class ProductController {
                                                @RequestParam("file") MultipartFile[] files,
                                                @RequestParam("categoryId") Long categoryId,
                                                @RequestParam("description") String description) {
-        StringBuffer imageUrl = new StringBuffer();
+        StringBuilder imageUrl = new StringBuilder();
         for (MultipartFile file : files) {
             String url = amazonClient.uploadFile(file);
-            imageUrl.append(url + ","); // ngan cach cac imageUrl bang dau phay
+            imageUrl.append(url).append(","); // ngan cach cac imageUrl bang dau phay
         }
 
         Category category = categoryService.findCategoryById(categoryId);
+        String email = getUsername();
+        Users user = userService.findByEmail(email);
 
         if (category != null) {
-            Products product = new Products(name, imageUrl.toString(), category, description);
-
-
+            Products product = new Products(name, imageUrl.toString(), category, description, user);
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("OK", "Save Successfully!", productService.save(product))
             );
@@ -105,15 +123,15 @@ public class ProductController {
             Products product = productService.findProductById(optionsRequests.getProductId());
 
             for (TypeOptions typeOption : optionsRequests.getOptions()) {
-                if (typeOption.getKey().equals("size")) {
-                    optionSize = optionsService.findByName(typeOption.getKey().toLowerCase());
+                if (typeOption.getKey().toUpperCase().equals("SIZE")) {
+                    optionSize = optionsService.findByName(typeOption.getKey().toUpperCase());
                     productOptionsSize = new ProductOptions();
                     ProductOptionsKey productOptionsKey = new ProductOptionsKey(product.getId(), optionSize.getId());
                     productOptionsSize.setId(productOptionsKey);
                     productOptionsService.save(productOptionsSize);
                     listSize = typeOption.getValues();
-                } else if (typeOption.getKey().equals("color")) {
-                    optionColor = optionsService.findByName(typeOption.getKey().toLowerCase());
+                } else if (typeOption.getKey().toUpperCase().equals("COLOR")) {
+                    optionColor = optionsService.findByName(typeOption.getKey().toUpperCase());
                     productOptionsColor = new ProductOptions();
                     ProductOptionsKey productOptionsKey = new ProductOptionsKey(product.getId(), optionColor.getId());
                     productOptionsColor.setId(productOptionsKey);
@@ -127,7 +145,7 @@ public class ProductController {
                 assert listSize != null;
                 for (String size : listSize) {
                     String skuId = getSkuId(optionsRequests.getProductId(), size, color);
-                    ProductVariants productVariants = new ProductVariants(skuId, null, product);
+                    ProductVariants productVariants = new ProductVariants(skuId, null, product, null);
                     productVariantsService.save(productVariants);
 
                     OptionValues optionValuesSize = optionValuesService.findByName(size);
@@ -171,15 +189,16 @@ public class ProductController {
         for (ProductVariants productVariant : productVariants) {
             TypeOptionsDetail typeOptionsDetail = new TypeOptionsDetail();
             typeOptionsDetail.setPrice(productVariant.getPrice());
+            typeOptionsDetail.setQuantity(productVariant.getQuantity());
             List<VariantValues> variantValues = variantValuesService.findById_VariantId(productVariant.getId());
             for (VariantValues variantValue : variantValues) {
                 OptionValues optionValues = optionValuesService.findByIdAndOption_Id(variantValue.getId().getValueId()
                         , variantValue.getId().getOptionId());
                 Options options = optionsService.findById(variantValue.getId().getOptionId());
-                if (options.getName().equals("size")) {
-                    typeOptionsDetail.setSize(optionValues.getName());
+                if (options.getName().equals("SIZE")) {
+                    typeOptionsDetail.setSize(optionValues.getName().toUpperCase());
                 } else
-                    typeOptionsDetail.setColor(optionValues.getName());
+                    typeOptionsDetail.setColor(optionValues.getName().toUpperCase());
 
             }
             typeOptionsDetailList.add(typeOptionsDetail);
@@ -196,12 +215,13 @@ public class ProductController {
             Products product = productService.findProductById(productId);
             if (product != null) {
                 for (TypeOptionsDetail typeOptionsDetail : optionsDetails.getOptions()) {
-                    String skuId = getSkuId(productId, typeOptionsDetail.getSize(), typeOptionsDetail.getColor());
+                    String skuId = getSkuId(productId, typeOptionsDetail.getSize().toUpperCase(), typeOptionsDetail.getColor().toUpperCase());
                     ProductVariants productVariant = productVariantsService.findBySkuId(skuId);
                     if (productVariant != null) {
                         productVariant.setPrice(typeOptionsDetail.getPrice());
                         productVariant.setProducts(productVariant.getProducts());
                         productVariant.setSkuId(productVariant.getSkuId());
+                        productVariant.setQuantity(typeOptionsDetail.getQuantity());
                         productVariantsService.save(productVariant);
                     }
                 }
@@ -219,116 +239,6 @@ public class ProductController {
             );
         }
     }
-
-//    @PostMapping("/options-detail")
-//    @PreAuthorize("hasRole('ADMIN')")
-//    @Consumes("multipart/form-data")
-//    public ResponseEntity<ResponseObject> addOptionsDetail(@RequestBody OptionsDetailRequest optionsRequest) {
-//        try {
-//            Products product = productService.findProductById(optionsRequest.getProductId());
-//            productOptionsService.save(new ProductOptions(product, optionsService.findByName("size")));
-//            productOptionsService.save(new ProductOptions(product, optionsService.findByName("color")));
-//            // get key and values for size and color
-//            for (TypeOptionsDetail typeOption : optionsRequest.getOptions()) {
-//                // tao skuId cho product variant
-//                String skuId = getSkuId(optionsRequest.getProductId(), typeOption.getSize(), typeOption.getColor());
-//                ProductVariants productVariants = new ProductVariants(skuId, typeOption.getPrice(), product);
-//                productVariantsService.save(productVariants);
-//                OptionValues optionValuesSize = optionValuesService.findByName(typeOption.getSize());
-//                OptionValues optionValuesColor = optionValuesService.findByName(typeOption.getColor());
-
-//                if (typeOption.getKey().equals("size")) {
-//                    ProductVariants productVariants = new ProductVariants(typeOption.getSkuId(), optionsRequest.getPrice(), product);
-//                    productVariantsService.save(productVariants);
-//
-//                    Options getOption = optionsService.findByName("size");
-//                    ProductOptions productOptions = new ProductOptions(product, getOption);
-//                    productOptionsService.save(productOptions);
-//                    // save optionValue
-//                    for (String optionValue : typeOption.getValues()) {
-//                        OptionValues optionValues = optionValuesService.findByName(optionValue);
-//                        VariantValues variantValues = new VariantValues(productOptions, optionValues, productVariants);
-//                        variantValuesService.save(variantValues);
-//                    }
-//                } else {
-//                    ProductVariants productVariants = new ProductVariants(typeOption.getSkuId(), optionsRequest.getPrice(), product);
-//                    productVariantsService.save(productVariants);
-//                    Options getOption = optionsService.findByName("color");
-//                    // tim option de luu productoption
-//                    ProductOptions productOptions = new ProductOptions(product, getOption);
-//                    productOptionsService.save(productOptions);
-//                    // save optionValue
-//                    for (String optionValue : typeOption.getValues()) {
-//                        OptionValues optionValues = optionValuesService.findByName(optionValue);
-//                        VariantValues variantValues = new VariantValues(productOptions, optionValues, productVariants);
-//                        variantValuesService.save(variantValues);
-//                    }
-//                }
-
-//                return ResponseEntity.status(HttpStatus.OK).body(
-//                        new ResponseObject("OK", "Add options SuccessFully!", null)
-//                );
-//            }
-//        } catch (
-//                Exception e) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-//                    new ResponseObject("Failed", "Error!", e.getMessage()));
-//        }
-//        return null;
-//    }
-
-
-//    @PreAuthorize("hasRole('ADMIN')")
-//    @Consumes("multipart/form-data")
-//    public ResponseEntity<ResponseObject> addOptions(@RequestParam("name") String name,
-//                                               @RequestParam("file") MultipartFile[] files,
-//                                               @RequestParam("categoryId") Long categoryId,
-//                                               @RequestParam("price") Long price,
-//                                               @RequestParam("skuId") String skuId,
-//                                               @RequestParam(name = "options", required = false) Options[] options) {
-//        try {
-//
-//
-//            StringBuffer imageUrl = new StringBuffer();
-//            for (MultipartFile file : files) {
-//                String url = amazonClient.uploadFile(file);
-//                imageUrl.append(url + ","); // ngan cach cac imageUrl bang dau phay
-//            }
-//
-//            Category category = categoryService.findCategoryById(categoryId);
-//
-//            if (category != null) {
-//                Products product = new Products(name, imageUrl.toString(), category);
-//                productService.save(product);
-//
-//                ProductVariants productVariants = new ProductVariants(skuId, price, product);
-//                productVariantsService.save(productVariants);
-//
-//
-//                // get key and values for size and color
-//                for (Options option : options) {
-//                    com.laptrinhjava.ShoppingCart.entity.Options getOption = optionsService.findByName(option.getKey());
-//
-//                    ProductOptions productOptions = new ProductOptions(product, getOption);
-//                    productOptionsService.save(productOptions);
-//                    OptionValues optionValues = optionValuesService.findByName(option.getValues());
-//                    VariantValues variantValues = new VariantValues(productOptions, optionValues, productVariants);
-//                    variantValuesService.save(variantValues);
-//
-//                }
-//
-//                return ResponseEntity.status(HttpStatus.OK).body(
-//                        new ResponseObject("OK", "Save Successfully!", null)
-//                );
-//            } else
-//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-//                        new ResponseObject("Failed", "Category not exists!", null)
-//                );
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-//                    new ResponseObject("Failed", "Error!", e.getMessage()));
-//        }
-//    }
 
 /**
  * Method: Delete Product

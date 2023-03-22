@@ -3,7 +3,7 @@ package com.laptrinhjava.ShoppingCart.controller;
 import com.laptrinhjava.ShoppingCart.entity.EProvider;
 import com.laptrinhjava.ShoppingCart.entity.ERole;
 import com.laptrinhjava.ShoppingCart.entity.Role;
-import com.laptrinhjava.ShoppingCart.entity.User;
+import com.laptrinhjava.ShoppingCart.entity.Users;
 import com.laptrinhjava.ShoppingCart.payload.request.SigninRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.SignupRequest;
 import com.laptrinhjava.ShoppingCart.payload.response.JwtResponse;
@@ -59,7 +59,7 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<ResponseObject> authenticateUser(@Valid @RequestBody SigninRequest loginRequest, HttpServletResponse response) {
 
-        User findUser = userService.findByEmail(loginRequest.getEmail());
+        Users findUser = userService.findByEmail(loginRequest.getEmail());
         if (findUser == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     new ResponseObject("failed", "Email not exists!", null
@@ -75,7 +75,7 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = jwtUtils.generateToken(authentication);
 
-            User user = userService.findByEmail(loginRequest.getEmail());
+            Users user = userService.findByEmail(loginRequest.getEmail());
 
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
             List<String> roles = userDetails.getAuthorities().stream()
@@ -114,7 +114,7 @@ public class AuthController {
             );
         }
 
-        User user = new User(encoder.encode(signupRequest.getPassword()),
+        Users user = new Users(encoder.encode(signupRequest.getPassword()),
                 signupRequest.getFullName(),
                 signupRequest.getEmail());
 

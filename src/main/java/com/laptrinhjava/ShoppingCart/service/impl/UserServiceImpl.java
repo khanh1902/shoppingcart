@@ -1,7 +1,7 @@
 package com.laptrinhjava.ShoppingCart.service.impl;
 
 import com.laptrinhjava.ShoppingCart.entity.EProvider;
-import com.laptrinhjava.ShoppingCart.entity.User;
+import com.laptrinhjava.ShoppingCart.entity.Users;
 import com.laptrinhjava.ShoppingCart.reponsitory.IUserRepository;
 import com.laptrinhjava.ShoppingCart.security.oauth2.CustomOAuth2User;
 import com.laptrinhjava.ShoppingCart.service.IRoleService;
@@ -25,17 +25,17 @@ public class UserServiceImpl implements IUserService {
 
 
     @Override
-    public User findByEmail(String email) {
+    public Users findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
     @Override
-    public Optional<User> findEmail(String email) {
+    public Optional<Users> findEmail(String email) {
         return Optional.ofNullable(userRepository.findByEmail(email));
     }
 
     @Override
-    public List<User> findALlByEmail(String email) {
+    public List<Users> findALlByEmail(String email) {
         return userRepository.findAllByEmail(email);
     }
 
@@ -45,16 +45,16 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public User save(User user) {
+    public Users save(Users user) {
         return userRepository.save(user);
     }
 
     @Override
     public void processOAuthPostLogin(CustomOAuth2User user) {
-        User existUser = userRepository.findByEmail(user.getEmail());
+        Users existUser = userRepository.findByEmail(user.getEmail());
 
         if (existUser == null) {
-            User newUser = new User();
+            Users newUser = new Users();
             newUser.setEmail(user.getEmail());
             newUser.setProvider(EProvider.GOOGLE);
             newUser.setFullName(user.getName());

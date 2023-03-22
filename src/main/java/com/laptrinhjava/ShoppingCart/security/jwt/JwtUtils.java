@@ -1,6 +1,6 @@
 package com.laptrinhjava.ShoppingCart.security.jwt;
 
-import com.laptrinhjava.ShoppingCart.entity.User;
+import com.laptrinhjava.ShoppingCart.entity.Users;
 import com.laptrinhjava.ShoppingCart.security.service.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
@@ -38,7 +38,7 @@ public class JwtUtils {
                 .compact(); // thực thi
     }
 
-    public String generateTokenForOAuth2(User user) {
+    public String generateTokenForOAuth2(Users user) {
         Claims claims = Jwts.claims().setSubject(user.getEmail());
 
         Date now = new Date(); // thời gian tạo

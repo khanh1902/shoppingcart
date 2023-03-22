@@ -1,9 +1,8 @@
 package com.laptrinhjava.ShoppingCart.security.oauth2;
 
-import com.laptrinhjava.ShoppingCart.entity.User;
+import com.laptrinhjava.ShoppingCart.entity.Users;
 import com.laptrinhjava.ShoppingCart.security.jwt.JwtUtils;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
-import org.apache.http.protocol.HttpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -12,11 +11,9 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +32,7 @@ public class OAuth2LoginSuccessHandle extends SimpleUrlAuthenticationSuccessHand
         CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
         String email = oAuth2User.getEmail();
         userService.processOAuthPostLogin(oAuth2User);
-        User user = userService.findByEmail(email);
+        Users user = userService.findByEmail(email);
         String jwt = jwtUtils.generateTokenForOAuth2(user);
 
         List<String> roles = oAuth2User.getAuthorities().stream()

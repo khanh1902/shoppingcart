@@ -12,9 +12,7 @@ import java.util.List;
 @Repository
 public interface ICategoryRepository extends JpaRepository<Category, Long> {
     Category findCategoryById(Long id);
-
     Page<Category> findByNameContainingIgnoreCase(String name, Pageable pageable);
-
     @Query("SELECT b FROM Category b WHERE LOWER(b.name) like CONCAT('%',LOWER(?1),'%')")
     List<Category> findByNameLike(String name);
 }

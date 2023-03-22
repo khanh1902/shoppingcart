@@ -1,7 +1,7 @@
 package com.laptrinhjava.ShoppingCart.security.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.laptrinhjava.ShoppingCart.entity.User;
+import com.laptrinhjava.ShoppingCart.entity.Users;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,7 +32,7 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     // Build user for userDetail
-    public static UserDetailsImpl build(User user) {
+    public static UserDetailsImpl build(Users user) {
         List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName().name()))
                 .collect(Collectors.toList()); // collect thực hiện -> map mới được thực hiện

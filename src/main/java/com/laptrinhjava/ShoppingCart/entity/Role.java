@@ -23,7 +23,7 @@ public class Role {
 
     @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
     // LAZY để tránh việc truy xuất dữ liệu không cần thiết. Lúc nào cần thì mới query
-    private List<User> users = new ArrayList<>();
+    private List<Users> users = new ArrayList<>();
 
     public Role() {
     }
