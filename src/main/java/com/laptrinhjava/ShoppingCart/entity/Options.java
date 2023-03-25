@@ -21,8 +21,7 @@ public class Options implements Serializable {
     private String name;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "option", fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "option", cascade = CascadeType.ALL)
     private List<OptionValues> optionValues;
 
 //    @JsonIgnore

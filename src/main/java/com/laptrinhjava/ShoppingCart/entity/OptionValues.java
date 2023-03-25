@@ -7,7 +7,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
 
 @Entity
 @Getter
@@ -24,11 +23,13 @@ public class OptionValues implements Serializable {
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "option_id", insertable = false, updatable = false)
+    @JoinColumn(name = "option_id")
     private Options option;
 
     public OptionValues(String name, Options option) {
         this.name = name;
         this.option = option;
     }
+
+
 }

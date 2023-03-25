@@ -80,7 +80,6 @@ public class ProductController {
     /**
      * Method: Save Product
      **/
-
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Consumes("multipart/form-data")
@@ -142,13 +141,24 @@ public class ProductController {
             assert listColor != null;
             for (String color : listColor) {
                 OptionValues optionValuesColor = optionValuesService.findByName(color);
+                // lưu color nếu không có sẳn trong db
+                if (optionValuesColor == null) {
+                    optionValuesColor = new OptionValues(color.toUpperCase(), optionSize);
+                    optionValuesService.save(optionValuesColor);
+                    optionValuesColor = optionValuesService.findByName(color.toUpperCase());
+                }
                 assert listSize != null;
                 for (String size : listSize) {
                     String skuId = getSkuId(optionsRequests.getProductId(), size, color);
                     ProductVariants productVariants = new ProductVariants(skuId, null, product, null);
                     productVariantsService.save(productVariants);
-
-                    OptionValues optionValuesSize = optionValuesService.findByName(size);
+                    OptionValues optionValuesSize = optionValuesService.findByName(size.toUpperCase());
+                    // lưu size nếu không có sẳn trong db
+                    if (optionValuesSize == null) {
+                        optionValuesSize = new OptionValues(size.toUpperCase(), optionSize);
+                        optionValuesService.save(optionValuesSize);
+                        optionValuesSize = optionValuesService.findByName(size.toUpperCase());
+                    }
                     VariantValues variantValuesSize = new VariantValues();
                     VariantValuesKey variantValuesKeySize = new VariantValuesKey(productOptionsSize.getId().getProductId(),
                             productVariants.getId(), productOptionsSize.getId().getOptionId(), optionValuesSize.getId());
@@ -162,6 +172,7 @@ public class ProductController {
                     variantValuesService.save(variantValuesColor);
                 }
             }
+
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("OK", "Successfully!", null)
             );
@@ -174,14 +185,15 @@ public class ProductController {
 
     public String getSkuId(Long productId, String size, String color) {
         StringBuilder skuId = new StringBuilder();
-        int sizeIndex1 = size.toUpperCase().charAt(0);
+//        int sizeIndex1 = size.toUpperCase().charAt(0);
         int colorIndex1 = color.toUpperCase().charAt(0);
-        skuId.append("P").append(productId).append("S").append((char) sizeIndex1).append("C").append((char) colorIndex1);
+        skuId.append("P").append(productId).append("S").append(size).append("C").append((char) colorIndex1);
         return skuId.toString();
 
     }
 
     @GetMapping("/options")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> findOptionByProductId(@RequestParam("productId") Long productId) {
         Products product = productService.findProductById(productId);
         List<TypeOptionsDetail> typeOptionsDetailList = new ArrayList<>();
@@ -195,11 +207,10 @@ public class ProductController {
                 OptionValues optionValues = optionValuesService.findByIdAndOption_Id(variantValue.getId().getValueId()
                         , variantValue.getId().getOptionId());
                 Options options = optionsService.findById(variantValue.getId().getOptionId());
-                if (options.getName().equals("SIZE")) {
+                if (options.getName().toUpperCase().equals("SIZE")) {
                     typeOptionsDetail.setSize(optionValues.getName().toUpperCase());
                 } else
                     typeOptionsDetail.setColor(optionValues.getName().toUpperCase());
-
             }
             typeOptionsDetailList.add(typeOptionsDetail);
         }
@@ -209,6 +220,7 @@ public class ProductController {
     }
 
     @PutMapping("/options")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> updatePriceProduct(@RequestParam("productId") Long productId,
                                                              @RequestBody OptionsDetailRequest optionsDetails) {
         try {
