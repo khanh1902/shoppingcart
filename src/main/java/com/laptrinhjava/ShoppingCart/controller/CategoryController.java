@@ -110,7 +110,7 @@ public class CategoryController {
         StringBuilder imageUrl = new StringBuilder();
         for (MultipartFile file : files.orElse(new MultipartFile[0])) {
             String url = amazonClient.uploadFile(file);
-            imageUrl.append(url + " "); // ngan cach cac imageUrl bang dau phay
+            imageUrl.append(url).append(" "); // ngan cach cac imageUrl bang dau phay
         }
 
         Category newCategory = new Category(name, code, imageUrl.toString());

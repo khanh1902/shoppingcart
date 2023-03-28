@@ -21,10 +21,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.ws.rs.Consumes;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static java.lang.Long.parseLong;
 
 @RestController
 @RequestMapping("/api/product")
@@ -89,7 +88,8 @@ public class ProductController {
                                                @RequestParam("file") MultipartFile[] files,
                                                @RequestParam("categoryId") Long categoryId,
                                                @RequestParam("description") String description,
-                                               @RequestParam("price") Long price) {
+                                               @RequestParam("price") Long price,
+                                               @RequestParam(name = "quantity") Long quantity) {
         StringBuilder imageUrl = new StringBuilder();
         for (MultipartFile file : files) {
             String url = amazonClient.uploadFile(file);
@@ -101,7 +101,12 @@ public class ProductController {
         Users user = userService.findByEmail(email);
 
         if (category != null) {
-            Products product = new Products(name, imageUrl.toString(), category, description, user, price);
+            Products product = null;
+            if (quantity == null) {
+                product = new Products(name, imageUrl.toString(), category, description, user, price, null);
+            } else {
+                product = new Products(name, imageUrl.toString(), category, description, user, price, quantity);
+            }
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("OK", "Save Successfully!", productService.save(product))
             );
@@ -122,6 +127,7 @@ public class ProductController {
                 StringBuilder skuId = new StringBuilder();
                 skuId.append("P").append(product.getId());
                 List<Long> valueIds = new ArrayList<>();
+                List<VariantValuesKey> variantValuesKeys = new ArrayList<>();
                 for (Map.Entry<String, String> entry : option.entrySet()) {
                     Options findOptions = optionsService.findByName(entry.getKey().toUpperCase());
                     // Nếu option k tồn tại thì lưu vào db
@@ -138,15 +144,26 @@ public class ProductController {
 
                     OptionValues findOptionValues = optionValuesService.findByNameAndOption_Id(entry.getValue(), findOptions.getId());
                     // Nếu giá trị của option không tồn tại thì lưu vào db
-                    if (findOptionValues == null){
+                    if (findOptionValues == null) {
                         findOptionValues = new OptionValues(entry.getValue(), findOptions);
                         optionValuesService.save(findOptionValues);
                     }
                     skuId.append(entry.getValue().toUpperCase());
                     valueIds.add(findOptionValues.getId());
+                    VariantValuesKey variantValuesKey = new VariantValuesKey();
+                    variantValuesKey.setProductId(product.getId());
+                    variantValuesKey.setOptionId(findOptions.getId());
+                    variantValuesKey.setValueId(findOptionValues.getId());
+                    variantValuesKeys.add(variantValuesKey);
                 }
                 ProductVariants productVariants = new ProductVariants(skuId.toString(), product.getPrice(), product, null);
                 productVariantsService.save(productVariants);
+                for (VariantValuesKey variantValuesKey : variantValuesKeys) {
+                    VariantValues variantValue = new VariantValues();
+                    variantValuesKey.setVariantId(productVariants.getId());
+                    variantValue.setId(variantValuesKey);
+                    variantValuesService.save(variantValue);
+                }
 
             }
             return ResponseEntity.status(HttpStatus.OK).body(
@@ -160,144 +177,73 @@ public class ProductController {
         }
     }
 
-
-//    @PostMapping("/options")
-////    @PreAuthorize("hasRole('ADMIN')")
-//    public ResponseEntity<ResponseObject> addOptions(@RequestBody OptionsRequest optionsRequests) {
-//        try {
-//            List<String> listSize = null;
-//            List<String> listColor = null;
-//            ProductOptions productOptionsSize = null;
-//            ProductOptions productOptionsColor = null;
-//            ProductOptions productOptionsOther = null;
-//            Options optionSize = null;
-//            Options optionColor = null;
-//            Products product = productService.findProductById(optionsRequests.getProductId());
-//
-//            for (TypeOptions typeOption : optionsRequests.getOptions()) {
-//                if (typeOption.getKey().toUpperCase().contains("SIZES")) {
-//                    optionSize = optionsService.findByName(typeOption.getKey().toUpperCase());
-//                    productOptionsSize = new ProductOptions();
-//                    ProductOptionsKey productOptionsKey = new ProductOptionsKey(product.getId(), optionSize.getId());
-//                    productOptionsSize.setId(productOptionsKey);
-//                    productOptionsService.save(productOptionsSize);
-//                    listSize = typeOption.getValues();
-//                } else if (typeOption.getKey().toUpperCase().contains("COLORS")) {
-//                    optionColor = optionsService.findByName(typeOption.getKey().toUpperCase());
-//                    productOptionsColor = new ProductOptions();
-//                    ProductOptionsKey productOptionsKey = new ProductOptionsKey(product.getId(), optionColor.getId());
-//                    productOptionsColor.setId(productOptionsKey);
-//                    productOptionsService.save(productOptionsColor);
-//                    listColor = typeOption.getValues();
-//                }
-//
-//            }
-//            assert listColor != null;
-//            for (String color : listColor) {
-//                OptionValues optionValuesColor = optionValuesService.findByName(color);
-//                // lưu color nếu không có sẳn trong db
-//                if (optionValuesColor == null) {
-//                    optionValuesColor = new OptionValues(color.toUpperCase(), optionColor);
-//                    optionValuesService.save(optionValuesColor);
-//                    optionValuesColor = optionValuesService.findByName(color.toUpperCase());
-//                }
-//                assert listSize != null;
-//                for (String size : listSize) {
-//                    String skuId = getSkuId(optionsRequests.getProductId(), size, color);
-//                    ProductVariants productVariants = new ProductVariants(skuId, null, product, null);
-//                    productVariantsService.save(productVariants);
-//                    OptionValues optionValuesSize = optionValuesService.findByName(size.toUpperCase());
-//                    // lưu size nếu không có sẳn trong db
-//                    if (optionValuesSize == null) {
-//                        optionValuesSize = new OptionValues(size.toUpperCase(), optionSize);
-//                        optionValuesService.save(optionValuesSize);
-//                        optionValuesSize = optionValuesService.findByName(size.toUpperCase());
-//                    }
-//                    VariantValues variantValuesSize = new VariantValues();
-//                    VariantValuesKey variantValuesKeySize = new VariantValuesKey(productOptionsSize.getId().getProductId(),
-//                            productVariants.getId(), productOptionsSize.getId().getOptionId(), optionValuesSize.getId());
-//                    variantValuesSize.setId(variantValuesKeySize);
-//                    variantValuesService.save(variantValuesSize);
-//
-//                    VariantValues variantValuesColor = new VariantValues();
-//                    VariantValuesKey variantValuesKeyColor = new VariantValuesKey(productOptionsColor.getId().getProductId(),
-//                            productVariants.getId(), productOptionsColor.getId().getOptionId(), optionValuesColor.getId());
-//                    variantValuesColor.setId(variantValuesKeyColor);
-//                    variantValuesService.save(variantValuesColor);
-//                }
-////            }
-//
-//            return ResponseEntity.status(HttpStatus.OK).body(
-//                    new ResponseObject("OK", "Successfully!", null)
-//            );
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-//                    new ResponseObject("Failed", "Error!", e.getMessage())
-//            );
-//        }
-//    }
-
-    public String getSkuId(Long productId, String size, String color) {
-        StringBuilder skuId = new StringBuilder();
-//        int sizeIndex1 = size.toUpperCase().charAt(0);
-//        int colorIndex1 = color.toUpperCase().charAt(0);
-        skuId.append("P").append(productId).append("S").append(size.toUpperCase()).append("C").append(color.toUpperCase());
-        return skuId.toString();
-    }
-
     @GetMapping("/options")
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> findOptionByProductId(@RequestParam("productId") Long productId) {
         Products product = productService.findProductById(productId);
-        List<TypeOptionsDetail> typeOptionsDetailList = new ArrayList<>();
+        List<Map<String, Object>> optionList = new ArrayList<>();
         List<ProductVariants> productVariants = productVariantsService.findByProducts_Id(product.getId());
         for (ProductVariants productVariant : productVariants) {
-            TypeOptionsDetail typeOptionsDetail = new TypeOptionsDetail();
-            typeOptionsDetail.setPrice(productVariant.getPrice());
-            typeOptionsDetail.setQuantity(productVariant.getQuantity());
+            Map<String, Object> optionMap = new HashMap<>();
+
+            if (productVariant.getPrice() == null) optionMap.put("price", null);
+            else optionMap.put("price", productVariant.getPrice());
+
+            if (productVariant.getQuantity() == null) optionMap.put("quantity", null);
+            else optionMap.put("quantity", productVariant.getQuantity());
+
             List<VariantValues> variantValues = variantValuesService.findById_VariantId(productVariant.getId());
             for (VariantValues variantValue : variantValues) {
                 OptionValues optionValues = optionValuesService.findByIdAndOption_Id(variantValue.getId().getValueId()
                         , variantValue.getId().getOptionId());
                 Options options = optionsService.findById(variantValue.getId().getOptionId());
-                if (options.getName().toUpperCase().contains("SIZES")) {
-                    typeOptionsDetail.setSize(optionValues.getName().toUpperCase());
-                } else
-                    typeOptionsDetail.setColor(optionValues.getName().toUpperCase());
+                optionMap.put(options.getName().toLowerCase(), optionValues.getName());
             }
-            typeOptionsDetailList.add(typeOptionsDetail);
+            optionList.add(optionMap);
         }
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("OK", "Successfully!", typeOptionsDetailList)
+                new ResponseObject("OK", "Successfully!", optionList)
         );
     }
 
     @PutMapping("/options")
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> updatePriceProduct(@RequestParam("productId") Long productId,
-                                                             @RequestBody OptionsDetailRequest optionsDetails) {
+                                                             @RequestBody List<Map<String, String>> options) {
         try {
             Products product = productService.findProductById(productId);
-            if (product != null) {
-                for (TypeOptionsDetail typeOptionsDetail : optionsDetails.getOptions()) {
-                    String skuId = getSkuId(productId, typeOptionsDetail.getSize().toUpperCase(), typeOptionsDetail.getColor().toUpperCase());
-                    ProductVariants productVariant = productVariantsService.findBySkuId(skuId);
-                    if (productVariant != null) {
-                        productVariant.setPrice(typeOptionsDetail.getPrice());
-                        productVariant.setProducts(productVariant.getProducts());
-                        productVariant.setSkuId(productVariant.getSkuId());
-                        productVariant.setQuantity(typeOptionsDetail.getQuantity());
-                        productVariantsService.save(productVariant);
+            Long totalQuantity = 0L;
+            for (Map<String, String> option : options) {
+                StringBuilder skuId = new StringBuilder();
+                skuId.append("P").append(product.getId());
+                for (Map.Entry<String, String> entry : option.entrySet()) {
+                    if (!Objects.equals(entry.getKey(), "price") && !Objects.equals(entry.getKey(), "quantity")) {
+                        skuId.append(entry.getKey().toUpperCase().charAt(0)).append(entry.getValue());
                     }
                 }
-                return ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject("OK", "Save Successfully!", null)
-                );
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                        new ResponseObject("Failed", "Error!", null)
-                );
+                ProductVariants productVariant = productVariantsService.findBySkuId(skuId.toString());
+                productVariant.setProducts(productVariant.getProducts());
+                productVariant.setSkuId(productVariant.getSkuId());
+                // set price và quantity
+                for (Map.Entry<String, String> entry : option.entrySet()) {
+                    if (entry.getKey().equals("price")) {
+                        productVariant.setPrice(parseLong(entry.getValue()));
+                    } else if (entry.getKey().equals("quantity")) {
+                        productVariant.setQuantity(parseLong(entry.getValue()));
+                    }
+                }
+                totalQuantity += productVariant.getQuantity();
+                productVariantsService.save(productVariant);
             }
+
+            // lưu lại quantity cho product từ các options
+            product = new Products(product.getName(), product.getImageUrl(), product.getCategory(),
+                    product.getDescription(), product.getUsers(), product.getPrice(), totalQuantity);
+            productService.save(product);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("OK", "Save Successfully!", null)
+            );
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
                     new ResponseObject("Failed", "Error!", e.getMessage())
