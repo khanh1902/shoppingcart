@@ -2,6 +2,7 @@ package com.laptrinhjava.ShoppingCart.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -12,6 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "options")
+@NoArgsConstructor
 public class Options implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,6 +35,7 @@ public class Options implements Serializable {
     @OneToMany(mappedBy = "options", cascade = CascadeType.ALL)
     private List<ProductOptions> productOptions;
 
-    public Options() {
+    public Options(String name) {
+        this.name = name;
     }
 }

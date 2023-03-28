@@ -38,4 +38,9 @@ public class OptionValuesServiceImpl implements IOptionValuesService {
     public OptionValues findByIdAndOption_Id(Long valueId, Long optionId) {
         return optionValuesRepository.findByIdAndOption_Id(valueId, optionId);
     }
+
+    @Override
+    public OptionValues findByNameAndOption_Id(String name, Long optionId) {
+        return optionValuesRepository.findByNameAndOption_Id(name, optionId);
+    }
 }

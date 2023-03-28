@@ -20,4 +20,9 @@ public class OptionsServiceImpl implements IOptionsService {
     public Options findByName(String name) {
         return optionsRepository.findByName(name);
     }
+
+    @Override
+    public Options save(Options option) {
+        return optionsRepository.save(option);
+    }
 }

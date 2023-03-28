@@ -13,5 +13,6 @@ public interface IOptionValuesRepository extends JpaRepository<OptionValues, Lon
     OptionValues findOptionValuesByName(String name);
     List<OptionValues> findByOption(Options options);
     OptionValues findByIdAndOption_Id(Long valueId, Long optionId);
+    OptionValues findByNameAndOption_Id(String name, Long optionId);
 }
 

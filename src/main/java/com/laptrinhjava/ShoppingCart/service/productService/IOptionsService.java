@@ -7,4 +7,5 @@ import javax.swing.text.html.Option;
 public interface IOptionsService {
     Options findById(Long id);
     Options findByName(String name);
+    Options save (Options option);
 }

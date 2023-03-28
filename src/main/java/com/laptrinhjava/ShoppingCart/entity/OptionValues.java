@@ -30,6 +30,4 @@ public class OptionValues implements Serializable {
         this.name = name;
         this.option = option;
     }
-
-
 }

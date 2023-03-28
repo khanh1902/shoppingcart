@@ -2,6 +2,7 @@ package com.laptrinhjava.ShoppingCart.service.impl.productServiceImpl;
 
 import com.laptrinhjava.ShoppingCart.entity.ProductVariants;
 import com.laptrinhjava.ShoppingCart.entity.Products;
+import com.laptrinhjava.ShoppingCart.payload.request.OptionsRequest;
 import com.laptrinhjava.ShoppingCart.payload.response.ProductResponse;
 import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.IProductRepository;
 import com.laptrinhjava.ShoppingCart.service.productService.IProductService;
@@ -10,9 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ProductsServiceImpl implements IProductService {
@@ -72,6 +71,31 @@ public class ProductsServiceImpl implements IProductService {
         }
         List<ProductResponse> productResponses = covertProductsToProductResponse(pageProduct);
         return new PageImpl<>(productResponses, paging, pageProduct.getTotalElements());
+    }
+
+    @Override
+    public List<Map<String, String>> convertOptionsRequestToMap(OptionsRequest optionsRequests) {
+        List<Map<String, String>> options = new ArrayList<>();
+        for (int i = 0; i < optionsRequests.getOptions().size(); i++) {
+            for (String iValue : optionsRequests.getOptions().get(i).getValues()) {
+                if (optionsRequests.getOptions().size() > 1) {
+                    for (int j = i + 1; j < optionsRequests.getOptions().size(); j++) {
+                        for (String jValue : optionsRequests.getOptions().get(j).getValues()) {
+                            Map<String, String> mapOption = new HashMap<>();
+                            mapOption.put(optionsRequests.getOptions().get(i).getKey(), iValue);
+                            mapOption.put(optionsRequests.getOptions().get(j).getKey(), jValue);
+                            options.add(mapOption);
+                        }
+                    }
+                } else {
+                    Map<String, String> mapOption = new HashMap<>();
+                    mapOption.put(optionsRequests.getOptions().get(i).getKey(), iValue);
+                    mapOption.put(optionsRequests.getOptions().get(i).getKey(), iValue);
+                    options.add(mapOption);
+                }
+            }
+        }
+        return options;
     }
 
     public List<ProductResponse> covertProductsToProductResponse( Page<Products> pageProduct) {

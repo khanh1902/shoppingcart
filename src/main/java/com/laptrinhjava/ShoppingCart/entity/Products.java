@@ -28,6 +28,9 @@ public class Products {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "price")
+    private Long price;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "createddate", nullable = false)
     private Date createdDate;
@@ -56,11 +59,12 @@ public class Products {
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Category category;
 
-    public Products(String name, String imageUrl, Category category, String description, Users users) {
+    public Products(String name, String imageUrl, Category category, String description, Users users, Long price) {
         this.name = name;
         this.imageUrl = imageUrl;
         this.category = category;
         this.description = description;
         this.users = users;
+        this.price = price;
     }
 }
