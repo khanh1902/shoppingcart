@@ -82,14 +82,14 @@ public class ProductController {
      * Method: Save Product
      **/
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     @Consumes("multipart/form-data")
-    public ResponseEntity<ResponseObject> save(@RequestParam("name") String name,
-                                               @RequestParam("file") MultipartFile[] files,
-                                               @RequestParam("categoryId") Long categoryId,
-                                               @RequestParam("description") String description,
-                                               @RequestParam("price") Long price,
-                                               @RequestParam(name = "quantity") Long quantity) {
+    public ResponseEntity<ResponseObject> save(@RequestParam(name = "name") String name,
+                                               @RequestParam(name = "file") MultipartFile[] files,
+                                               @RequestParam(name = "categoryId") Long categoryId,
+                                               @RequestParam(name = "description") String description,
+                                               @RequestParam(name = "price", required = false) Long price,
+                                               @RequestParam(name = "quantity", required = false) Long quantity) {
         StringBuilder imageUrl = new StringBuilder();
         for (MultipartFile file : files) {
             String url = amazonClient.uploadFile(file);
@@ -117,6 +117,9 @@ public class ProductController {
         }
     }
 
+    /**
+     * Method: Add Options for Product
+     **/
     @PostMapping("/options")
 //    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> addOptions(@RequestBody OptionsRequest optionsRequests) {
@@ -156,16 +159,26 @@ public class ProductController {
                     variantValuesKey.setValueId(findOptionValues.getId());
                     variantValuesKeys.add(variantValuesKey);
                 }
-                ProductVariants productVariants = new ProductVariants(skuId.toString(), product.getPrice(), product, null);
-                productVariantsService.save(productVariants);
-                for (VariantValuesKey variantValuesKey : variantValuesKeys) {
-                    VariantValues variantValue = new VariantValues();
-                    variantValuesKey.setVariantId(productVariants.getId());
-                    variantValue.setId(variantValuesKey);
-                    variantValuesService.save(variantValue);
+                boolean flag = true;
+                List<ProductVariants> productVariantsList = productVariantsService.findByProducts_Id(product.getId());
+                for (ProductVariants productVariant : productVariantsList) {
+                    if (productVariant.getSkuId().equals(skuId.toString())) {
+                        flag = false;
+                        break;
+                    }
                 }
-
+                if (flag) {
+                    ProductVariants productVariants = new ProductVariants(skuId.toString(), product.getPrice(), product, null);
+                    productVariantsService.save(productVariants);
+                    for (VariantValuesKey variantValuesKey : variantValuesKeys) {
+                        VariantValues variantValue = new VariantValues();
+                        variantValuesKey.setVariantId(productVariants.getId());
+                        variantValue.setId(variantValuesKey);
+                        variantValuesService.save(variantValue);
+                    }
+                }
             }
+
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("OK", "Successfully!", null)
             );
@@ -177,9 +190,12 @@ public class ProductController {
         }
     }
 
+    /**
+     * Method: Find options Product By product id
+     **/
     @GetMapping("/options")
 //    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseObject> findOptionByProductId(@RequestParam("productId") Long productId) {
+    public ResponseEntity<ResponseObject> findOptionByProductId(@RequestParam(name = "productId") Long productId) {
         Products product = productService.findProductById(productId);
         List<Map<String, Object>> optionList = new ArrayList<>();
         List<ProductVariants> productVariants = productVariantsService.findByProducts_Id(product.getId());
@@ -206,9 +222,12 @@ public class ProductController {
         );
     }
 
+    /**
+     * Method: Update Price and Quantity for options product by product id
+     **/
     @PutMapping("/options")
 //    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseObject> updatePriceProduct(@RequestParam("productId") Long productId,
+    public ResponseEntity<ResponseObject> updatePriceProduct(@RequestParam(name = "productId") Long productId,
                                                              @RequestBody List<Map<String, String>> options) {
         try {
             Products product = productService.findProductById(productId);
@@ -251,59 +270,99 @@ public class ProductController {
         }
     }
 
-/**
- * Method: Delete Product
- * <p>
- * Method: Update Product
- **/
-//    @DeleteMapping("/{id}")
+    /**
+     * Method: Delete Product
+     **/
+    @DeleteMapping()
 //    @PreAuthorize("hasRole('ADMIN')")
-//    public ResponseEntity<ResponseObject> delete(@PathVariable Long id) {
-//        try {
-//            Product findById = productService.findProductById(id);
-//            if (findById != null) {
-//                amazonClient.deleteFile(findById.getImageUrl());
-//                productService.delete(id);
-//                return ResponseEntity.status(HttpStatus.OK).body(
-//                        new ResponseObject("OK", "Delete successfully!", null)
-//                );
-//            } else
-//                return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-//                        new ResponseObject("FAILED", "Delete failed!", null)
-//                );
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-//                    new ResponseObject("Failed", "Error!", e.getMessage())
-//            );
-//        }
-//
-//    }
+    public ResponseEntity<ResponseObject> delete(@RequestParam(name = "productIds", required = false) List<Long> ids) {
+        try {
+            for (Long id : ids) {
+                Products product = productService.findProductById(id);
+                if (product != null) {
+                    // delete variant values if exists
+                    List<VariantValues> variantValuesList = variantValuesService.findById_ProductId(product.getId());
+                    if (variantValuesList != null) {
+                        for (VariantValues variantValue : variantValuesList) {
+                            variantValuesService.deleteById_ProductId(variantValue.getId().getProductId());
+                        }
+                    }
+
+                    // delete product variant if exists
+                    List<ProductVariants> productVariantsList = productVariantsService.findByProducts_Id(product.getId());
+                    if (productVariantsList != null) {
+                        for (ProductVariants productVariant : productVariantsList) {
+                            productVariantsService.deleteById(productVariant.getId());
+                        }
+                    }
+
+                    // delete product options if exists
+                    List<ProductOptions> productOptionsList = productOptionsService.findByProducts_Id(product.getId());
+                    if (productOptionsList != null) {
+                        for (ProductOptions productOption : productOptionsList) {
+                            productOptionsService.deleteById_ProductId(productOption.getId().getProductId());
+                        }
+                    }
+
+                    // delete image on aws
+                    amazonClient.deleteFile(product.getImageUrl());
+
+                    // delete product
+                    productService.delete(product.getId());
+                } else
+                    return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+                            new ResponseObject("FAILED", "Product not exists!", null)
+                    );
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("OK", "Delete successfully!", null)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+                    new ResponseObject("Failed", "Error!", e.getMessage())
+            );
+        }
+    }
 
     /**
-     * Method: Update Product
+     * Method: Delete product option by product id
      **/
-//    @PutMapping("/{id}")
+    @DeleteMapping("/options/delete")
 //    @PreAuthorize("hasRole('ADMIN')")
-//    public ResponseEntity<ResponseObject> updateProduct(@RequestParam("name") String name,
-//                                                        @RequestParam("price") Long price,
-//                                                        @RequestParam("file") MultipartFile[] files,
-//                                                        @RequestParam("categoryId") Long categoryId,
-//                                                        @RequestParam("discountId") Long discountId,
-//                                                        @PathVariable Long id) {
-//        Product findById = productService.findProductById(id);
-//        if (findById != null) {
-//            amazonClient.deleteFile(findById.getImageUrl());
-//        }
-//        StringBuffer imageUrl = new StringBuffer();
-//        for (MultipartFile file : files) {
-//            String url = amazonClient.uploadFile(file);
-//            imageUrl.append(url + ", ");
-//        }
-//
-//        Product newProduct = new Product(name, price, imageUrl.toString(), categoryId, discountId);
-//        return ResponseEntity.status(HttpStatus.OK).body(
-//                new ResponseObject("OK", "Update Successfully!", productService.update(newProduct, id))
-//        );
-//    }
-
+    public ResponseEntity<ResponseObject> deleteProductOption(@RequestParam("productId") Long productId,
+                                                              @RequestBody List<Map<String, Object>> options) {
+        try {
+            Products findProduct = productService.findProductById(productId);
+            if (findProduct != null) {
+                for (Map<String, Object> option : options) {
+                    StringBuilder skuId = new StringBuilder();
+                    skuId.append("P").append(findProduct.getId());
+                    for (Map.Entry<String, Object> entry : option.entrySet()) {
+                        skuId.append(entry.getKey().toUpperCase().charAt(0)).append(entry.getValue());
+                    }
+                    List<ProductVariants> productVariantsList = productVariantsService.findByProducts_Id(findProduct.getId());
+                    for (ProductVariants productVariant : productVariantsList) {
+                        if (productVariant.getSkuId().equals(skuId.toString())) {
+                            List<VariantValues> variantValuesList = variantValuesService.findById_VariantId(productVariant.getId());
+                            for (VariantValues variantValue : variantValuesList) {
+                                variantValuesService.deleteById_VariantId(variantValue.getId().getVariantId());
+                            }
+                            productVariantsService.deleteById(productVariant.getId());
+                        }
+                        return ResponseEntity.status(HttpStatus.OK).body(
+                                new ResponseObject("OK", "Delete successfully!", null)
+                        );
+                    }
+                }
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    new ResponseObject("Failed", "Product not exist!", null)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+                    new ResponseObject("Failed", "Error!", e.getMessage())
+            );
+        }
+    }
 }
+

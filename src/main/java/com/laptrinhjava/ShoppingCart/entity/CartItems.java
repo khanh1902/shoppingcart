@@ -44,7 +44,7 @@
 //    public CartItems() {
 //    }
 //
-//    public CartItems(Cart cart, Product product, Long quantity, Long price) {
+//    public CartItems(Cart cart, Products product, Long quantity, Long price) {
 //        this.cart = cart;
 //        this.product = product;
 //        this.quantity = quantity;

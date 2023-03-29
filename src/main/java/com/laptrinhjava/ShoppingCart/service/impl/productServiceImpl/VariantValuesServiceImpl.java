@@ -22,4 +22,19 @@ public class VariantValuesServiceImpl implements IVariantValuesService {
     public List<VariantValues> findById_VariantId(Long variantId) {
         return variantValuesRepository.findById_VariantId(variantId);
     }
+
+    @Override
+    public List<VariantValues> findById_ProductId(Long productId) {
+        return variantValuesRepository.findById_ProductId(productId);
+    }
+
+    @Override
+    public void deleteById_ProductId(Long productId) {
+        variantValuesRepository.deleteById_ProductId(productId);
+    }
+
+    @Override
+    public void deleteById_VariantId(Long variantId) {
+        variantValuesRepository.deleteById_VariantId(variantId);
+    }
 }

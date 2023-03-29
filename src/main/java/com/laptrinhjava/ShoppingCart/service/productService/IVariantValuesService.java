@@ -9,5 +9,8 @@ import java.util.List;
 public interface IVariantValuesService {
     VariantValues save(VariantValues variantValues);
     List<VariantValues> findById_VariantId(Long variantId);
+    List<VariantValues> findById_ProductId(Long productId);
+    void deleteById_ProductId(Long productId);
+    void deleteById_VariantId(Long variantId);
 
 }

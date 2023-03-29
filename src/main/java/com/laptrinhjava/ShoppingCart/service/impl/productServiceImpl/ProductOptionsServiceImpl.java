@@ -6,6 +6,8 @@ import com.laptrinhjava.ShoppingCart.service.productService.IProductOptionsServi
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ProductOptionsServiceImpl implements IProductOptionsService {
     @Autowired
@@ -16,8 +18,13 @@ public class ProductOptionsServiceImpl implements IProductOptionsService {
         return productOptionsRepository.save(productOptions);
     }
 
-//    @Override
-//    public ProductOptions findProductOptionsByOptionId(Long optionId) {
-//        return productOptionsRepository.findByOptionId(optionId);
-//    }
+    @Override
+    public List<ProductOptions> findByProducts_Id(Long productId) {
+        return productOptionsRepository.findByProducts_Id(productId);
+    }
+
+    @Override
+    public void deleteById_ProductId(Long productId) {
+        productOptionsRepository.deleteById_ProductId(productId);
+    }
 }

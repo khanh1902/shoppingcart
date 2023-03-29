@@ -11,4 +11,5 @@ public interface IProductVariantsRepository extends JpaRepository<ProductVariant
     ProductVariants findProductVariantsById(Long id);
     List<ProductVariants> findByProducts_Id(Long productId);
     ProductVariants findBySkuId(String skuId);
+    void deleteById(Long id);
 }

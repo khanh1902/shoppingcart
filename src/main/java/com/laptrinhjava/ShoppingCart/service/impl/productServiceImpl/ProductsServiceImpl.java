@@ -23,7 +23,6 @@ public class ProductsServiceImpl implements IProductService {
     private IProductVariantsService productVariantsService;
 
 
-
     @Override
     public Products save(Products product) {
         return productRepository.save(product);
@@ -63,10 +62,9 @@ public class ProductsServiceImpl implements IProductService {
     public Page<ProductResponse> findWithFilterAndPageAndSort(Integer offset, Integer limit, String sortBy, String name) {
         Pageable paging = PageRequest.of(offset, limit, Sort.by(sortBy).ascending());
         Page<Products> pageProduct = null;
-        if(name == null) {
+        if (name == null) {
             pageProduct = productRepository.findAll(paging);
-        }
-        else {
+        } else {
             pageProduct = productRepository.findByNameContainingIgnoreCase(name, paging);
         }
         List<ProductResponse> productResponses = covertProductsToProductResponse(pageProduct);
@@ -98,17 +96,23 @@ public class ProductsServiceImpl implements IProductService {
         return options;
     }
 
-    public List<ProductResponse> covertProductsToProductResponse( Page<Products> pageProduct) {
+    public List<ProductResponse> covertProductsToProductResponse(Page<Products> pageProduct) {
         List<ProductResponse> productResponses = new ArrayList<>();
         for (Products product : pageProduct) {
             List<ProductVariants> productVariants = productVariantsService.findByProducts_Id(product.getId());
-            Long minPrice = productVariants.get(0).getPrice();
-            for (int i = 1; i < productVariants.size(); i++) {
-                if (minPrice >= productVariants.get(i).getPrice()) minPrice = productVariants.get(i).getPrice();
+            if (!productVariants.isEmpty()){
+                Long minPrice = productVariants.get(0).getPrice();
+                for (int i = 1; i < productVariants.size(); i++) {
+                    if (minPrice >= productVariants.get(i).getPrice()) minPrice = productVariants.get(i).getPrice();
+                }
+                ProductResponse productResponse = new ProductResponse(product.getId(), product.getName()
+                        , product.getImageUrl(), minPrice);
+                productResponses.add(productResponse);
+            } else {
+                ProductResponse productResponse = new ProductResponse(product.getId(), product.getName()
+                        , product.getImageUrl(), product.getPrice());
+                productResponses.add(productResponse);
             }
-            ProductResponse productResponse = new ProductResponse(product.getId(), product.getName()
-                    , product.getImageUrl(), minPrice);
-            productResponses.add(productResponse);
         }
         return productResponses;
     }

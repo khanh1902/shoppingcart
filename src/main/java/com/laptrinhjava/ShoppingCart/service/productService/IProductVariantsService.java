@@ -10,4 +10,5 @@ public interface IProductVariantsService {
     ProductVariants save(ProductVariants productVariants);
     List<ProductVariants> findByProducts_Id(Long productId);
     ProductVariants findBySkuId(String skuId);
+    void deleteById(Long id);
 }

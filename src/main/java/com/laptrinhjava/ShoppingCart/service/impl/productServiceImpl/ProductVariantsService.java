@@ -27,4 +27,9 @@ public class ProductVariantsService implements IProductVariantsService {
     public ProductVariants findBySkuId(String skuId) {
         return productVariantsRepository.findBySkuId(skuId);
     }
+
+    @Override
+    public void deleteById(Long id) {
+        productVariantsRepository.deleteById(id);
+    }
 }
