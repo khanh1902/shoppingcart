@@ -5,6 +5,7 @@ import com.laptrinhjava.ShoppingCart.payload.TypeOptionsDetail;
 import com.laptrinhjava.ShoppingCart.payload.request.OptionsDetailRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.OptionsRequest;
 import com.laptrinhjava.ShoppingCart.payload.TypeOptions;
+import com.laptrinhjava.ShoppingCart.payload.response.OneProductResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
 import com.laptrinhjava.ShoppingCart.service.IAmazonClient;
 import com.laptrinhjava.ShoppingCart.service.ICategoryService;
@@ -76,6 +77,48 @@ public class ProductController {
             return authentication.getName();
         }
         return null;
+    }
+
+    @GetMapping("/getOne")
+    public ResponseEntity<ResponseObject> getOneProduct(@RequestParam(name = "id") Long productId) {
+        Products product = productService.findProductById(productId);
+        if (product != null) {
+            List<Map<String, Object>> optionList = new ArrayList<>();
+            OneProductResponse productResponse = new OneProductResponse();
+            productResponse.setId(product.getId());
+            productResponse.setDescription(product.getDescription());
+            productResponse.setImageUrl(product.getImageUrl());
+            productResponse.setName(product.getName());
+            productResponse.setPrice(product.getPrice());
+            productResponse.setQuantity(product.getQuantity());
+
+            List<ProductVariants> productVariants = productVariantsService.findByProducts_Id(product.getId());
+            for (ProductVariants productVariant : productVariants) {
+                Map<String, Object> optionMap = new HashMap<>();
+
+                if (productVariant.getPrice() == null) optionMap.put("price", null);
+                else optionMap.put("price", productVariant.getPrice());
+
+                if (productVariant.getQuantity() == null) optionMap.put("quantity", null);
+                else optionMap.put("quantity", productVariant.getQuantity());
+
+                List<VariantValues> variantValues = variantValuesService.findById_VariantId(productVariant.getId());
+                for (VariantValues variantValue : variantValues) {
+                    OptionValues optionValues = optionValuesService.findByIdAndOption_Id(variantValue.getId().getValueId()
+                            , variantValue.getId().getOptionId());
+                    Options options = optionsService.findById(variantValue.getId().getOptionId());
+                    optionMap.put(options.getName().toLowerCase(), optionValues.getName());
+                }
+                optionList.add(optionMap);
+            }
+            productResponse.setOptions(optionList);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("OK", "Successfully!", productResponse)
+            );
+        } else
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    new ResponseObject("OK", "Product is not exists!", null)
+            );
     }
 
     /**
