@@ -22,7 +22,7 @@ public class Products {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "imageurl")
+    @Column(name = "imageurl", length = 1280)
     private String imageUrl;
 
     @Column(name = "description")
