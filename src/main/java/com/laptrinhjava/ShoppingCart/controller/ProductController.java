@@ -191,7 +191,7 @@ public class ProductController {
                     OptionValues findOptionValues = optionValuesService.findByNameAndOption_Id(entry.getValue(), findOptions.getId());
                     // Nếu giá trị của option không tồn tại thì lưu vào db
                     if (findOptionValues == null) {
-                        findOptionValues = new OptionValues(entry.getValue(), findOptions);
+                        findOptionValues = new OptionValues(entry.getValue().toUpperCase(), findOptions);
                         optionValuesService.save(findOptionValues);
                     }
                     skuId.append(entry.getValue().toUpperCase());
