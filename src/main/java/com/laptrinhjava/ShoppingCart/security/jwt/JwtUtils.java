@@ -22,7 +22,7 @@ public class JwtUtils {
     private final String jwtSecret = "khanh";
 
     // Thời gian có hiệu lực của chuỗi jwt
-    private final long jwtExpiration = 3600000L;  //hạn chuỗi jwt 30p
+    private final long jwtExpiration = 3600000L * 2L * 24L;  //hạn chuỗi jwt 1 ngay
 
     // Tạo jwt
     public String generateToken(Authentication authentication) {

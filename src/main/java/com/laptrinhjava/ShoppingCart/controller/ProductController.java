@@ -245,12 +245,6 @@ public class ProductController {
         for (ProductVariants productVariant : productVariants) {
             Map<String, Object> optionMap = new HashMap<>();
 
-            if (productVariant.getPrice() == null) optionMap.put("price", null);
-            else optionMap.put("price", productVariant.getPrice());
-
-            if (productVariant.getQuantity() == null) optionMap.put("quantity", null);
-            else optionMap.put("quantity", productVariant.getQuantity());
-
             List<VariantValues> variantValues = variantValuesService.findById_VariantId(productVariant.getId());
             for (VariantValues variantValue : variantValues) {
                 OptionValues optionValues = optionValuesService.findByIdAndOption_Id(variantValue.getId().getValueId()
@@ -258,6 +252,13 @@ public class ProductController {
                 Options options = optionsService.findById(variantValue.getId().getOptionId());
                 optionMap.put(options.getName().toLowerCase(), optionValues.getName());
             }
+
+            if (productVariant.getPrice() == null) optionMap.put("price", null);
+            else optionMap.put("price", productVariant.getPrice());
+
+            if (productVariant.getQuantity() == null) optionMap.put("quantity", null);
+            else optionMap.put("quantity", productVariant.getQuantity());
+            optionMap.entrySet().stream().sorted();
             optionList.add(optionMap);
         }
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -280,7 +281,7 @@ public class ProductController {
                 skuId.append("P").append(product.getId());
                 for (Map.Entry<String, String> entry : option.entrySet()) {
                     if (!Objects.equals(entry.getKey(), "price") && !Objects.equals(entry.getKey(), "quantity")) {
-                        skuId.append(entry.getKey().toUpperCase().charAt(0)).append(entry.getValue());
+                        skuId.append(entry.getKey().toUpperCase().charAt(0)).append(entry.getValue().toUpperCase());
                     }
                 }
                 ProductVariants productVariant = productVariantsService.findBySkuId(skuId.toString());
