@@ -250,7 +250,7 @@ public class ProductController {
                 OptionValues optionValues = optionValuesService.findByIdAndOption_Id(variantValue.getId().getValueId()
                         , variantValue.getId().getOptionId());
                 Options options = optionsService.findById(variantValue.getId().getOptionId());
-                optionMap.put(options.getName().toLowerCase(), optionValues.getName());
+                optionMap.put(options.getName().toLowerCase(), optionValues.getName().toLowerCase());
             }
 
             if (productVariant.getPrice() == null) optionMap.put("price", null);
