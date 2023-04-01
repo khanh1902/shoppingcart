@@ -90,7 +90,6 @@ public class ProductController {
             productResponse.setImageUrl(product.getImageUrl());
             productResponse.setName(product.getName());
             productResponse.setPrice(product.getPrice());
-            productResponse.setQuantity(product.getQuantity());
 
             List<ProductVariants> productVariants = productVariantsService.findByProducts_Id(product.getId());
             for (ProductVariants productVariant : productVariants) {
@@ -111,6 +110,7 @@ public class ProductController {
                 }
                 optionList.add(optionMap);
             }
+            productResponse.setQuantity(product.getQuantity());
             productResponse.setOptions(optionList);
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("OK", "Successfully!", productResponse)
@@ -161,10 +161,63 @@ public class ProductController {
     }
 
     /**
+     * Method: Update product
+     **/
+    @Consumes("multipart/form-data")
+    @PutMapping
+    public ResponseEntity<ResponseObject> updateProduct(@RequestParam(name = "id") Long productId,
+                                                        @RequestParam(name = "name") String newProductName,
+                                                        @RequestParam(name = "file") MultipartFile[] newFiles,
+                                                        @RequestParam(name = "categoryId") Long newCategoryId,
+                                                        @RequestParam(name = "description") String newDescription,
+                                                        @RequestParam(name = "price", required = false) Long newPrice,
+                                                        @RequestParam(name = "quantity", required = false) Long newQuantity) {
+        try {
+            Products findProduct = productService.findProductById(productId);
+            if (findProduct != null) {
+                String email = getUsername();
+                Users user = userService.findByEmail(email);
+
+                if (newProductName != null) findProduct.setName(newProductName);
+                if (newFiles != null) {
+                    amazonClient.deleteFile(findProduct.getImageUrl()); // xoa cac image da luu truoc do tren aws
+                    StringBuilder imageUrl = new StringBuilder();
+                    for (MultipartFile file : newFiles) {
+                        String url = amazonClient.uploadFile(file);
+                        imageUrl.append(url).append(","); // ngan cach cac imageUrl bang dau phay
+                    }
+                    findProduct.setImageUrl(imageUrl.toString()); // luu cac image vao db
+                }
+                if (newCategoryId != null) {
+                    Category category = categoryService.findCategoryById(newCategoryId);
+                    if (category == null) throw new RuntimeException("Category is not exists!");
+                    findProduct.setCategory(category);
+                }
+                if (newDescription != null) findProduct.setDescription(newDescription);
+                if (newPrice != null) findProduct.setPrice(newPrice);
+                if (newQuantity != null) findProduct.setQuantity(newQuantity);
+                findProduct.setUsers(user);
+                return ResponseEntity.status(HttpStatus.OK).body(
+                        new ResponseObject("OK", "Save Successfully!", productService.save(findProduct)
+                        )
+                );
+            } else
+                return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+                        new ResponseObject("FAILED", "Product not exists!", null)
+                );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+                    new ResponseObject("FAILED", "Error!", null)
+            );
+        }
+    }
+
+    /**
      * Method: Add Options for Product
      **/
     @PostMapping("/options")
-//    @PreAuthorize("hasRole('ADMIN')")
+
+    //    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> addOptions(@RequestBody OptionsRequest optionsRequests) {
         try {
             Products product = productService.findProductById(optionsRequests.getProductId());
@@ -300,8 +353,7 @@ public class ProductController {
             }
 
             // lưu lại quantity cho product từ các options
-            product = new Products(product.getName(), product.getImageUrl(), product.getCategory(),
-                    product.getDescription(), product.getUsers(), product.getPrice(), totalQuantity);
+            product.setQuantity(totalQuantity);
             productService.save(product);
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("OK", "Save Successfully!", null)
@@ -378,11 +430,12 @@ public class ProductController {
         try {
             Products findProduct = productService.findProductById(productId);
             if (findProduct != null) {
+                Long quantity = findProduct.getQuantity();
                 for (Map<String, Object> option : options) {
                     StringBuilder skuId = new StringBuilder();
                     skuId.append("P").append(findProduct.getId());
                     for (Map.Entry<String, Object> entry : option.entrySet()) {
-                        skuId.append(entry.getKey().toUpperCase().charAt(0)).append(entry.getValue());
+                        skuId.append(entry.getKey().toUpperCase().charAt(0)).append(entry.getValue().toString().toUpperCase());
                     }
                     List<ProductVariants> productVariantsList = productVariantsService.findByProducts_Id(findProduct.getId());
                     for (ProductVariants productVariant : productVariantsList) {
@@ -391,12 +444,15 @@ public class ProductController {
                             for (VariantValues variantValue : variantValuesList) {
                                 variantValuesService.deleteById_VariantId(variantValue.getId().getVariantId());
                             }
+                            quantity -= productVariant.getQuantity();
                             productVariantsService.deleteById(productVariant.getId());
                         }
-                        return ResponseEntity.status(HttpStatus.OK).body(
-                                new ResponseObject("OK", "Delete successfully!", null)
-                        );
                     }
+                    findProduct.setQuantity(quantity);
+                    productService.save(findProduct);
+                    return ResponseEntity.status(HttpStatus.OK).body(
+                            new ResponseObject("OK", "Delete successfully!", null)
+                    );
                 }
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
