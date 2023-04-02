@@ -19,4 +19,5 @@ public interface IVariantValuesRepository extends JpaRepository<VariantValues, V
     @Transactional
     @Modifying
     void deleteById_VariantId(Long variantId);
+    List<VariantValues> findById_ProductIdAndId_OptionIdAndId_ValueId(Long productId, Long optionId, Long valueId);
 }

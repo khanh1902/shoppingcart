@@ -13,8 +13,9 @@ import java.util.Map;
 public class OneProductResponse {
     private Long id;
     private String name;
-    private String imageUrl;
+    private String imageURL;
     private String description;
+    private Long categoryId;
     private List<Map<String, Object>> options;
     private Long price;
     private Long quantity;

@@ -12,5 +12,8 @@ public interface IVariantValuesService {
     List<VariantValues> findById_ProductId(Long productId);
     void deleteById_ProductId(Long productId);
     void deleteById_VariantId(Long variantId);
+    List<VariantValues> findById_ProductIdAndId_OptionIdAndId_ValueId(Long productId, Long optionId, Long valueId);
+
+
 
 }

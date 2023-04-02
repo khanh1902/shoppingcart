@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.ws.rs.Consumes;
 import java.util.*;
 
+import static java.lang.Long.min;
 import static java.lang.Long.parseLong;
 
 @RestController
@@ -79,6 +80,48 @@ public class ProductController {
         return null;
     }
 
+    @GetMapping("/filter")
+    public ResponseEntity<ResponseObject> filter(@RequestParam(required = false, name = "offset", defaultValue = "0") Integer offset,
+                                                 @RequestParam(required = false, name = "limit", defaultValue = "10") Integer limit,
+                                                 @RequestParam(required = false, name = "sortBy", defaultValue = "id") String sortBy,
+                                                 @RequestParam(required = false, name = "name") String name,
+                                                 @RequestParam(required = false, name = "categoryIds") List<Long> categoryIds,
+                                                 @RequestParam(required = false, name = "minPrice") Long minPrice,
+                                                 @RequestParam(required = false, name = "maxPrice") Long maxPrice) {
+//        List<Products> products = productService.findByNameContainingIgnoreCase(name);
+//        List<Products> filterWithCategory = new ArrayList<>();
+//        List<Products> filerWithPrice = new ArrayList<>();
+//
+//        if (products != null) {
+//
+//            if (categoryIds != null) {
+//                for (Products product : products) {
+//                    for (Long categoryId : categoryIds) {
+//                        if (product.getCategory().getId().equals(categoryId)) {
+//                            filterWithCategory.add(product);
+//                        }
+//                    }
+//                }
+//            } else filerWithPrice.addAll(products);
+//
+//            if (minPrice != null && maxPrice != null) {
+//                for (Products product : filterWithCategory) {
+//                    if (product.getPrice() >= minPrice && product.getPrice() <= maxPrice)
+//                        filerWithPrice.add(product);
+//                }
+//            } else filerWithPrice.addAll(filterWithCategory);
+//
+//
+//        }
+//        return ResponseEntity.status(HttpStatus.OK).body(
+//                new ResponseObject("OK", "Successfully!", filerWithPrice)
+//        );
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject("OK", "Successfully!",
+                        productService.filterWithPaging(offset, limit, sortBy, name, categoryIds, minPrice, maxPrice)));
+
+    }
+
     @GetMapping("/getOne")
     public ResponseEntity<ResponseObject> getOneProduct(@RequestParam(name = "id") Long productId) {
         Products product = productService.findProductById(productId);
@@ -87,7 +130,7 @@ public class ProductController {
             OneProductResponse productResponse = new OneProductResponse();
             productResponse.setId(product.getId());
             productResponse.setDescription(product.getDescription());
-            productResponse.setImageUrl(product.getImageUrl());
+            productResponse.setImageURL(product.getImageUrl());
             productResponse.setName(product.getName());
             productResponse.setPrice(product.getPrice());
 
@@ -110,6 +153,7 @@ public class ProductController {
                 }
                 optionList.add(optionMap);
             }
+            productResponse.setCategoryId(product.getCategory().getId());
             productResponse.setQuantity(product.getQuantity());
             productResponse.setOptions(optionList);
             return ResponseEntity.status(HttpStatus.OK).body(
@@ -163,11 +207,11 @@ public class ProductController {
     /**
      * Method: Update product
      **/
-    @Consumes("multipart/form-data")
+//    @Consumes("multipart/form-data")
     @PutMapping
     public ResponseEntity<ResponseObject> updateProduct(@RequestParam(name = "id") Long productId,
                                                         @RequestParam(name = "name") String newProductName,
-                                                        @RequestParam(name = "file") MultipartFile[] newFiles,
+                                                        @RequestParam(name = "file") List<Object> newFiles,
                                                         @RequestParam(name = "categoryId") Long newCategoryId,
                                                         @RequestParam(name = "description") String newDescription,
                                                         @RequestParam(name = "price", required = false) Long newPrice,
@@ -180,9 +224,42 @@ public class ProductController {
 
                 if (newProductName != null) findProduct.setName(newProductName);
                 if (newFiles != null) {
-                    amazonClient.deleteFile(findProduct.getImageUrl()); // xoa cac image da luu truoc do tren aws
                     StringBuilder imageUrl = new StringBuilder();
-                    for (MultipartFile file : newFiles) {
+                    List<String> oldImageUrlList = new ArrayList<>();
+                    List<String> newImageUrlList = new ArrayList<>();
+                    List<MultipartFile> newFileList = new ArrayList<>();
+                    List<String> listToDelete = new ArrayList<>();
+                    // lấy ra ảnh cũ từ aws và ảnh mới từ máy
+                    for (Object file : newFiles) {
+                        if (file instanceof String) newImageUrlList.add((String) file);
+                        else if (file instanceof MultipartFile) newFileList.add((MultipartFile) file);
+                    }
+                    String[] str = findProduct.getImageUrl().split(","); // tach rieng tung url
+                    //                        String[] fileName = s.split("/"); // lay key cua tung chuoi sau khi tach
+                    //                        oldImageUrlList.add(fileName[fileName.length -1]);
+                    oldImageUrlList.addAll(Arrays.asList(str));
+                    // lấy các image cần phải xóa đi
+                    for (String newImageUrl : newImageUrlList) {
+                        for (String oldImageUrl : oldImageUrlList) {
+                            if (!oldImageUrl.equals(newImageUrl)) {
+                                listToDelete.add(oldImageUrl);
+                            } else {
+                                imageUrl.append(newImageUrl).append(",");
+                                oldImageUrlList.remove(newImageUrl);
+                            }
+                        }
+                    }
+                    if (!listToDelete.isEmpty()) {
+                        // xóa các image cũ
+                        StringBuilder imageUrlDelete = new StringBuilder();
+                        for (String image : listToDelete) {
+                            imageUrlDelete.append(image).append(",");
+                        }
+                        amazonClient.deleteFile(imageUrlDelete.toString()); // xoa cac image da luu truoc do tren aws
+                    }
+
+                    // ảnh mới cập nhật
+                    for (MultipartFile file : newFileList) {
                         String url = amazonClient.uploadFile(file);
                         imageUrl.append(url).append(","); // ngan cach cac imageUrl bang dau phay
                     }

@@ -4,11 +4,14 @@ import com.laptrinhjava.ShoppingCart.entity.ProductVariants;
 import com.laptrinhjava.ShoppingCart.entity.Products;
 import com.laptrinhjava.ShoppingCart.payload.request.OptionsRequest;
 import com.laptrinhjava.ShoppingCart.payload.response.ProductResponse;
+import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
 import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.IProductRepository;
 import com.laptrinhjava.ShoppingCart.service.productService.IProductService;
 import com.laptrinhjava.ShoppingCart.service.productService.IProductVariantsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -94,6 +97,57 @@ public class ProductsServiceImpl implements IProductService {
             }
         }
         return options;
+    }
+
+    @Override
+    public List<Products> findByNameContainingIgnoreCase(String name) {
+        return productRepository.findByNameContainingIgnoreCase(name);
+    }
+
+    @Override
+    public Page<ProductResponse> filterWithPaging(Integer offset, Integer limit, String sortBy, String name,
+                                        List<Long> categoryIds, Long minPrice, Long maxPrice) {
+        Pageable paging = PageRequest.of(offset, limit, Sort.by(sortBy).ascending());
+        Page<Products> pageProduct = null;
+        if (name == null) {
+            pageProduct = productRepository.findAll(paging);
+        } else {
+            List<Products> products = filer(name, categoryIds, minPrice, maxPrice);
+            PageRequest pageRequest = PageRequest.of(offset, limit);
+            int start = (int) pageRequest.getOffset();
+            int end = Math.min((start + pageRequest.getPageSize()), products.size());
+            pageProduct = new PageImpl<>(products.subList(start, end), pageRequest, products.size());
+
+        }
+        List<ProductResponse> productResponses = covertProductsToProductResponse(pageProduct);
+        return new PageImpl<>(productResponses, paging, pageProduct.getTotalElements());
+    }
+
+    private List<Products> filer(String name, List<Long> categoryIds, Long minPrice, Long maxPrice){
+        List<Products> products = productRepository.findByNameContainingIgnoreCase(name);
+        List<Products> filterWithCategory = new ArrayList<>();
+        List<Products> filerWithPrice = new ArrayList<>();
+
+        if (products != null) {
+
+            if (categoryIds != null) {
+                for (Products product : products) {
+                    for (Long categoryId : categoryIds) {
+                        if (product.getCategory().getId().equals(categoryId)) {
+                            filterWithCategory.add(product);
+                        }
+                    }
+                }
+            } else filerWithPrice.addAll(products);
+
+            if (minPrice != null && maxPrice != null) {
+                for (Products product : filterWithCategory) {
+                    if (product.getPrice() >= minPrice && product.getPrice() <= maxPrice)
+                        filerWithPrice.add(product);
+                }
+            } else filerWithPrice.addAll(filterWithCategory);
+        }
+        return filerWithPrice;
     }
 
     public List<ProductResponse> covertProductsToProductResponse(Page<Products> pageProduct) {

@@ -18,4 +18,7 @@ public interface IProductService {
     Products update(Products newProduct, Long id);
     Page<ProductResponse> findWithFilterAndPageAndSort (Integer offset, Integer limit, String sortBy, String name);
     List<Map<String, String>> convertOptionsRequestToMap(OptionsRequest optionsRequest);
+    List<Products> findByNameContainingIgnoreCase(String name);
+    Page<ProductResponse> filterWithPaging(Integer offset, Integer limit, String sortBy, String name, List<Long> categoryIds, Long minPrice, Long maxPrice);
+
 }

@@ -119,4 +119,9 @@ public class AmazonClientImpl implements IAmazonClient {
 //        return fileName;
         return null;
     }
+
+    @Override
+    public void deleteOneFile(String key) {
+        amazonS3.deleteObject(bucketName, key);
+    }
 }

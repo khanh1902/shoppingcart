@@ -37,4 +37,9 @@ public class VariantValuesServiceImpl implements IVariantValuesService {
     public void deleteById_VariantId(Long variantId) {
         variantValuesRepository.deleteById_VariantId(variantId);
     }
+
+    @Override
+    public List<VariantValues> findById_ProductIdAndId_OptionIdAndId_ValueId(Long productId, Long optionId, Long valueId) {
+        return variantValuesRepository.findById_ProductIdAndId_OptionIdAndId_ValueId(productId, optionId, valueId);
+    }
 }

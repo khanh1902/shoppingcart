@@ -8,4 +8,5 @@ public interface IAmazonClient {
     String uploadFile(MultipartFile multipartFile);
     void deleteFile(String fileName);
     String updateFile(String fileName, String newFile);
+    void deleteOneFile(String key);
 }
