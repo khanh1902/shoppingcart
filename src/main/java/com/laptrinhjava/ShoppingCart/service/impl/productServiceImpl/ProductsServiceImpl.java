@@ -106,47 +106,44 @@ public class ProductsServiceImpl implements IProductService {
 
     @Override
     public Page<ProductResponse> filterWithPaging(Integer offset, Integer limit, String sortBy, String name,
-                                        List<Long> categoryIds, Long minPrice, Long maxPrice) {
+                                                  List<Long> categoryIds, Long minPrice, Long maxPrice) {
         Pageable paging = PageRequest.of(offset, limit, Sort.by(sortBy).ascending());
         Page<Products> pageProduct = null;
-        if (name == null) {
-            pageProduct = productRepository.findAll(paging);
-        } else {
-            List<Products> products = filer(name, categoryIds, minPrice, maxPrice);
-            PageRequest pageRequest = PageRequest.of(offset, limit);
-            int start = (int) pageRequest.getOffset();
-            int end = Math.min((start + pageRequest.getPageSize()), products.size());
-            pageProduct = new PageImpl<>(products.subList(start, end), pageRequest, products.size());
 
-        }
+        List<Products> products = filer(name, categoryIds, minPrice, maxPrice);
+        PageRequest pageRequest = PageRequest.of(offset, limit);
+        int start = (int) pageRequest.getOffset();
+        int end = Math.min((start + pageRequest.getPageSize()), products.size());
+        pageProduct = new PageImpl<>(products.subList(start, end), pageRequest, products.size());
+
         List<ProductResponse> productResponses = covertProductsToProductResponse(pageProduct);
         return new PageImpl<>(productResponses, paging, pageProduct.getTotalElements());
     }
 
-    private List<Products> filer(String name, List<Long> categoryIds, Long minPrice, Long maxPrice){
-        List<Products> products = productRepository.findByNameContainingIgnoreCase(name);
+    private List<Products> filer(String name, List<Long> categoryIds, Long minPrice, Long maxPrice) {
+        List<Products> products = new ArrayList<>();
         List<Products> filterWithCategory = new ArrayList<>();
         List<Products> filerWithPrice = new ArrayList<>();
+        if (name != null) {
+            products.addAll(productRepository.findByNameContainingIgnoreCase(name));
+        } else products.addAll(productRepository.findAll());
 
-        if (products != null) {
-
-            if (categoryIds != null) {
-                for (Products product : products) {
-                    for (Long categoryId : categoryIds) {
-                        if (product.getCategory().getId().equals(categoryId)) {
-                            filterWithCategory.add(product);
-                        }
+        if (categoryIds != null) {
+            for (Products product : products) {
+                for (Long categoryId : categoryIds) {
+                    if (product.getCategory().getId().equals(categoryId)) {
+                        filterWithCategory.add(product);
                     }
                 }
-            } else filerWithPrice.addAll(products);
+            }
+        } else filerWithPrice.addAll(products);
 
-            if (minPrice != null && maxPrice != null) {
-                for (Products product : filterWithCategory) {
-                    if (product.getPrice() >= minPrice && product.getPrice() <= maxPrice)
-                        filerWithPrice.add(product);
-                }
-            } else filerWithPrice.addAll(filterWithCategory);
-        }
+        if (minPrice != null && maxPrice != null) {
+            for (Products product : filterWithCategory) {
+                if (product.getPrice() >= minPrice && product.getPrice() <= maxPrice)
+                    filerWithPrice.add(product);
+            }
+        } else filerWithPrice.addAll(filterWithCategory);
         return filerWithPrice;
     }
 
@@ -154,7 +151,7 @@ public class ProductsServiceImpl implements IProductService {
         List<ProductResponse> productResponses = new ArrayList<>();
         for (Products product : pageProduct) {
             List<ProductVariants> productVariants = productVariantsService.findByProducts_Id(product.getId());
-            if (!productVariants.isEmpty()){
+            if (!productVariants.isEmpty()) {
                 Long minPrice = productVariants.get(0).getPrice();
                 for (int i = 1; i < productVariants.size(); i++) {
                     if (minPrice >= productVariants.get(i).getPrice()) minPrice = productVariants.get(i).getPrice();
