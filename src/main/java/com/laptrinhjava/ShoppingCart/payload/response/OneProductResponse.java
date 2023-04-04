@@ -17,7 +17,7 @@ public class OneProductResponse {
     private String description;
     private Long categoryId;
     private List<Map<String, Object>> options;
-    private Long price;
+    private Double price;
     private Long quantity;
 
 }

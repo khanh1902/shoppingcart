@@ -22,7 +22,7 @@ public class ProductVariants {
     private String skuId;
 
     @Column(name = "price", nullable = true)
-    private Long price;
+    private Double price;
 
     @Column(name = "quantity")
     private Long quantity;
@@ -32,7 +32,7 @@ public class ProductVariants {
     @JoinColumn(name = "product_id") // thông qua khóa ngoại address_id
     private Products products;
 
-    public ProductVariants(String skuId, Long price, Products products, Long quantity) {
+    public ProductVariants(String skuId, Double price, Products products, Long quantity) {
         this.skuId = skuId;
         this.price = price;
         this.products = products;

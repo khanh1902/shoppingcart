@@ -4,14 +4,11 @@ import com.laptrinhjava.ShoppingCart.entity.ProductVariants;
 import com.laptrinhjava.ShoppingCart.entity.Products;
 import com.laptrinhjava.ShoppingCart.payload.request.OptionsRequest;
 import com.laptrinhjava.ShoppingCart.payload.response.ProductResponse;
-import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
 import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.IProductRepository;
 import com.laptrinhjava.ShoppingCart.service.productService.IProductService;
 import com.laptrinhjava.ShoppingCart.service.productService.IProductVariantsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -39,6 +36,11 @@ public class ProductsServiceImpl implements IProductService {
     @Override
     public Products findByName(String name) {
         return productRepository.findByName(name);
+    }
+
+    @Override
+    public List<Products> findByCategory_Id(Long categoryId) {
+        return productRepository.findByCategory_Id(categoryId);
     }
 
     @Override
@@ -136,14 +138,19 @@ public class ProductsServiceImpl implements IProductService {
                     }
                 }
             }
-        } else filerWithPrice.addAll(products);
+        } else filterWithCategory.addAll(products);
 
         if (minPrice != null && maxPrice != null) {
             for (Products product : filterWithCategory) {
                 if (product.getPrice() >= minPrice && product.getPrice() <= maxPrice)
                     filerWithPrice.add(product);
             }
-        } else filerWithPrice.addAll(filterWithCategory);
+        } else if (maxPrice != null) {
+            for (Products product : filterWithCategory) {
+                if (product.getPrice() <= maxPrice)
+                    filerWithPrice.add(product);
+            }
+        } else if (minPrice == null) filerWithPrice.addAll(filterWithCategory);
         return filerWithPrice;
     }
 
@@ -152,7 +159,7 @@ public class ProductsServiceImpl implements IProductService {
         for (Products product : pageProduct) {
             List<ProductVariants> productVariants = productVariantsService.findByProducts_Id(product.getId());
             if (!productVariants.isEmpty()) {
-                Long minPrice = productVariants.get(0).getPrice();
+                Double minPrice = productVariants.get(0).getPrice();
                 for (int i = 1; i < productVariants.size(); i++) {
                     if (minPrice >= productVariants.get(i).getPrice()) minPrice = productVariants.get(i).getPrice();
                 }

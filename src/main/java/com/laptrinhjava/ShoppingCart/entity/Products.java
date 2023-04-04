@@ -29,7 +29,7 @@ public class Products {
     private String description;
 
     @Column(name = "price")
-    private Long price;
+    private Double price;
 
     @Column(name = "quantity")
     private Long quantity;
@@ -62,7 +62,7 @@ public class Products {
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Category category;
 
-    public Products(String name, String imageUrl, Category category, String description, Users users, Long price, Long quantity) {
+    public Products(String name, String imageUrl, Category category, String description, Users users, Double price, Long quantity) {
         this.name = name;
         this.imageUrl = imageUrl;
         this.category = category;

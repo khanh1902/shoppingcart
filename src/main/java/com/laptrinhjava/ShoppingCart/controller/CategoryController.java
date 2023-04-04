@@ -1,13 +1,13 @@
 package com.laptrinhjava.ShoppingCart.controller;
 
 import com.laptrinhjava.ShoppingCart.entity.Category;
+import com.laptrinhjava.ShoppingCart.entity.Products;
 import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
 import com.laptrinhjava.ShoppingCart.reponsitory.ICategoryRepository;
 import com.laptrinhjava.ShoppingCart.service.IAmazonClient;
 import com.laptrinhjava.ShoppingCart.service.ICategoryService;
-import com.sun.istack.Nullable;
+import com.laptrinhjava.ShoppingCart.service.productService.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,9 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.ws.rs.Consumes;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -31,6 +29,9 @@ public class CategoryController {
 
     @Autowired
     private IAmazonClient amazonClient;
+
+    @Autowired
+    private IProductService productService;
 
 
     @GetMapping("/all")
@@ -85,7 +86,7 @@ public class CategoryController {
             StringBuilder imageUrl = new StringBuilder();
             for (MultipartFile file : files) {
                 String url = amazonClient.uploadFile(file);
-                imageUrl.append(url + ","); // ngan cach cac imageUrl bang dau phay
+                imageUrl.append(url).append(","); // ngan cach cac imageUrl bang dau phay
             }
 
             Category category = new Category(name, code, imageUrl.toString());
@@ -128,6 +129,12 @@ public class CategoryController {
                 if (findCategory != null) {
                     amazonClient.deleteFile(findCategory.getImageUrl());
                     categoryService.delete(id);
+                    List<Products> findProductsByCategoryId = productService.findByCategory_Id(findCategory.getId());
+                    if (findProductsByCategoryId != null)
+                        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+                                new ResponseObject("Failed", "Can not remove " + findCategory.getName() +
+                                        " because product exists in this!", null)
+                        );
                 }
             }
             return ResponseEntity.status(HttpStatus.OK).body(

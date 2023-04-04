@@ -175,7 +175,7 @@ public class ProductController {
                                                @RequestParam(name = "file") MultipartFile[] files,
                                                @RequestParam(name = "categoryId") Long categoryId,
                                                @RequestParam(name = "description") String description,
-                                               @RequestParam(name = "price", required = false) Long price,
+                                               @RequestParam(name = "price", required = false) Double price,
                                                @RequestParam(name = "quantity", required = false) Long quantity) {
         StringBuilder imageUrl = new StringBuilder();
         for (MultipartFile file : files) {
@@ -211,10 +211,11 @@ public class ProductController {
     @PutMapping
     public ResponseEntity<ResponseObject> updateProduct(@RequestParam(name = "id") Long productId,
                                                         @RequestParam(name = "name") String newProductName,
-                                                        @RequestParam(name = "file") List<Object> newFiles,
+                                                        @RequestParam(name = "oldFiles") List<String> oldFiles,
+                                                        @RequestParam(name = "newFiles") List<MultipartFile> newFiles,
                                                         @RequestParam(name = "categoryId") Long newCategoryId,
                                                         @RequestParam(name = "description") String newDescription,
-                                                        @RequestParam(name = "price", required = false) Long newPrice,
+                                                        @RequestParam(name = "price", required = false) Double newPrice,
                                                         @RequestParam(name = "quantity", required = false) Long newQuantity) {
         try {
             Products findProduct = productService.findProductById(productId);
@@ -223,29 +224,17 @@ public class ProductController {
                 Users user = userService.findByEmail(email);
 
                 if (newProductName != null) findProduct.setName(newProductName);
-                if (newFiles != null) {
-                    StringBuilder imageUrl = new StringBuilder();
-                    List<String> oldImageUrlList = new ArrayList<>();
-                    List<String> newImageUrlList = new ArrayList<>();
-                    List<MultipartFile> newFileList = new ArrayList<>();
+                StringBuilder imageUrl = new StringBuilder();
+                if (oldFiles != null) {
                     List<String> listToDelete = new ArrayList<>();
-                    // lấy ra ảnh cũ từ aws và ảnh mới từ máy
-                    for (Object file : newFiles) {
-                        if (file instanceof String) newImageUrlList.add((String) file);
-                        else if (file instanceof MultipartFile) newFileList.add((MultipartFile) file);
-                    }
                     String[] str = findProduct.getImageUrl().split(","); // tach rieng tung url
-                    //                        String[] fileName = s.split("/"); // lay key cua tung chuoi sau khi tach
-                    //                        oldImageUrlList.add(fileName[fileName.length -1]);
-                    oldImageUrlList.addAll(Arrays.asList(str));
-                    // lấy các image cần phải xóa đi
-                    for (String newImageUrl : newImageUrlList) {
+                    List<String> oldImageUrlList = new ArrayList<>(Arrays.asList(str));
+                    for (String newImageUrl : oldFiles) {
                         for (String oldImageUrl : oldImageUrlList) {
                             if (!oldImageUrl.equals(newImageUrl)) {
                                 listToDelete.add(oldImageUrl);
                             } else {
                                 imageUrl.append(newImageUrl).append(",");
-                                oldImageUrlList.remove(newImageUrl);
                             }
                         }
                     }
@@ -257,14 +246,15 @@ public class ProductController {
                         }
                         amazonClient.deleteFile(imageUrlDelete.toString()); // xoa cac image da luu truoc do tren aws
                     }
-
-                    // ảnh mới cập nhật
-                    for (MultipartFile file : newFileList) {
+                }
+                if (newFiles != null) {
+                    for (MultipartFile file : newFiles) {
                         String url = amazonClient.uploadFile(file);
                         imageUrl.append(url).append(","); // ngan cach cac imageUrl bang dau phay
                     }
                     findProduct.setImageUrl(imageUrl.toString()); // luu cac image vao db
                 }
+
                 if (newCategoryId != null) {
                     Category category = categoryService.findCategoryById(newCategoryId);
                     if (category == null) throw new RuntimeException("Category is not exists!");
@@ -420,7 +410,7 @@ public class ProductController {
                 // set price và quantity
                 for (Map.Entry<String, String> entry : option.entrySet()) {
                     if (entry.getKey().equals("price")) {
-                        productVariant.setPrice(parseLong(entry.getValue()));
+                        productVariant.setPrice(Double.valueOf(entry.getValue()));
                     } else if (entry.getKey().equals("quantity")) {
                         productVariant.setQuantity(parseLong(entry.getValue()));
                     }
@@ -496,6 +486,7 @@ public class ProductController {
             );
         }
     }
+
 
     /**
      * Method: Delete product option by product id
