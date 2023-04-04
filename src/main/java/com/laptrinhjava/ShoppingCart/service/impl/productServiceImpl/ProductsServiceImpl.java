@@ -112,35 +112,22 @@ public class ProductsServiceImpl implements IProductService {
     public Page<Products> filterWithPaging(Integer offset, Integer limit, String sortBy, Boolean asc, String name,
                                            List<Long> categoryIds, Long minPrice, Long maxPrice) {
 
-//        List<Products> products = filer(name, categoryIds, minPrice, maxPrice);
         PageRequest pageRequest = null;
         if (asc) pageRequest = PageRequest.of(offset, limit, Sort.by(sortBy).ascending());
         else pageRequest = PageRequest.of(offset, limit, Sort.by(sortBy).descending());
-////        int start = (int) pageRequest.getOffset();
-////        int end = Math.min((start + pageRequest.getPageSize()), products.size());
-////        Page<Products> page = new PageImpl<Products>(products.subList(start, end), pageRequest, products.size());
-//
-////        List<ProductResponse> productResponses = covertProductsToProductResponse(pageProduct);
-////        return new PageImpl<>(productResponses, pageRequest, pageProduct.getTotalElements());
-//        Page<Products> pageProducts = filer(name, categoryIds, minPrice, maxPrice, pageRequest);
-//        return pageProducts;
         Page<Products> pageProduct = null;
         if (name == null) {
             pageProduct = productRepository.findAll(pageRequest);
         } else {
             pageProduct = productRepository.findByNameContainingIgnoreCase(name, pageRequest);
         }
-        Page<Products> pageProductFilter = filer(categoryIds, minPrice, maxPrice, pageProduct, pageRequest);
-        return pageProductFilter;
+        return filer(categoryIds, minPrice, maxPrice, pageProduct, pageRequest);
     }
 
     private Page<Products> filer(List<Long> categoryIds, Long minPrice, Long maxPrice, Page<Products> pageProduct, Pageable paging) {
         List<Products> filterWithCategory = new ArrayList<>();
         List<Products> filerWithPrice = new ArrayList<>();
-//        if (name != null) {
-//            products.addAll(productRepository.findByNameContainingIgnoreCase(name));
         List<Products> products = new ArrayList<>(pageProduct.getContent());
-//        } else products.addAll(productRepository.findAll());
 
         if (categoryIds != null) {
             for (Products product : products) {
@@ -164,11 +151,10 @@ public class ProductsServiceImpl implements IProductService {
             }
         } else if (minPrice == null) filerWithPrice.addAll(filterWithCategory);
 
-//        int start = (int) paging.getOffset();
-//        int end = Math.min((start + paging.getPageSize()), filerWithPrice.size());
-//        return new PageImpl<Products>(filerWithPrice.subList(start, end), paging, filerWithPrice.size());
-        Page<Products> newPage = new PageImpl<>(filerWithPrice, paging, filerWithPrice.size());
-        return newPage;
+        int start = (int) paging.getOffset();
+        int end = Math.min((start + paging.getPageSize()), filerWithPrice.size());
+        return new PageImpl<Products>(filerWithPrice.subList(start, end), paging, pageProduct.getTotalElements());
+//        return new PageImpl<>(filerWithPrice, paging, filerWithPrice.size());
     }
 
     public List<ProductResponse> covertProductsToProductResponse(Page<Products> pageProduct) {
