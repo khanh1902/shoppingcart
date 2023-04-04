@@ -64,16 +64,18 @@ public class ProductsServiceImpl implements IProductService {
     }
 
     @Override
-    public Page<ProductResponse> findWithFilterAndPageAndSort(Integer offset, Integer limit, String sortBy, String name) {
-        Pageable paging = PageRequest.of(offset, limit, Sort.by(sortBy).ascending());
+    public Page<Products> findWithFilterAndPageAndSort(Integer offset, Integer limit, String sortBy, String name) {
+        Pageable paging = PageRequest.of(offset, limit, Sort.by(sortBy).descending());
+
         Page<Products> pageProduct = null;
         if (name == null) {
             pageProduct = productRepository.findAll(paging);
         } else {
             pageProduct = productRepository.findByNameContainingIgnoreCase(name, paging);
         }
-        List<ProductResponse> productResponses = covertProductsToProductResponse(pageProduct);
-        return new PageImpl<>(productResponses, paging, pageProduct.getTotalElements());
+//        List<ProductResponse> productResponses = covertProductsToProductResponse(pageProduct);
+//        return new PageImpl<>(productResponses, paging, pageProduct.getTotalElements());
+        return pageProduct;
     }
 
     @Override
@@ -107,22 +109,24 @@ public class ProductsServiceImpl implements IProductService {
     }
 
     @Override
-    public Page<ProductResponse> filterWithPaging(Integer offset, Integer limit, String sortBy, String name,
-                                                  List<Long> categoryIds, Long minPrice, Long maxPrice) {
-        Pageable paging = PageRequest.of(offset, limit, Sort.by(sortBy).ascending());
-        Page<Products> pageProduct = null;
+    public Page<Products> filterWithPaging(Integer offset, Integer limit, String sortBy, Boolean asc, String name,
+                                           List<Long> categoryIds, Long minPrice, Long maxPrice) {
 
-        List<Products> products = filer(name, categoryIds, minPrice, maxPrice);
-        PageRequest pageRequest = PageRequest.of(offset, limit);
-        int start = (int) pageRequest.getOffset();
-        int end = Math.min((start + pageRequest.getPageSize()), products.size());
-        pageProduct = new PageImpl<>(products.subList(start, end), pageRequest, products.size());
+//        List<Products> products = filer(name, categoryIds, minPrice, maxPrice);
+        PageRequest pageRequest = null;
+        if (asc) pageRequest = PageRequest.of(offset, limit, Sort.by(sortBy).ascending());
+        else pageRequest = PageRequest.of(offset, limit, Sort.by(sortBy).descending());
+//        int start = (int) pageRequest.getOffset();
+//        int end = Math.min((start + pageRequest.getPageSize()), products.size());
+//        Page<Products> page = new PageImpl<Products>(products.subList(start, end), pageRequest, products.size());
 
-        List<ProductResponse> productResponses = covertProductsToProductResponse(pageProduct);
-        return new PageImpl<>(productResponses, paging, pageProduct.getTotalElements());
+//        List<ProductResponse> productResponses = covertProductsToProductResponse(pageProduct);
+//        return new PageImpl<>(productResponses, pageRequest, pageProduct.getTotalElements());
+        Page<Products> pageProducts = filer(name, categoryIds, minPrice, maxPrice, pageRequest);
+        return pageProducts;
     }
 
-    private List<Products> filer(String name, List<Long> categoryIds, Long minPrice, Long maxPrice) {
+    private Page<Products> filer(String name, List<Long> categoryIds, Long minPrice, Long maxPrice, Pageable paging) {
         List<Products> products = new ArrayList<>();
         List<Products> filterWithCategory = new ArrayList<>();
         List<Products> filerWithPrice = new ArrayList<>();
@@ -151,7 +155,10 @@ public class ProductsServiceImpl implements IProductService {
                     filerWithPrice.add(product);
             }
         } else if (minPrice == null) filerWithPrice.addAll(filterWithCategory);
-        return filerWithPrice;
+
+        int start = (int) paging.getOffset();
+        int end = Math.min((start + paging.getPageSize()), filerWithPrice.size());
+        return new PageImpl<Products>(filerWithPrice.subList(start, end), paging, filerWithPrice.size());
     }
 
     public List<ProductResponse> covertProductsToProductResponse(Page<Products> pageProduct) {

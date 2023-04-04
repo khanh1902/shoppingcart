@@ -84,6 +84,7 @@ public class ProductController {
     public ResponseEntity<ResponseObject> filter(@RequestParam(required = false, name = "offset", defaultValue = "0") Integer offset,
                                                  @RequestParam(required = false, name = "limit", defaultValue = "10") Integer limit,
                                                  @RequestParam(required = false, name = "sortBy", defaultValue = "id") String sortBy,
+                                                 @RequestParam(required = false, name = "asc", defaultValue = "true") Boolean asc,
                                                  @RequestParam(required = false, name = "name") String name,
                                                  @RequestParam(required = false, name = "categoryIds") List<Long> categoryIds,
                                                  @RequestParam(required = false, name = "minPrice") Long minPrice,
@@ -118,7 +119,7 @@ public class ProductController {
 //        );
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("OK", "Successfully!",
-                        productService.filterWithPaging(offset, limit, sortBy, name, categoryIds, minPrice, maxPrice)));
+                        productService.filterWithPaging(offset, limit, sortBy, asc, name, categoryIds, minPrice, maxPrice)));
 
     }
 
@@ -210,11 +211,11 @@ public class ProductController {
 //    @Consumes("multipart/form-data")
     @PutMapping
     public ResponseEntity<ResponseObject> updateProduct(@RequestParam(name = "id") Long productId,
-                                                        @RequestParam(name = "name") String newProductName,
-                                                        @RequestParam(name = "oldFiles") List<String> oldFiles,
-                                                        @RequestParam(name = "newFiles") List<MultipartFile> newFiles,
-                                                        @RequestParam(name = "categoryId") Long newCategoryId,
-                                                        @RequestParam(name = "description") String newDescription,
+                                                        @RequestParam(name = "name", required = false) String newProductName,
+                                                        @RequestParam(name = "oldFiles", required = false) List<String> oldFiles,
+                                                        @RequestParam(name = "newFiles", required = false) List<MultipartFile> newFiles,
+                                                        @RequestParam(name = "categoryId", required = false) Long newCategoryId,
+                                                        @RequestParam(name = "description", required = false) String newDescription,
                                                         @RequestParam(name = "price", required = false) Double newPrice,
                                                         @RequestParam(name = "quantity", required = false) Long newQuantity) {
         try {
