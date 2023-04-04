@@ -151,10 +151,14 @@ public class ProductsServiceImpl implements IProductService {
             }
         } else if (minPrice == null) filerWithPrice.addAll(filterWithCategory);
 
-        int start = (int) paging.getOffset();
-        int end = Math.min((start + paging.getPageSize()), filerWithPrice.size());
-        return new PageImpl<Products>(filerWithPrice.subList(start, end), paging, pageProduct.getTotalElements());
-//        return new PageImpl<>(filerWithPrice, paging, filerWithPrice.size());
+        int pageSize = paging.getPageSize();
+        // Create a new Page object with the correct page size and total number of elements
+        int totalElements = filerWithPrice.size();
+        int totalPages = (int) Math.ceil((double) totalElements / (double) pageSize);
+//        int start = (int) paging.getOffset();
+//        int end = Math.min((start + paging.getPageSize()), filerWithPrice.size());
+//        return new PageImpl<Products>(filerWithPrice.subList(start, end), paging, pageProduct.getTotalElements());
+        return new PageImpl<>(filerWithPrice, paging, totalPages);
     }
 
     public List<ProductResponse> covertProductsToProductResponse(Page<Products> pageProduct) {
