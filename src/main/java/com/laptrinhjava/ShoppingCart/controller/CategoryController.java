@@ -127,22 +127,25 @@ public class CategoryController {
             for (Long id : ids) {
                 Category findCategory = categoryService.findCategoryById(id);
                 if (findCategory != null) {
-                    amazonClient.deleteFile(findCategory.getImageUrl());
-                    categoryService.delete(id);
                     List<Products> findProductsByCategoryId = productService.findByCategory_Id(findCategory.getId());
                     if (findProductsByCategoryId != null)
                         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
                                 new ResponseObject("Failed", "Can not remove " + findCategory.getName() +
                                         " because product exists in this!", null)
                         );
+
+                    else {
+                        amazonClient.deleteFile(findCategory.getImageUrl());
+                        categoryService.delete(findCategory.getId());
+                    }
                 }
             }
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("OK", "Delete Successfully!", null)
             );
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                    new ResponseObject("Failed", "Error!", e.getMessage())
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("FAILED", "Error!", e.getMessage())
             );
         }
     }

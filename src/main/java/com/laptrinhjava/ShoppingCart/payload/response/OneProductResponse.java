@@ -13,7 +13,7 @@ import java.util.Map;
 public class OneProductResponse {
     private Long id;
     private String name;
-    private String imageURL;
+    private String imageUrl;
     private String description;
     private Long categoryId;
     private List<Map<String, Object>> options;

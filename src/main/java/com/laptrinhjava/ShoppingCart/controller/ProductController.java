@@ -1,10 +1,7 @@
 package com.laptrinhjava.ShoppingCart.controller;
 
 import com.laptrinhjava.ShoppingCart.entity.*;
-import com.laptrinhjava.ShoppingCart.payload.TypeOptionsDetail;
-import com.laptrinhjava.ShoppingCart.payload.request.OptionsDetailRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.OptionsRequest;
-import com.laptrinhjava.ShoppingCart.payload.TypeOptions;
 import com.laptrinhjava.ShoppingCart.payload.response.OneProductResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
 import com.laptrinhjava.ShoppingCart.service.IAmazonClient;
@@ -14,7 +11,6 @@ import com.laptrinhjava.ShoppingCart.service.productService.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,9 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.ws.rs.Consumes;
+import java.text.DecimalFormat;
 import java.util.*;
 
-import static java.lang.Long.min;
 import static java.lang.Long.parseLong;
 
 @RestController
@@ -57,6 +53,8 @@ public class ProductController {
 
     @Autowired
     private IUserService userService;
+
+    private static final DecimalFormat df = new DecimalFormat("0.00");
 
     /**
      * Method: Find All Product with paging, sort and filter
@@ -131,16 +129,16 @@ public class ProductController {
             OneProductResponse productResponse = new OneProductResponse();
             productResponse.setId(product.getId());
             productResponse.setDescription(product.getDescription());
-            productResponse.setImageURL(product.getImageUrl());
+            productResponse.setImageUrl(product.getImageUrl());
             productResponse.setName(product.getName());
-            productResponse.setPrice(product.getPrice());
+            productResponse.setPrice(product.getPrice()); // làm tròn 2 số thập phân
 
             List<ProductVariants> productVariants = productVariantsService.findByProducts_Id(product.getId());
             for (ProductVariants productVariant : productVariants) {
                 Map<String, Object> optionMap = new HashMap<>();
 
                 if (productVariant.getPrice() == null) optionMap.put("price", null);
-                else optionMap.put("price", productVariant.getPrice());
+                else optionMap.put("price", productVariant.getPrice()); // làm tròn 2 số thập phân
 
                 if (productVariant.getQuantity() == null) optionMap.put("quantity", null);
                 else optionMap.put("quantity", productVariant.getQuantity());
