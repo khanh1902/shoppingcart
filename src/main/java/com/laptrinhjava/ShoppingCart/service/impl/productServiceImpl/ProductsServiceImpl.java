@@ -64,14 +64,17 @@ public class ProductsServiceImpl implements IProductService {
     }
 
     @Override
-    public Page<Products> findWithFilterAndPageAndSort(Integer offset, Integer limit, String sortBy, String name) {
-        Pageable paging = PageRequest.of(offset, limit, Sort.by(sortBy).descending());
+    public Page<Products> findWithFilterAndPageAndSort(Integer offset, Integer limit, String sortBy, Boolean asc, String name) {
+//        Pageable paging = PageRequest.of(offset, limit, Sort.by(sortBy).descending());
+        PageRequest paging = null;
+        if (asc) paging = PageRequest.of(offset, limit, Sort.by(sortBy).ascending());
+        else paging = PageRequest.of(offset, limit, Sort.by(sortBy).descending());
 
         Page<Products> pageProduct = null;
         if (name == null) {
             pageProduct = productRepository.findAll(paging);
         } else {
-            pageProduct = productRepository.findByNameContainingIgnoreCase(name, paging);
+//            pageProduct = productRepository.findByNameContainingIgnoreCase(name, paging);
         }
 //        List<ProductResponse> productResponses = covertProductsToProductResponse(pageProduct);
 //        return new PageImpl<>(productResponses, paging, pageProduct.getTotalElements());
@@ -105,29 +108,22 @@ public class ProductsServiceImpl implements IProductService {
 
     @Override
     public List<Products> findByNameContainingIgnoreCase(String name) {
-        return productRepository.findByNameContainingIgnoreCase(name);
+//        return productRepository.findByNameContainingIgnoreCase(name);
+        return null;
     }
 
     @Override
-    public Page<Products> filterWithPaging(Integer offset, Integer limit, String sortBy, Boolean asc, String name,
-                                           List<Long> categoryIds, Long minPrice, Long maxPrice) {
-
-        PageRequest pageRequest = null;
-        if (asc) pageRequest = PageRequest.of(offset, limit, Sort.by(sortBy).ascending());
-        else pageRequest = PageRequest.of(offset, limit, Sort.by(sortBy).descending());
-        Page<Products> pageProduct = null;
-        if (name == null) {
-            pageProduct = productRepository.findAll(pageRequest);
-        } else {
-            pageProduct = productRepository.findByNameContainingIgnoreCase(name, pageRequest);
-        }
-        return filer(categoryIds, minPrice, maxPrice, pageProduct, pageRequest);
-    }
-
-    private Page<Products> filer(List<Long> categoryIds, Long minPrice, Long maxPrice, Page<Products> pageProduct, Pageable paging) {
+    public List<Products> filer(String sortBy, Boolean asc, String name, List<Long> categoryIds, Long minPrice, Long maxPrice) {
         List<Products> filterWithCategory = new ArrayList<>();
         List<Products> filerWithPrice = new ArrayList<>();
-        List<Products> products = new ArrayList<>(pageProduct.getContent());
+
+        Sort sort = Sort.by(sortBy);
+        if (asc) sort = sort.ascending();
+        else sort = sort.descending();
+
+        List<Products> products = null;
+        if (name == null) products = productRepository.findAll(sort);
+        else products = productRepository.findByNameContainingIgnoreCase(name, sort);
 
         if (categoryIds != null) {
             for (Products product : products) {
@@ -151,14 +147,7 @@ public class ProductsServiceImpl implements IProductService {
             }
         } else if (minPrice == null) filerWithPrice.addAll(filterWithCategory);
 
-        int pageSize = paging.getPageSize();
-        // Create a new Page object with the correct page size and total number of elements
-        int totalElements = filerWithPrice.size();
-        int totalPages = (int) Math.ceil((double) totalElements / (double) pageSize);
-//        int start = (int) paging.getOffset();
-//        int end = Math.min((start + paging.getPageSize()), filerWithPrice.size());
-//        return new PageImpl<Products>(filerWithPrice.subList(start, end), paging, pageProduct.getTotalElements());
-        return new PageImpl<>(filerWithPrice, paging, totalPages);
+        return filerWithPrice;
     }
 
     public List<ProductResponse> covertProductsToProductResponse(Page<Products> pageProduct) {

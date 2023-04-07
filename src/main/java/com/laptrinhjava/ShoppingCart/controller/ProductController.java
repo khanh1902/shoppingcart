@@ -9,6 +9,10 @@ import com.laptrinhjava.ShoppingCart.service.ICategoryService;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
 import com.laptrinhjava.ShoppingCart.service.productService.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -19,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.ws.rs.Consumes;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.*;
 
 import static java.lang.Long.parseLong;
@@ -61,12 +66,13 @@ public class ProductController {
      **/
     @GetMapping
     public ResponseEntity<ResponseObject> searchWithFilter(@RequestParam(required = false, name = "offset", defaultValue = "0") Integer offset,
-                                                           @RequestParam(required = false, name = "limit", defaultValue = "5") Integer limit,
+                                                           @RequestParam(required = false, name = "limit", defaultValue = "10") Integer limit,
                                                            @RequestParam(required = false, name = "sortBy", defaultValue = "id") String sortBy,
+                                                           @RequestParam(required = false, name = "asc", defaultValue = "true") Boolean asc,
                                                            @RequestParam(required = false, name = "name") String name) {
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("OK", "Successfully!",
-                        productService.findWithFilterAndPageAndSort(offset, limit, sortBy, name)));
+                        productService.findWithFilterAndPageAndSort(offset, limit, sortBy, asc, name)));
     }
 
 
@@ -87,37 +93,18 @@ public class ProductController {
                                                  @RequestParam(required = false, name = "categoryIds") List<Long> categoryIds,
                                                  @RequestParam(required = false, name = "minPrice") Long minPrice,
                                                  @RequestParam(required = false, name = "maxPrice") Long maxPrice) {
-//        List<Products> products = productService.findByNameContainingIgnoreCase(name);
-//        List<Products> filterWithCategory = new ArrayList<>();
-//        List<Products> filerWithPrice = new ArrayList<>();
-//
-//        if (products != null) {
-//
-//            if (categoryIds != null) {
-//                for (Products product : products) {
-//                    for (Long categoryId : categoryIds) {
-//                        if (product.getCategory().getId().equals(categoryId)) {
-//                            filterWithCategory.add(product);
-//                        }
-//                    }
-//                }
-//            } else filerWithPrice.addAll(products);
-//
-//            if (minPrice != null && maxPrice != null) {
-//                for (Products product : filterWithCategory) {
-//                    if (product.getPrice() >= minPrice && product.getPrice() <= maxPrice)
-//                        filerWithPrice.add(product);
-//                }
-//            } else filerWithPrice.addAll(filterWithCategory);
-//
-//
-//        }
-//        return ResponseEntity.status(HttpStatus.OK).body(
-//                new ResponseObject("OK", "Successfully!", filerWithPrice)
-//        );
+        PageRequest pageRequest = PageRequest.of(offset, limit);
+//        if (asc) pageRequest = PageRequest.of(offset, limit, Sort.by(sortBy).ascending());
+//        else pageRequest = PageRequest.of(offset, limit, Sort.by(sortBy).descending());
+        List<Products> products = productService.filer(sortBy, asc, name, categoryIds, minPrice, maxPrice);
+        int start = (int) pageRequest.getOffset();
+        int end = Math.min(start+pageRequest.getPageSize(),products.size());
+        Page<Products> pageProducts = new PageImpl<>(products.subList(start, end), pageRequest, products.size());
+
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("OK", "Successfully!",
-                        productService.filterWithPaging(offset, limit, sortBy, asc, name, categoryIds, minPrice, maxPrice)));
+                        pageProducts)
+        );
 
     }
 
