@@ -68,7 +68,7 @@ public class CartItemsServiceImpl implements ICartItemsService {
     }
 
     @Override
-    public CartItems addProductToCartItem(CartItemsRequest item) {
+    public CartItemsResponse addProductToCartItem(CartItemsRequest item) {
         String email = getUsername();
         Users findUser = userRepository.findByEmail(email);
         Cart cart = cartRepository.findByUserId(findUser.getId());
@@ -89,15 +89,20 @@ public class CartItemsServiceImpl implements ICartItemsService {
                     cartItemsRepository.save(cartItem);
                     cart.setTotalPrice(cart.getTotalPrice() + (item.getQuantity() * product.getPrice()));
                     cartRepository.save(cart);
-                    return cartItem;
+//                    return cartItem;
+                    return new CartItemsResponse(product.getId(), product.getName(),
+                            product.getImageUrl(), item.getOption(), cartItem.getQuantity(), cartItem.getPrice());
+
                 } else if (cartItem.getProductVariants().getSkuId().equals(skuid.toString())) {
                     cartItem.setQuantity(cartItem.getQuantity() + item.getQuantity());
-                    cartItem.setPrice(cartItem.getPrice() + (item.getQuantity() * product.getPrice()));
+                    cartItem.setPrice(cartItem.getPrice() + (item.getQuantity() * cartItem.getProductVariants().getPrice()));
                     cartItemsRepository.save(cartItem);
                     cart.setTotalPrice(cart.getTotalPrice() + (item.getQuantity() * product.getPrice()));
                     cartRepository.save(cart);
-                    return cartItem;
+//                    return cartItem;
                 }
+                return new CartItemsResponse(product.getId(), product.getName(),
+                        product.getImageUrl(), item.getOption(), cartItem.getQuantity(), cartItem.getPrice());
             }
             // nếu sản phẩm tồn tại nhưng có skuid khác
             ProductVariants productVariant = productVariantsRepository.findBySkuId(skuid.toString());
@@ -105,7 +110,9 @@ public class CartItemsServiceImpl implements ICartItemsService {
             cartItemsRepository.save(cartItems);
             cart.setTotalPrice(cart.getTotalPrice() + (item.getQuantity() * productVariant.getPrice()));
             cartRepository.save(cart);
-            return cartItems;
+//            return cartItems;
+            return new CartItemsResponse(product.getId(), product.getName(),
+                    product.getImageUrl(), item.getOption(), cartItems.getQuantity(), cartItems.getPrice());
 
         } else { // nếu sản phẩm chưa tồn tại trong giỏ hàng thì lưu mới
             ProductVariants productVariant = productVariantsRepository.findBySkuId(skuid.toString());
@@ -120,7 +127,9 @@ public class CartItemsServiceImpl implements ICartItemsService {
                 cart.setTotalPrice(cart.getTotalPrice() + (item.getQuantity() * product.getPrice()));
                 cartRepository.save(cart);
             }
-            return cartItems;
+//            return cartItems;
+            return new CartItemsResponse(product.getId(), product.getName(),
+                    product.getImageUrl(), item.getOption(), cartItems.getQuantity(), cartItems.getPrice());
         }
     }
 
