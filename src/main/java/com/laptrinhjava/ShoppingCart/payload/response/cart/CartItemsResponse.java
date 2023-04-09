@@ -10,13 +10,15 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 public class CartItemsResponse {
+    private Long productId;
     private String productName;
     private String imageUrl;
     private Map<String, Object> option;
     private Long quantity;
     private Double price;
 
-    public CartItemsResponse(String productName, String imageUrl, Map<String, Object> option, Long quantity, Double price) {
+    public CartItemsResponse(Long productId, String productName, String imageUrl, Map<String, Object> option, Long quantity, Double price) {
+        this.productId = productId;
         this.productName = productName;
         this.imageUrl = imageUrl;
         this.option = option;

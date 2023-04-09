@@ -14,7 +14,7 @@ public interface ICartItemsService {
 //    void deleteByProduct(Product product);
     void deleteByProductId(Long id);
     CartItems findByProductIdAndProductVariantsId(Long productId, Long productVariantsId);
-    List<CartItems> findByProductId(Long productId);
+    List<CartItems> findByProductIdAndCart_Id(Long productId, Long cartId);
     CartItems addProductToCartItem(Long userId, CartItemsRequest item);
     CartResponse getAllCart(Long userId);
     CartItems updateProductInCartItem(Long userId, UpdateCartItemRequest item);

@@ -58,8 +58,8 @@ public class CartItemsServiceImpl implements ICartItemsService {
     }
 
     @Override
-    public List<CartItems> findByProductId(Long productId) {
-        return cartItemsRepository.findByProductId(productId);
+    public List<CartItems> findByProductIdAndCart_Id(Long productId, Long cartId) {
+        return cartItemsRepository.findByProductIdAndCart_Id(productId, cartId);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class CartItemsServiceImpl implements ICartItemsService {
         for (Map.Entry<String, Object> option : item.getOption().entrySet()) {
             skuid.append(option.getKey().toUpperCase().charAt(0)).append(option.getValue().toString().toUpperCase());
         }
-        List<CartItems> cartItemsList = cartItemsRepository.findByProductId(product.getId());
+        List<CartItems> cartItemsList = cartItemsRepository.findByProductIdAndCart_Id(product.getId(), cart.getId());
         CartItems cartItems = null;
         if (!cartItemsList.isEmpty()) {
             //nếu sản phẩm đã tồn tại trong giỏ hàng thì update lại số lượng
@@ -92,21 +92,29 @@ public class CartItemsServiceImpl implements ICartItemsService {
                     return cartItem;
                 }
             }
-            // nếu sản phẩm chưa tồn tại trong giỏ hàng thì lưu mới
-        } else {
+            // nếu sản phẩm tồn tại nhưng có skuid khác
+            ProductVariants productVariant = productVariantsRepository.findBySkuId(skuid.toString());
+            cartItems = new CartItems(cart, product.getId(), item.getQuantity(), productVariant.getPrice() * item.getQuantity(), productVariant);
+            cartItemsRepository.save(cartItems);
+            cart.setTotalPrice(cart.getTotalPrice() + (item.getQuantity() * productVariant.getPrice()));
+            cartRepository.save(cart);
+            return cartItems;
+
+        } else { // nếu sản phẩm chưa tồn tại trong giỏ hàng thì lưu mới
             ProductVariants productVariant = productVariantsRepository.findBySkuId(skuid.toString());
             if (productVariant != null) {
                 cartItems = new CartItems(cart, product.getId(), item.getQuantity(), productVariant.getPrice() * item.getQuantity(), productVariant);
+                cartItemsRepository.save(cartItems);
+                cart.setTotalPrice(cart.getTotalPrice() + (item.getQuantity() * productVariant.getPrice()));
+                cartRepository.save(cart);
             } else {
                 cartItems = new CartItems(cart, product.getId(), item.getQuantity(), product.getPrice() * item.getQuantity(), null);
+                cartItemsRepository.save(cartItems);
+                cart.setTotalPrice(cart.getTotalPrice() + (item.getQuantity() * product.getPrice()));
+                cartRepository.save(cart);
             }
-            cartItemsRepository.save(cartItems);
-
-            cart.setTotalPrice(cart.getTotalPrice() + (item.getQuantity() * product.getPrice()));
-            cartRepository.save(cart);
             return cartItems;
         }
-        return null;
     }
 
     @Override
@@ -118,6 +126,7 @@ public class CartItemsServiceImpl implements ICartItemsService {
             for (CartItems cartItem : findCartItemsByCartId) {
                 CartItemsResponse cartItemsResponse = new CartItemsResponse();
                 Products product = productRepository.findProductById(cartItem.getProductId());
+                cartItemsResponse.setProductId(product.getId());
                 cartItemsResponse.setProductName(product.getName());
                 cartItemsResponse.setImageUrl(product.getImageUrl());
                 cartItemsResponse.setPrice(cartItem.getPrice());
