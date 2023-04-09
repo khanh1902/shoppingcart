@@ -47,9 +47,9 @@ public class CartController {
      *        3: save CartResponse from Card and CartItemsResponse
      **/
     @GetMapping
-    public ResponseEntity<ResponseObject> findById(@RequestParam(name = "id") Long cartId) {
+    public ResponseEntity<ResponseObject> findById(@RequestParam(name = "userId") Long userId) {
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("OK", "Add Product Successfully!", cartItemsService.getAllCart(cartId))
+                new ResponseObject("OK", "Add Product Successfully!", cartItemsService.getAllCart(userId))
         );
 
     }
@@ -57,10 +57,10 @@ public class CartController {
      * Method: Add 1 Item To Cart
      **/
     @PostMapping
-    public ResponseEntity<ResponseObject> addItems(@RequestParam(name = "cartId") Long id,
+    public ResponseEntity<ResponseObject> addItems(@RequestParam(name = "userId") Long userId,
                                                    @RequestBody CartItemsRequest item) {
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("OK", "Add Product Successfully!", cartItemsService.addProductToCartItem(id, item))
+                new ResponseObject("OK", "Add Product Successfully!", cartItemsService.addProductToCartItem(userId, item))
         );
     }
 
@@ -68,10 +68,10 @@ public class CartController {
      * Method: Update Cart
      **/
     @PutMapping
-    public ResponseEntity<ResponseObject> update(@RequestParam(name = "cartId") Long cartId,
+    public ResponseEntity<ResponseObject> update(@RequestParam(name = "userId") Long userId,
                                                  @RequestBody UpdateCartItemRequest item) {
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("OK", "Add Product Successfully!", cartItemsService.updateProductInCartItem(cartId, item))
+                new ResponseObject("OK", "Add Product Successfully!", cartItemsService.updateProductInCartItem(userId, item))
         );
     }
 

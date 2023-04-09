@@ -63,8 +63,8 @@ public class CartItemsServiceImpl implements ICartItemsService {
     }
 
     @Override
-    public CartItems addProductToCartItem(Long cartId, CartItemsRequest item) {
-        Cart cart = cartRepository.findCartById(cartId);
+    public CartItems addProductToCartItem(Long userId, CartItemsRequest item) {
+        Cart cart = cartRepository.findByUserId(userId);
         Products product = productRepository.findProductById(item.getProductId());
         StringBuilder skuid = new StringBuilder();
         skuid.append("P").append(product.getId());
@@ -110,8 +110,8 @@ public class CartItemsServiceImpl implements ICartItemsService {
     }
 
     @Override
-    public CartResponse getAllCart(Long cartId) {
-        Cart cart = cartRepository.findCartById(cartId);
+    public CartResponse getAllCart(Long userId) {
+        Cart cart = cartRepository.findByUserId(userId);
         List<CartItemsResponse> cartItems = new ArrayList<>();
         if (cart != null) {
             List<CartItems> findCartItemsByCartId = cartItemsRepository.findByCart_Id(cart.getId());
@@ -147,8 +147,8 @@ public class CartItemsServiceImpl implements ICartItemsService {
     }
 
     @Override
-    public CartItems updateProductInCartItem(Long cartId, UpdateCartItemRequest item) {
-        Cart findCart = cartRepository.findCartById(cartId);
+    public CartItems updateProductInCartItem(Long userId, UpdateCartItemRequest item) {
+        Cart findCart = cartRepository.findByUserId(userId);
         if (findCart != null) {
             Double totalPrice = findCart.getTotalPrice();
             CartItems findCartItem = cartItemsRepository.findCartItemsById(item.getCartItemId());
@@ -157,43 +157,15 @@ public class CartItemsServiceImpl implements ICartItemsService {
                 if (item.getAddQuantity() != null) {
                     findCartItem.setQuantity(findCartItem.getQuantity() + item.getAddQuantity());
                     findCartItem.setPrice(findCartItem.getPrice() + (findProduct.getPrice() * item.getAddQuantity()));
+                    totalPrice += findProduct.getPrice() * item.getAddQuantity();
                 } else if (item.getSubQuantity() != null) {
                     findCartItem.setQuantity(findCartItem.getQuantity() - item.getSubQuantity());
                     findCartItem.setPrice(findCartItem.getPrice() - (findProduct.getPrice() * item.getSubQuantity()));
+                    totalPrice -= findProduct.getPrice() * item.getAddQuantity();
                 }
                 cartItemsRepository.save(findCartItem);
                 return findCartItem;
             } else {
-//                if(item.getOption() != null){
-//                    StringBuilder skuid = new StringBuilder();
-//                    skuid.append("P").append(findProduct.getId());
-//                    for (Map.Entry<String, Object> option : item.getOption().entrySet()) {
-//                        skuid.append(option.getKey().toUpperCase().charAt(0)).append(option.getValue().toString().toUpperCase());
-//                    }
-//                    ProductVariants findProductVariant = productVariantsRepository.findBySkuId(skuid.toString());
-//                    if (findProductVariant != null) {
-//                        findCartItem.setProductVariants(findProductVariant);
-//                        if (item.getAddQuantity() != null){
-//                            findCartItem.setQuantity(findCartItem.getQuantity() + item.getAddQuantity());
-//                            findCartItem.setPrice(findCartItem.getPrice() + (findProductVariant.getPrice() * item.getAddQuantity()));
-//                        }
-//                        else if(item.getSubQuantity() != null){
-//                            findCartItem.setQuantity(findCartItem.getQuantity() - item.getSubQuantity());
-//                            findCartItem.setPrice(findCartItem.getPrice() - (findProductVariant.getPrice() * item.getSubQuantity()));
-//                        }
-//                    }
-//                }
-//                else {
-//                    ProductVariants findProductVariant = productVariantsRepository.findBySkuId(findCartItem.getProductVariants().getSkuId());
-//                    if (item.getAddQuantity() != null){
-//                        findCartItem.setQuantity(findCartItem.getQuantity() + item.getAddQuantity());
-//                        findCartItem.setPrice(findCartItem.getPrice() + (findProductVariant.getPrice() * item.getAddQuantity()));
-//                    }
-//                    else if(item.getSubQuantity() != null){
-//                        findCartItem.setQuantity(findCartItem.getQuantity() - item.getSubQuantity());
-//                        findCartItem.setPrice(findCartItem.getPrice() - (findProductVariant.getPrice() * item.getSubQuantity()));
-//                    }
-//                }
                 StringBuilder skuid = new StringBuilder();
                 skuid.append("P").append(findProduct.getId());
                 for (Map.Entry<String, Object> option : item.getOption().entrySet()) {
@@ -203,6 +175,7 @@ public class CartItemsServiceImpl implements ICartItemsService {
 
                 // nếu thay đổi option thì cập nhật lại productVariant thông qua skuid
                 if (!findProductVariant.getSkuId().equals(findCartItem.getProductVariants().getSkuId())) {
+                    totalPrice -= findCartItem.getPrice();
                     findCartItem.setProductVariants(findProductVariant);
                     findCartItem.setPrice(findCartItem.getQuantity() * findProductVariant.getPrice());
                     if (item.getAddQuantity() != null) {
@@ -215,20 +188,23 @@ public class CartItemsServiceImpl implements ICartItemsService {
                         findCartItem.setPrice(findCartItem.getQuantity() * findProductVariant.getPrice());
                     }
                     cartItemsRepository.save(findCartItem);
+                    totalPrice += findCartItem.getPrice();
 //                    return findCartItem;
-
                 } else {
                     if (item.getAddQuantity() != null) {
                         findCartItem.setQuantity(findCartItem.getQuantity() + item.getAddQuantity());
                         findCartItem.setPrice(findCartItem.getPrice() + (findProductVariant.getPrice() * item.getAddQuantity()));
+                        totalPrice += findProductVariant.getPrice() * item.getAddQuantity();
                     } else if (item.getSubQuantity() != null) {
                         findCartItem.setQuantity(findCartItem.getQuantity() - item.getSubQuantity());
                         findCartItem.setPrice(findCartItem.getPrice() - (findProductVariant.getPrice() * item.getSubQuantity()));
+                        totalPrice -= findProductVariant.getPrice() * item.getSubQuantity();
                     }
                     cartItemsRepository.save(findCartItem);
 //                    return findCartItem;
-
                 }
+                findCart.setTotalPrice(totalPrice);
+                cartRepository.save(findCart);
             }
             return findCartItem;
         }
