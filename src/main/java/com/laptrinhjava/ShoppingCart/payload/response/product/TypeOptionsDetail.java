@@ -1,4 +1,4 @@
-package com.laptrinhjava.ShoppingCart.payload;
+package com.laptrinhjava.ShoppingCart.payload.response.product;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

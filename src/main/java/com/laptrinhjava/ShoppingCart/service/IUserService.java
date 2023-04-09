@@ -15,4 +15,6 @@ public interface IUserService {
     Boolean existsByEmail(String email);
     Users save(Users user);
     void processOAuthPostLogin(CustomOAuth2User user);
+    List<Users> findByRoles_Id(Long roles_id);
+
 }

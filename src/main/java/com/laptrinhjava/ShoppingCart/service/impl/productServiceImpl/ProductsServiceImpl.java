@@ -2,8 +2,8 @@ package com.laptrinhjava.ShoppingCart.service.impl.productServiceImpl;
 
 import com.laptrinhjava.ShoppingCart.entity.ProductVariants;
 import com.laptrinhjava.ShoppingCart.entity.Products;
-import com.laptrinhjava.ShoppingCart.payload.request.OptionsRequest;
-import com.laptrinhjava.ShoppingCart.payload.response.ProductResponse;
+import com.laptrinhjava.ShoppingCart.payload.request.product.OptionsRequest;
+import com.laptrinhjava.ShoppingCart.payload.response.product.ProductResponse;
 import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.IProductRepository;
 import com.laptrinhjava.ShoppingCart.service.productService.IProductService;
 import com.laptrinhjava.ShoppingCart.service.productService.IProductVariantsService;
@@ -74,11 +74,11 @@ public class ProductsServiceImpl implements IProductService {
         if (name == null) {
             pageProduct = productRepository.findAll(paging);
         } else {
-//            pageProduct = productRepository.findByNameContainingIgnoreCase(name, paging);
+            pageProduct = productRepository.findByNameContainingIgnoreCase(name, paging);
         }
-//        List<ProductResponse> productResponses = covertProductsToProductResponse(pageProduct);
+        List<ProductResponse> productResponses = covertProductsToProductResponse(pageProduct);
 //        return new PageImpl<>(productResponses, paging, pageProduct.getTotalElements());
-        return pageProduct;
+        return null;
     }
 
     @Override

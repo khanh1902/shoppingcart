@@ -1,10 +1,8 @@
 package com.laptrinhjava.ShoppingCart.service.productService;
 
 import com.laptrinhjava.ShoppingCart.entity.Products;
-import com.laptrinhjava.ShoppingCart.payload.request.OptionsRequest;
-import com.laptrinhjava.ShoppingCart.payload.response.ProductResponse;
+import com.laptrinhjava.ShoppingCart.payload.request.product.OptionsRequest;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

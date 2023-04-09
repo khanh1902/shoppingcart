@@ -1,4 +1,4 @@
-package com.laptrinhjava.ShoppingCart.payload.request;
+package com.laptrinhjava.ShoppingCart.payload.request.auth;
 
 import lombok.Getter;
 import lombok.Setter;

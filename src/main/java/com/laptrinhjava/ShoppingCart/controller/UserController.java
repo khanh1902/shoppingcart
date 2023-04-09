@@ -2,7 +2,7 @@ package com.laptrinhjava.ShoppingCart.controller;
 
 import com.laptrinhjava.ShoppingCart.entity.Users;
 import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
-import com.laptrinhjava.ShoppingCart.payload.response.UserResponse;
+import com.laptrinhjava.ShoppingCart.payload.response.auth.UserResponse;
 import com.laptrinhjava.ShoppingCart.security.jwt.JwtUtils;
 import com.laptrinhjava.ShoppingCart.security.service.UserDetailsServiceImpl;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
@@ -12,10 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -67,5 +64,27 @@ public class UserController {
             return headerAuth.substring(7, headerAuth.length());
         }
         return null;
+    }
+
+    // get all user
+    @GetMapping
+    public ResponseEntity<ResponseObject> getAllUser(@RequestParam(name = "roleid") Long roleId){
+        try {
+            List<Users> users = userService.findByRoles_Id(roleId);
+            if(users != null){
+                return ResponseEntity.status(HttpStatus.OK).body(
+                        new ResponseObject("OK", "Successfully!", users)
+                );
+            }
+            else {
+                return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+                        new ResponseObject("FAILED", "User is not exists!", null)
+                );
+            }
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+                    new ResponseObject("FAILED", "Error from Exception!", e.getMessage())
+            );
+        }
     }
 }

@@ -65,4 +65,9 @@ public class UserServiceImpl implements IUserService {
 
         }
     }
+
+    @Override
+    public List<Users> findByRoles_Id(Long roles_id) {
+        return userRepository.findByRoles_Id(roles_id);
+    }
 }

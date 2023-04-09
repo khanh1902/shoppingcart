@@ -1,4 +1,4 @@
-package com.laptrinhjava.ShoppingCart.payload.response;
+package com.laptrinhjava.ShoppingCart.payload.response.product;
 
 import com.laptrinhjava.ShoppingCart.entity.Products;
 import lombok.Getter;

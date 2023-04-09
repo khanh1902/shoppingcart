@@ -1,6 +1,5 @@
-package com.laptrinhjava.ShoppingCart.payload.response;
+package com.laptrinhjava.ShoppingCart.payload.response.product;
 
-import com.laptrinhjava.ShoppingCart.payload.TypeOptionsDetail;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

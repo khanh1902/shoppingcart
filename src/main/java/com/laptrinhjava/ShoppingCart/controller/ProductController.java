@@ -1,8 +1,8 @@
 package com.laptrinhjava.ShoppingCart.controller;
 
 import com.laptrinhjava.ShoppingCart.entity.*;
-import com.laptrinhjava.ShoppingCart.payload.request.OptionsRequest;
-import com.laptrinhjava.ShoppingCart.payload.response.OneProductResponse;
+import com.laptrinhjava.ShoppingCart.payload.request.product.OptionsRequest;
+import com.laptrinhjava.ShoppingCart.payload.response.product.OneProductResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
 import com.laptrinhjava.ShoppingCart.service.IAmazonClient;
 import com.laptrinhjava.ShoppingCart.service.ICategoryService;
@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -23,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.ws.rs.Consumes;
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.util.*;
 
 import static java.lang.Long.parseLong;
@@ -93,19 +91,28 @@ public class ProductController {
                                                  @RequestParam(required = false, name = "categoryIds") List<Long> categoryIds,
                                                  @RequestParam(required = false, name = "minPrice") Long minPrice,
                                                  @RequestParam(required = false, name = "maxPrice") Long maxPrice) {
-        PageRequest pageRequest = PageRequest.of(offset, limit);
-//        if (asc) pageRequest = PageRequest.of(offset, limit, Sort.by(sortBy).ascending());
-//        else pageRequest = PageRequest.of(offset, limit, Sort.by(sortBy).descending());
-        List<Products> products = productService.filer(sortBy, asc, name, categoryIds, minPrice, maxPrice);
-        int start = (int) pageRequest.getOffset();
-        int end = Math.min(start+pageRequest.getPageSize(),products.size());
-        Page<Products> pageProducts = new PageImpl<>(products.subList(start, end), pageRequest, products.size());
+        try {
 
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("OK", "Successfully!",
-                        pageProducts)
-        );
+            PageRequest pageRequest = PageRequest.of(offset, limit);
+            List<Products> products = productService.filer(sortBy, asc, name, categoryIds, minPrice, maxPrice);
 
+            int start = (int) pageRequest.getOffset();
+            int end = Math.min(start + pageRequest.getPageSize(), products.size());
+            Page<Products> pageProducts = new PageImpl<>(products.subList(start, end), pageRequest, products.size());
+            if (products.size() < offset * limit) {
+                Page<Products> page = new PageImpl<>(products.subList(start, end), pageRequest, products.size());
+                return ResponseEntity.status(HttpStatus.OK).body(
+                        new ResponseObject("OK", "Successfully!", page)
+                );
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("OK", "Successfully!", pageProducts)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+                    new ResponseObject("FAILED", "Error!", e.getCause())
+            );
+        }
     }
 
     @GetMapping("/getOne")
@@ -269,7 +276,6 @@ public class ProductController {
      * Method: Add Options for Product
      **/
     @PostMapping("/options")
-
     //    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> addOptions(@RequestBody OptionsRequest optionsRequests) {
         try {
@@ -364,7 +370,7 @@ public class ProductController {
 
             if (productVariant.getQuantity() == null) optionMap.put("quantity", null);
             else optionMap.put("quantity", productVariant.getQuantity());
-            optionMap.entrySet().stream().sorted();
+//            optionMap.entrySet().stream().sorted();
             optionList.add(optionMap);
         }
         return ResponseEntity.status(HttpStatus.OK).body(

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter
@@ -31,6 +32,10 @@ public class ProductVariants {
     @ManyToOne
     @JoinColumn(name = "product_id") // thông qua khóa ngoại address_id
     private Products products;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "productVariants", cascade = CascadeType.ALL)
+    private List<CartItems> cartItems;
 
     public ProductVariants(String skuId, Double price, Products products, Long quantity) {
         this.skuId = skuId;

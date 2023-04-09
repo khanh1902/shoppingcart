@@ -1,15 +1,13 @@
 package com.laptrinhjava.ShoppingCart.controller;
 
-import com.laptrinhjava.ShoppingCart.entity.EProvider;
-import com.laptrinhjava.ShoppingCart.entity.ERole;
-import com.laptrinhjava.ShoppingCart.entity.Role;
-import com.laptrinhjava.ShoppingCart.entity.Users;
-import com.laptrinhjava.ShoppingCart.payload.request.SigninRequest;
-import com.laptrinhjava.ShoppingCart.payload.request.SignupRequest;
-import com.laptrinhjava.ShoppingCart.payload.response.JwtResponse;
+import com.laptrinhjava.ShoppingCart.entity.*;
+import com.laptrinhjava.ShoppingCart.payload.request.auth.SigninRequest;
+import com.laptrinhjava.ShoppingCart.payload.request.auth.SignupRequest;
+import com.laptrinhjava.ShoppingCart.payload.response.auth.JwtResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
 import com.laptrinhjava.ShoppingCart.security.jwt.JwtUtils;
 import com.laptrinhjava.ShoppingCart.security.service.UserDetailsImpl;
+import com.laptrinhjava.ShoppingCart.service.ICartService;
 import com.laptrinhjava.ShoppingCart.service.IRoleService;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,8 +50,8 @@ public class AuthController {
     @Autowired
     private JwtUtils jwtUtils;
 
-//    @Autowired
-//    private ICartService cartService;
+    @Autowired
+    private ICartService cartService;
 
     // đăng nhập
     @PostMapping("/signin")
@@ -94,8 +92,8 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("ok", "Login successfully!", new JwtResponse(jwt,
                             userDetails.getId(),
+                            user.getFullName(),
                             userDetails.getUsername(),
-                            user.getEmail(),
                             roles))
             );
 
@@ -145,12 +143,13 @@ public class AuthController {
         user.setRoles(roles);
         userService.save(user);
 
-//        // tao gio hang cho user
+        // tao gio hang cho user
 //        user.getRoles().forEach(role -> {
 //            if (role.getName().equals(ERole.ROLE_USER)) {
-//                cartService.save(new Cart(user.getId(), user.getId(), null));
+//                cartService.save(new Cart(user.getId(), user.getId(), 0D));
 //            }
 //        });
+        cartService.save(new Cart(user.getId(), user.getId(), 0D));
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("ok", "User registered successfully!", " ")
