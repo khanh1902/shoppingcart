@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +25,7 @@ import javax.ws.rs.Consumes;
 import java.text.DecimalFormat;
 import java.util.*;
 
+import static com.laptrinhjava.ShoppingCart.common.HandleAuth.getUsername;
 import static java.lang.Long.parseLong;
 
 @RestController
@@ -74,13 +76,13 @@ public class ProductController {
     }
 
 
-    public String getUsername() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!(authentication instanceof AnonymousAuthenticationToken)) {
-            return authentication.getName();
-        }
-        return null;
-    }
+//    public String getUsername() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+//            return authentication.getName();
+//        }
+//        return null;
+//    }
 
     @GetMapping("/filter")
     public ResponseEntity<ResponseObject> filter(@RequestParam(required = false, name = "offset", defaultValue = "0") Integer offset,
@@ -202,6 +204,7 @@ public class ProductController {
      **/
 //    @Consumes("multipart/form-data")
     @PutMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> updateProduct(@RequestParam(name = "id") Long productId,
                                                         @RequestParam(name = "name", required = false) String newProductName,
                                                         @RequestParam(name = "oldFiles", required = false) List<String> oldFiles,
@@ -276,7 +279,7 @@ public class ProductController {
      * Method: Add Options for Product
      **/
     @PostMapping("/options")
-    //    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> addOptions(@RequestBody OptionsRequest optionsRequests) {
         try {
             Products product = productService.findProductById(optionsRequests.getProductId());
@@ -382,7 +385,7 @@ public class ProductController {
      * Method: Update Price and Quantity for options product by product id
      **/
     @PutMapping("/options")
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> updatePriceProduct(@RequestParam(name = "productId") Long productId,
                                                              @RequestBody List<Map<String, String>> options) {
         try {
@@ -429,7 +432,7 @@ public class ProductController {
      * Method: Delete Product
      **/
     @DeleteMapping()
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> delete(@RequestParam(name = "productIds", required = false) List<Long> ids) {
         try {
             for (Long id : ids) {
@@ -484,7 +487,7 @@ public class ProductController {
      * Method: Delete product option by product id
      **/
     @DeleteMapping("/options/delete")
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> deleteProductOption(@RequestParam("productId") Long productId,
                                                               @RequestBody List<Map<String, Object>> options) {
         try {

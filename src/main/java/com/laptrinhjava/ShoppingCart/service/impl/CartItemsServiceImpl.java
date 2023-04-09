@@ -7,6 +7,7 @@ import com.laptrinhjava.ShoppingCart.payload.response.cart.CartItemsResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.cart.CartResponse;
 import com.laptrinhjava.ShoppingCart.reponsitory.ICartItemsRepository;
 import com.laptrinhjava.ShoppingCart.reponsitory.ICartRepository;
+import com.laptrinhjava.ShoppingCart.reponsitory.IUserRepository;
 import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.*;
 import com.laptrinhjava.ShoppingCart.service.ICartItemsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.laptrinhjava.ShoppingCart.common.HandleAuth.getUsername;
 import static com.laptrinhjava.ShoppingCart.common.HandleChar.upperFirstString;
 
 @Service
@@ -42,6 +44,9 @@ public class CartItemsServiceImpl implements ICartItemsService {
     @Autowired
     private IOptionValuesRepository optionValuesRepository;
 
+    @Autowired
+    private IUserRepository userRepository;
+
     @Override
     public CartItems save(CartItems cartItems) {
         return cartItemsRepository.save(cartItems);
@@ -63,8 +68,10 @@ public class CartItemsServiceImpl implements ICartItemsService {
     }
 
     @Override
-    public CartItems addProductToCartItem(Long userId, CartItemsRequest item) {
-        Cart cart = cartRepository.findByUserId(userId);
+    public CartItems addProductToCartItem(CartItemsRequest item) {
+        String email = getUsername();
+        Users findUser = userRepository.findByEmail(email);
+        Cart cart = cartRepository.findByUserId(findUser.getId());
         Products product = productRepository.findProductById(item.getProductId());
         StringBuilder skuid = new StringBuilder();
         skuid.append("P").append(product.getId());
@@ -118,8 +125,10 @@ public class CartItemsServiceImpl implements ICartItemsService {
     }
 
     @Override
-    public CartResponse getAllCart(Long userId) {
-        Cart cart = cartRepository.findByUserId(userId);
+    public CartResponse getAllCart() {
+        String email = getUsername();
+        Users findUser = userRepository.findByEmail(email);
+        Cart cart = cartRepository.findByUserId(findUser.getId());
         List<CartItemsResponse> cartItems = new ArrayList<>();
         if (cart != null) {
             List<CartItems> findCartItemsByCartId = cartItemsRepository.findByCart_Id(cart.getId());
@@ -156,8 +165,10 @@ public class CartItemsServiceImpl implements ICartItemsService {
     }
 
     @Override
-    public CartItems updateProductInCartItem(Long userId, UpdateCartItemRequest item) {
-        Cart findCart = cartRepository.findByUserId(userId);
+    public CartItems updateProductInCartItem(UpdateCartItemRequest item) {
+        String email = getUsername();
+        Users findUser = userRepository.findByEmail(email);
+        Cart findCart = cartRepository.findByUserId(findUser.getId());
         if (findCart != null) {
             Double totalPrice = findCart.getTotalPrice();
             CartItems findCartItem = cartItemsRepository.findCartItemsById(item.getCartItemId());
@@ -221,14 +232,30 @@ public class CartItemsServiceImpl implements ICartItemsService {
         return null;
     }
 
+    @Override
+    public void deleteOneItemByCartItemId(Long cartItemId) {
+        String email = getUsername();
+        Users findUser = userRepository.findByEmail(email);
+        CartItems findCartItem = cartItemsRepository.findCartItemsById(cartItemId);
+        // cập nhật lại tổng giá tiền trong giỏ hàng
+        Cart findCart = cartRepository.findCartById(findCartItem.getCart().getId());
+        if(findCartItem.getCart().getUserId().equals(findUser.getId())){
+            findCart.setTotalPrice(findCart.getTotalPrice() - findCartItem.getPrice());
+            cartItemsRepository.deleteById(findCartItem.getId());
+            cartRepository.save(findCart);
+        }
+    }
 
-//    @Override
-//    public void deleteByProduct(Product product) {
-//        cartItemsRepository.deleteByProduct(product);
-//    }
-//
-//    @Override
-//    public void deleteByProductId(Long id) {
-//        cartItemsRepository.deleteByProductId(id);
-//    }
+    @Override
+    public void deleteAllCartItems() {
+        String email = getUsername();
+        Users findUser = userRepository.findByEmail(email);
+        List<CartItems> findCartItems = cartItemsRepository.findByCart_Id(findUser.getId());
+        Cart findCart = cartRepository.findCartById(findUser.getId());
+        for(CartItems cartItem : findCartItems){
+            cartItemsRepository.deleteById(cartItem.getId());
+            findCart.setTotalPrice(findCart.getTotalPrice() - cartItem.getPrice());
+        }
+        cartRepository.save(findCart);
+    }
 }

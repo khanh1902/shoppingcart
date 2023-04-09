@@ -12,6 +12,7 @@ import com.laptrinhjava.ShoppingCart.service.productService.IProductVariantsServ
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -43,24 +44,26 @@ public class CartController {
     /**
      * Method: Find Cart By  cart id
      * Steps: 1: find cart by id form PathVariable
-     *        2: save details list of product to CartItemsResponse
-     *        3: save CartResponse from Card and CartItemsResponse
+     * 2: save details list of product to CartItemsResponse
+     * 3: save CartResponse from Card and CartItemsResponse
      **/
     @GetMapping
-    public ResponseEntity<ResponseObject> findById(@RequestParam(name = "userId") Long userId) {
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseObject> findById() {
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("OK", "Add Product Successfully!", cartItemsService.getAllCart(userId))
+                new ResponseObject("OK", "Add Product Successfully!", cartItemsService.getAllCart())
         );
 
     }
+
     /**
      * Method: Add 1 Item To Cart
      **/
     @PostMapping
-    public ResponseEntity<ResponseObject> addItems(@RequestParam(name = "userId") Long userId,
-                                                   @RequestBody CartItemsRequest item) {
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseObject> addItems(@RequestBody CartItemsRequest item) {
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("OK", "Add Product Successfully!", cartItemsService.addProductToCartItem(userId, item))
+                new ResponseObject("OK", "Add Product Successfully!", cartItemsService.addProductToCartItem(item))
         );
     }
 
@@ -68,52 +71,35 @@ public class CartController {
      * Method: Update Cart
      **/
     @PutMapping
-    public ResponseEntity<ResponseObject> update(@RequestParam(name = "userId") Long userId,
-                                                 @RequestBody UpdateCartItemRequest item) {
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseObject> update(@RequestBody UpdateCartItemRequest item) {
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("OK", "Add Product Successfully!", cartItemsService.updateProductInCartItem(userId, item))
+                new ResponseObject("OK", "Add Product Successfully!", cartItemsService.updateProductInCartItem(item))
         );
     }
 
     /**
-     * Method: Delete Cart
+     * Method: Delete All Item
      **/
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<ResponseObject> deleteById(@PathVariable Long id) {
-//        Cart cart = cartService.findById(id);
-//        if (cart != null) {
-//            cartService.deleteById(id);
-//            return ResponseEntity.status(HttpStatus.OK).body(
-//                    new ResponseObject("OK", "Delete Successfully!", "")
-//            );
-//        } else
-//            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-//                    new ResponseObject("FAILED", "Delete Does Not Successfully!", "")
-//            );
-//    }
+    @DeleteMapping("/delete-all")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseObject> deleteAllItems() {
+        cartItemsService.deleteAllCartItems();
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject("OK", "Delete Successfully!", "")
+        );
+    }
 
 
-
-
-/**
- * Method: Delete 1 Items
- **/
-//    @DeleteMapping("/{id}")
-////    @Transactional(rollbackFor = {Exception.class, Throwable.class})
-//    public ResponseEntity<ResponseObject> deleteItems(@PathVariable Long id,
-//                                                      @RequestParam("productId") Long productId) {
-//        Cart cart = cartService.findById(id);
-//        Product product = productService.findProductById(productId);
-//        if(cart != null){
-//            for(CartItems c : cart.getCartItems()) {
-//                if (c.getProduct().equals(product)) {
-//                    cartItemsService.deleteByProductId(product.getId());
-//                    return ResponseEntity.status(HttpStatus.OK).body(
-//                            new ResponseObject("OK", "Delete Successfully!", "")
-//                    );
-//                }
-//            }
-//        }
-//        return null;
-//    }
+    /**
+     * Method: Delete 1 Items
+     **/
+    @DeleteMapping
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseObject> deleteOneItems(@RequestParam(name = "cartItemId") Long carItemId) {
+        cartItemsService.deleteOneItemByCartItemId(carItemId);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject("OK", "Delete Successfully!", null)
+        );
+    }
 }
