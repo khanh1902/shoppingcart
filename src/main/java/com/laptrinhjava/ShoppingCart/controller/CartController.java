@@ -10,6 +10,7 @@ import com.laptrinhjava.ShoppingCart.service.IUserService;
 import com.laptrinhjava.ShoppingCart.service.productService.IProductService;
 import com.laptrinhjava.ShoppingCart.service.productService.IProductVariantsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,12 +19,19 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/cart")
 public class CartController {
+    @Qualifier("cartServiceImpl")
     @Autowired
     private ICartService cartService;
+
+    @Qualifier("userServiceImpl")
     @Autowired
     private IUserService userService;
+
+    @Qualifier("productsServiceImpl")
     @Autowired
     private IProductService productService;
+
+    @Qualifier("cartItemsServiceImpl")
     @Autowired
     private ICartItemsService cartItemsService;
 

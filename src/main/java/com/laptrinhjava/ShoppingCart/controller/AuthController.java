@@ -11,6 +11,7 @@ import com.laptrinhjava.ShoppingCart.service.ICartService;
 import com.laptrinhjava.ShoppingCart.service.IRoleService;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -38,9 +39,11 @@ public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Qualifier("userServiceImpl")
     @Autowired
     private IUserService userService;
 
+    @Qualifier("roleServiceImpl")
     @Autowired
     private IRoleService roleService;
 
@@ -50,6 +53,7 @@ public class AuthController {
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Qualifier("cartServiceImpl")
     @Autowired
     private ICartService cartService;
 
@@ -144,11 +148,6 @@ public class AuthController {
         userService.save(user);
 
         // tao gio hang cho user
-//        user.getRoles().forEach(role -> {
-//            if (role.getName().equals(ERole.ROLE_USER)) {
-//                cartService.save(new Cart(user.getId(), user.getId(), 0D));
-//            }
-//        });
         cartService.save(new Cart(user.getId(), user.getId(), 0D));
 
         return ResponseEntity.status(HttpStatus.OK).body(

@@ -8,6 +8,7 @@ import com.laptrinhjava.ShoppingCart.security.service.UserDetailsServiceImpl;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/user")
 public class UserController {
 
+    @Qualifier("userServiceImpl")
     @Autowired
     private IUserService userService;
 

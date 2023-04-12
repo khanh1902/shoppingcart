@@ -9,6 +9,7 @@ import com.laptrinhjava.ShoppingCart.service.ICategoryService;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
 import com.laptrinhjava.ShoppingCart.service.productService.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -32,30 +33,37 @@ import static java.lang.Long.parseLong;
 @RequestMapping("/api/product")
 public class ProductController {
 
+    @Qualifier("productsServiceImpl")
     @Autowired
     private IProductService productService;
 
+    @Qualifier("amazonClientImpl")
     @Autowired
     private IAmazonClient amazonClient;
 
     @Autowired
     private ICategoryService categoryService;
 
+    @Qualifier("optionValuesServiceImpl")
     @Autowired
     private IOptionValuesService optionValuesService;
 
+    @Qualifier("productOptionsServiceImpl")
     @Autowired
     private IProductOptionsService productOptionsService;
 
     @Autowired
     private IProductVariantsService productVariantsService;
 
+    @Qualifier("variantValuesServiceImpl")
     @Autowired
     private IVariantValuesService variantValuesService;
 
     @Autowired
     private IOptionsService optionsService;
 
+
+    @Qualifier("userServiceImpl")
     @Autowired
     private IUserService userService;
 

@@ -90,7 +90,7 @@ public class CartItemsServiceImpl implements ICartItemsService {
                     cart.setTotalPrice(cart.getTotalPrice() + (item.getQuantity() * product.getPrice()));
                     cartRepository.save(cart);
 //                    return cartItem;
-                    return new CartItemsResponse(product.getId(), product.getName(),
+                    return new CartItemsResponse(cartItem.getId(), product.getId(), product.getName(),
                             product.getImageUrl(), item.getOption(), cartItem.getQuantity(), cartItem.getPrice());
 
                 } else if (cartItem.getProductVariants().getSkuId().equals(skuid.toString())) {
@@ -100,9 +100,9 @@ public class CartItemsServiceImpl implements ICartItemsService {
                     cart.setTotalPrice(cart.getTotalPrice() + (item.getQuantity() * product.getPrice()));
                     cartRepository.save(cart);
 //                    return cartItem;
+                    return new CartItemsResponse(cartItem.getId(), product.getId(), product.getName(),
+                            product.getImageUrl(), item.getOption(), cartItem.getQuantity(), cartItem.getPrice());
                 }
-                return new CartItemsResponse(product.getId(), product.getName(),
-                        product.getImageUrl(), item.getOption(), cartItem.getQuantity(), cartItem.getPrice());
             }
             // nếu sản phẩm tồn tại nhưng có skuid khác
             ProductVariants productVariant = productVariantsRepository.findBySkuId(skuid.toString());
@@ -111,7 +111,7 @@ public class CartItemsServiceImpl implements ICartItemsService {
             cart.setTotalPrice(cart.getTotalPrice() + (item.getQuantity() * productVariant.getPrice()));
             cartRepository.save(cart);
 //            return cartItems;
-            return new CartItemsResponse(product.getId(), product.getName(),
+            return new CartItemsResponse(cartItems.getId(), product.getId(), product.getName(),
                     product.getImageUrl(), item.getOption(), cartItems.getQuantity(), cartItems.getPrice());
 
         } else { // nếu sản phẩm chưa tồn tại trong giỏ hàng thì lưu mới
@@ -128,7 +128,7 @@ public class CartItemsServiceImpl implements ICartItemsService {
                 cartRepository.save(cart);
             }
 //            return cartItems;
-            return new CartItemsResponse(product.getId(), product.getName(),
+            return new CartItemsResponse(cartItems.getId(), product.getId(), product.getName(),
                     product.getImageUrl(), item.getOption(), cartItems.getQuantity(), cartItems.getPrice());
         }
     }
@@ -144,6 +144,8 @@ public class CartItemsServiceImpl implements ICartItemsService {
             for (CartItems cartItem : findCartItemsByCartId) {
                 CartItemsResponse cartItemsResponse = new CartItemsResponse();
                 Products product = productRepository.findProductById(cartItem.getProductId());
+
+                cartItemsResponse.setCartItemId(cartItem.getId());
                 cartItemsResponse.setProductId(product.getId());
                 cartItemsResponse.setProductName(product.getName());
                 cartItemsResponse.setImageUrl(product.getImageUrl());
@@ -248,7 +250,7 @@ public class CartItemsServiceImpl implements ICartItemsService {
         CartItems findCartItem = cartItemsRepository.findCartItemsById(cartItemId);
         // cập nhật lại tổng giá tiền trong giỏ hàng
         Cart findCart = cartRepository.findCartById(findCartItem.getCart().getId());
-        if(findCartItem.getCart().getUserId().equals(findUser.getId())){
+        if (findCartItem.getCart().getUserId().equals(findUser.getId())) {
             findCart.setTotalPrice(findCart.getTotalPrice() - findCartItem.getPrice());
             cartItemsRepository.deleteById(findCartItem.getId());
             cartRepository.save(findCart);
@@ -261,7 +263,7 @@ public class CartItemsServiceImpl implements ICartItemsService {
         Users findUser = userRepository.findByEmail(email);
         List<CartItems> findCartItems = cartItemsRepository.findByCart_Id(findUser.getId());
         Cart findCart = cartRepository.findCartById(findUser.getId());
-        for(CartItems cartItem : findCartItems){
+        for (CartItems cartItem : findCartItems) {
             cartItemsRepository.deleteById(cartItem.getId());
             findCart.setTotalPrice(findCart.getTotalPrice() - cartItem.getPrice());
         }

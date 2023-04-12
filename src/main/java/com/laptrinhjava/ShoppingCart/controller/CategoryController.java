@@ -8,6 +8,7 @@ import com.laptrinhjava.ShoppingCart.service.IAmazonClient;
 import com.laptrinhjava.ShoppingCart.service.ICategoryService;
 import com.laptrinhjava.ShoppingCart.service.productService.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,9 +28,11 @@ public class CategoryController {
     @Autowired
     private ICategoryRepository categoryRepository;
 
+    @Qualifier("amazonClientImpl")
     @Autowired
     private IAmazonClient amazonClient;
 
+    @Qualifier("productsServiceImpl")
     @Autowired
     private IProductService productService;
 
