@@ -89,7 +89,7 @@ public class CartItemsServiceImpl implements ICartItemsService {
                     cartItemsRepository.save(cartItem);
                     cart.setTotalPrice(cart.getTotalPrice() + (item.getQuantity() * product.getPrice()));
                     cartRepository.save(cart);
-//                    return cartItem;
+
                     return new CartItemsResponse(cartItem.getId(), product.getId(), product.getName(),
                             product.getImageUrl(), item.getOption(), cartItem.getQuantity(), cartItem.getPrice());
 
@@ -99,7 +99,7 @@ public class CartItemsServiceImpl implements ICartItemsService {
                     cartItemsRepository.save(cartItem);
                     cart.setTotalPrice(cart.getTotalPrice() + (item.getQuantity() * product.getPrice()));
                     cartRepository.save(cart);
-//                    return cartItem;
+
                     return new CartItemsResponse(cartItem.getId(), product.getId(), product.getName(),
                             product.getImageUrl(), item.getOption(), cartItem.getQuantity(), cartItem.getPrice());
                 }
@@ -110,7 +110,7 @@ public class CartItemsServiceImpl implements ICartItemsService {
             cartItemsRepository.save(cartItems);
             cart.setTotalPrice(cart.getTotalPrice() + (item.getQuantity() * productVariant.getPrice()));
             cartRepository.save(cart);
-//            return cartItems;
+
             return new CartItemsResponse(cartItems.getId(), product.getId(), product.getName(),
                     product.getImageUrl(), item.getOption(), cartItems.getQuantity(), cartItems.getPrice());
 
@@ -127,7 +127,6 @@ public class CartItemsServiceImpl implements ICartItemsService {
                 cart.setTotalPrice(cart.getTotalPrice() + (item.getQuantity() * product.getPrice()));
                 cartRepository.save(cart);
             }
-//            return cartItems;
             return new CartItemsResponse(cartItems.getId(), product.getId(), product.getName(),
                     product.getImageUrl(), item.getOption(), cartItems.getQuantity(), cartItems.getPrice());
         }
@@ -175,73 +174,128 @@ public class CartItemsServiceImpl implements ICartItemsService {
             return null;
     }
 
+//    @Override
+//    public CartItems updateProductInCartItem(UpdateCartItemRequest item) {
+//        String email = getUsername();
+//        Users findUser = userRepository.findByEmail(email);
+//        Cart findCart = cartRepository.findByUserId(findUser.getId());
+//        if (findCart != null) {
+//            Double totalPrice = findCart.getTotalPrice();
+//            CartItems findCartItem = cartItemsRepository.findCartItemsById(item.getCartItemId());
+//            Products findProduct = productRepository.findProductById(findCartItem.getProductId());
+//            if (findCartItem.getProductVariants() == null) {
+//                if (item.getAddQuantity() != null) {
+//                    findCartItem.setQuantity(findCartItem.getQuantity() + item.getAddQuantity());
+//                    findCartItem.setPrice(findCartItem.getPrice() + (findProduct.getPrice() * item.getAddQuantity()));
+//                    totalPrice += findProduct.getPrice() * item.getAddQuantity();
+//                } else if (item.getSubQuantity() != null) {
+//                    findCartItem.setQuantity(findCartItem.getQuantity() - item.getSubQuantity());
+//                    findCartItem.setPrice(findCartItem.getPrice() - (findProduct.getPrice() * item.getSubQuantity()));
+//                    totalPrice -= findProduct.getPrice() * item.getAddQuantity();
+//                }
+//                cartItemsRepository.save(findCartItem);
+//                return findCartItem;
+//            } else {
+//                StringBuilder skuid = new StringBuilder();
+//                skuid.append("P").append(findProduct.getId());
+//                for (Map.Entry<String, Object> option : item.getOption().entrySet()) {
+//                    skuid.append(option.getKey().toUpperCase().charAt(0)).append(option.getValue().toString().toUpperCase());
+//                }
+//                ProductVariants findProductVariant = productVariantsRepository.findBySkuId(skuid.toString());
+//
+//                // nếu thay đổi option thì cập nhật lại productVariant thông qua skuid
+//                if (!findProductVariant.getSkuId().equals(findCartItem.getProductVariants().getSkuId())) {
+//                    totalPrice -= findCartItem.getPrice();
+//                    findCartItem.setProductVariants(findProductVariant);
+//                    findCartItem.setPrice(findCartItem.getQuantity() * findProductVariant.getPrice());
+//                    if (item.getAddQuantity() != null) {
+//                        findCartItem.setQuantity(findCartItem.getQuantity() + item.getAddQuantity());
+//                        //cập nhật lại số tiền cho option mới
+//                        findCartItem.setPrice(findCartItem.getQuantity() * findProductVariant.getPrice());
+//                        findCart.setTotalPrice(findCart.getTotalPrice() + item.getAddQuantity() * findProductVariant.getPrice());
+//                    } else if (item.getSubQuantity() != null) {
+//                        findCartItem.setQuantity(findCartItem.getQuantity() - item.getSubQuantity());
+//                        findCartItem.setPrice(findCartItem.getQuantity() * findProductVariant.getPrice());
+//                    }
+//                    cartItemsRepository.save(findCartItem);
+//                    totalPrice += findCartItem.getPrice();
+//
+//                } else {
+//                    if (item.getAddQuantity() != null) {
+//                        findCartItem.setQuantity(findCartItem.getQuantity() + item.getAddQuantity());
+//                        findCartItem.setPrice(findCartItem.getPrice() + (findProductVariant.getPrice() * item.getAddQuantity()));
+//                        totalPrice += findProductVariant.getPrice() * item.getAddQuantity();
+//                    } else if (item.getSubQuantity() != null) {
+//                        findCartItem.setQuantity(findCartItem.getQuantity() - item.getSubQuantity());
+//                        findCartItem.setPrice(findCartItem.getPrice() - (findProductVariant.getPrice() * item.getSubQuantity()));
+//                        totalPrice -= findProductVariant.getPrice() * item.getSubQuantity();
+//                    }
+//                    cartItemsRepository.save(findCartItem);
+//                }
+//                findCart.setTotalPrice(totalPrice);
+//                cartRepository.save(findCart);
+//            }
+//            return findCartItem;
+//        }
+//
+//        return null;
+//    }
+
     @Override
-    public CartItems updateProductInCartItem(UpdateCartItemRequest item) {
+    public CartItemsResponse updateProductInCartItem(UpdateCartItemRequest item) {
         String email = getUsername();
         Users findUser = userRepository.findByEmail(email);
-        Cart findCart = cartRepository.findByUserId(findUser.getId());
+        Cart findCart = cartRepository.findCartById(findUser.getId()); // userId va cartId trung nhau
         if (findCart != null) {
             Double totalPrice = findCart.getTotalPrice();
             CartItems findCartItem = cartItemsRepository.findCartItemsById(item.getCartItemId());
-            Products findProduct = productRepository.findProductById(findCartItem.getProductId());
+            Products findProduct = productRepository.findProductById(item.getProductId());
             if (findCartItem.getProductVariants() == null) {
-                if (item.getAddQuantity() != null) {
-                    findCartItem.setQuantity(findCartItem.getQuantity() + item.getAddQuantity());
-                    findCartItem.setPrice(findCartItem.getPrice() + (findProduct.getPrice() * item.getAddQuantity()));
-                    totalPrice += findProduct.getPrice() * item.getAddQuantity();
-                } else if (item.getSubQuantity() != null) {
-                    findCartItem.setQuantity(findCartItem.getQuantity() - item.getSubQuantity());
-                    findCartItem.setPrice(findCartItem.getPrice() - (findProduct.getPrice() * item.getSubQuantity()));
-                    totalPrice -= findProduct.getPrice() * item.getAddQuantity();
-                }
+                totalPrice -= findCartItem.getPrice(); // xoa gia cu
+                findCartItem.setQuantity(item.getQuantity());
+                findCartItem.setPrice(item.getQuantity() * findProduct.getPrice());
+                totalPrice += item.getQuantity() * findProduct.getPrice();
                 cartItemsRepository.save(findCartItem);
-                return findCartItem;
+
+                findCart.setTotalPrice(totalPrice);
+                cartRepository.save(findCart);
+                return new CartItemsResponse(findCartItem.getId(), findProduct.getId(), findProduct.getName(),
+                        findProduct.getImageUrl(), item.getOption(), findCartItem.getQuantity(), findCartItem.getPrice());
+
             } else {
-                StringBuilder skuid = new StringBuilder();
-                skuid.append("P").append(findProduct.getId());
+                StringBuilder skuId = new StringBuilder();
+                skuId.append("P").append(findProduct.getId());
                 for (Map.Entry<String, Object> option : item.getOption().entrySet()) {
-                    skuid.append(option.getKey().toUpperCase().charAt(0)).append(option.getValue().toString().toUpperCase());
+                    skuId.append(option.getKey().toUpperCase().charAt(0)).append(option.getValue().toString().toUpperCase());
                 }
-                ProductVariants findProductVariant = productVariantsRepository.findBySkuId(skuid.toString());
+                ProductVariants findProductVariant = productVariantsRepository.findBySkuId(skuId.toString());
 
                 // nếu thay đổi option thì cập nhật lại productVariant thông qua skuid
-                if (!findProductVariant.getSkuId().equals(findCartItem.getProductVariants().getSkuId())) {
+                if (findProductVariant.getSkuId().equals(findCartItem.getProductVariants().getSkuId())) {
+                    totalPrice -= findCartItem.getPrice();
+                    findCartItem.setQuantity(item.getQuantity());
+                    findCartItem.setPrice(item.getQuantity() * findProductVariant.getPrice());
+
+                    cartItemsRepository.save(findCartItem);
+                    totalPrice += item.getQuantity() * findProduct.getPrice();
+                } else {
                     totalPrice -= findCartItem.getPrice();
                     findCartItem.setProductVariants(findProductVariant);
-                    findCartItem.setPrice(findCartItem.getQuantity() * findProductVariant.getPrice());
-                    if (item.getAddQuantity() != null) {
-                        findCartItem.setQuantity(findCartItem.getQuantity() + item.getAddQuantity());
-                        //cập nhật lại số tiền cho option mới
-                        findCartItem.setPrice(findCartItem.getQuantity() * findProductVariant.getPrice());
-                        findCart.setTotalPrice(findCart.getTotalPrice() + item.getAddQuantity() * findProductVariant.getPrice());
-                    } else if (item.getSubQuantity() != null) {
-                        findCartItem.setQuantity(findCartItem.getQuantity() - item.getSubQuantity());
-                        findCartItem.setPrice(findCartItem.getQuantity() * findProductVariant.getPrice());
-                    }
+                    findCartItem.setQuantity(item.getQuantity());
+                    findCartItem.setPrice(item.getQuantity() * findProductVariant.getPrice());
+
                     cartItemsRepository.save(findCartItem);
-                    totalPrice += findCartItem.getPrice();
-//                    return findCartItem;
-                } else {
-                    if (item.getAddQuantity() != null) {
-                        findCartItem.setQuantity(findCartItem.getQuantity() + item.getAddQuantity());
-                        findCartItem.setPrice(findCartItem.getPrice() + (findProductVariant.getPrice() * item.getAddQuantity()));
-                        totalPrice += findProductVariant.getPrice() * item.getAddQuantity();
-                    } else if (item.getSubQuantity() != null) {
-                        findCartItem.setQuantity(findCartItem.getQuantity() - item.getSubQuantity());
-                        findCartItem.setPrice(findCartItem.getPrice() - (findProductVariant.getPrice() * item.getSubQuantity()));
-                        totalPrice -= findProductVariant.getPrice() * item.getSubQuantity();
-                    }
-                    cartItemsRepository.save(findCartItem);
-//                    return findCartItem;
+                    totalPrice += item.getQuantity() * findProduct.getPrice();
                 }
                 findCart.setTotalPrice(totalPrice);
                 cartRepository.save(findCart);
+                return new CartItemsResponse(findCartItem.getId(), findProduct.getId(), findProduct.getName(),
+                        findProduct.getImageUrl(), item.getOption(), findCartItem.getQuantity(), findCartItem.getPrice());
             }
-            return findCartItem;
         }
-
         return null;
     }
+
 
     @Override
     public void deleteOneItemByCartItemId(Long cartItemId) {

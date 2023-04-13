@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 @Service
 public interface ICartService {
     Cart save(Cart cart);
-    CartResponse saveCart(CartRequest cartRequest);
     Cart findById(Long id);
     void deleteById(Long id);
 }

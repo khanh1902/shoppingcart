@@ -35,61 +35,6 @@ public class CartServiceImpl implements ICartService {
     }
 
     @Override
-    public CartResponse saveCart(CartRequest cartRequest) {
-        List<CartItems> cartItems = new ArrayList<>(); // danh sach san pham them vao gio hang
-        List<CartItemsResponse> cartItemsResponses = new ArrayList<>(); // danh sach chi tiet san pham da them vao gio hang
-        try {
-//            Cart cart = new Cart();
-//            cart.setId(getUserId());
-//            cart.setUserId(getUserId());
-//            for (CartItemsRequest item : cartRequest.getListProducts()) {
-//
-//                CartItems cartItem = new CartItems();
-//
-//                Product product = productRepository.findProductById(item.getProductId());
-//                // tao moi exception
-//                if (product == null) throw new Exception("Product does not exist!");
-//
-//                cartItem.setProduct(product);
-//
-//                cartItem.setPrice(product.getPrice() * item.getQuantity());
-//
-//                cartItem.setCart(cart);
-//
-//                cartItem.setQuantity(item.getQuantity());
-//
-//                // them 1 san pham vao danh sach gio hang
-//                cartItems.add(cartItem);
-//
-//                // thong tin san pham da them vao gio
-//                CartItemsResponse response = new CartItemsResponse(product.getName(), product.getImageUrl(),
-//                        item.getQuantity(), cartItem.getPrice());
-//                cartItemsResponses.add(response);
-//            }
-//
-//            cart.setCartItems(cartItems);
-//            cartRepository.save(cart);
-//            return new CartResponse(cart.getId(),
-//                            cart.getUserId(),
-//                            cartItemsResponses,
-//                            cart.getCreatedDate());
-        } catch (Exception e) {
-            return null;
-        }
-        return null;
-    }
-
-    private Long getUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        Users findByUserName = userRepository.findByEmail(email);
-        if (findByUserName != null)
-            return findByUserName.getId();
-        else
-            return null;
-    }
-
-    @Override
     public Cart findById(Long id) {
         return cartRepository.findCartById(id);
     }
