@@ -37,6 +37,10 @@ public class ProductVariants {
     @OneToMany(mappedBy = "productVariants", cascade = CascadeType.ALL)
     private List<CartItems> cartItems;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "productVariants", cascade = CascadeType.ALL)
+    private List<OrderItems> orderItems;
+
     public ProductVariants(String skuId, Double price, Products products, Long quantity) {
         this.skuId = skuId;
         this.price = price;

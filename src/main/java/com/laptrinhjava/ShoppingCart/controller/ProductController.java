@@ -179,7 +179,8 @@ public class ProductController {
                                                @RequestParam(name = "categoryId") Long categoryId,
                                                @RequestParam(name = "description") String description,
                                                @RequestParam(name = "price", required = false) Double price,
-                                               @RequestParam(name = "quantity", required = false) Long quantity) {
+                                               @RequestParam(name = "quantity", required = false) Long quantity,
+                                               @RequestParam(name = "discountPercent", required = false) Long discountPercent) {
         StringBuilder imageUrl = new StringBuilder();
         for (MultipartFile file : files) {
             String url = amazonClient.uploadFile(file);
@@ -193,9 +194,9 @@ public class ProductController {
         if (category != null) {
             Products product = null;
             if (quantity == null) {
-                product = new Products(name, imageUrl.toString(), category, description, user, price, null);
+                product = new Products(name, imageUrl.toString(), category, description, user, price, null, discountPercent);
             } else {
-                product = new Products(name, imageUrl.toString(), category, description, user, price, quantity);
+                product = new Products(name, imageUrl.toString(), category, description, user, price, quantity, discountPercent);
             }
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("OK", "Save Successfully!", productService.save(product))
@@ -220,7 +221,8 @@ public class ProductController {
                                                         @RequestParam(name = "categoryId", required = false) Long newCategoryId,
                                                         @RequestParam(name = "description", required = false) String newDescription,
                                                         @RequestParam(name = "price", required = false) Double newPrice,
-                                                        @RequestParam(name = "quantity", required = false) Long newQuantity) {
+                                                        @RequestParam(name = "quantity", required = false) Long newQuantity,
+                                                        @RequestParam(name = "discountPercent", required = false) Long newDiscountPercent) {
         try {
             Products findProduct = productService.findProductById(productId);
             if (findProduct != null) {
@@ -267,6 +269,7 @@ public class ProductController {
                 if (newDescription != null) findProduct.setDescription(newDescription);
                 if (newPrice != null) findProduct.setPrice(newPrice);
                 if (newQuantity != null) findProduct.setQuantity(newQuantity);
+                if(newDiscountPercent != null) findProduct.setDiscountPercent(newDiscountPercent);
                 findProduct.setUsers(user);
                 return ResponseEntity.status(HttpStatus.OK).body(
                         new ResponseObject("OK", "Save Successfully!", productService.save(findProduct)

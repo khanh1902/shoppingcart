@@ -34,6 +34,9 @@ public class Products {
     @Column(name = "quantity")
     private Long quantity;
 
+    @Column(name = "discount_percent")
+    private Long discountPercent;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "createddate", nullable = false)
     private Date createdDate;
@@ -62,7 +65,7 @@ public class Products {
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Category category;
 
-    public Products(String name, String imageUrl, Category category, String description, Users users, Double price, Long quantity) {
+    public Products(String name, String imageUrl, Category category, String description, Users users, Double price, Long quantity, Long discountPercent) {
         this.name = name;
         this.imageUrl = imageUrl;
         this.category = category;
@@ -70,5 +73,6 @@ public class Products {
         this.users = users;
         this.price = price;
         this.quantity = quantity;
+        this.discountPercent = discountPercent;
     }
 }
