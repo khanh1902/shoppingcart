@@ -72,6 +72,8 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public UpdateStatusResponse updateStatusOrder(Long orderId, String newStatus) {
         Order findOrder = orderRepository.findOrderById(orderId);
+        findOrder.setStatus(newStatus);
+
 
         return null;
     }

@@ -1,7 +1,7 @@
 amazonProperties:
   endpointUrl: https://upload-image-shoppingcart.s3.ap-southeast-1.amazonaws.com
-  accessKey: AKIA4YKHWLEWQ2EG6NKS
-  secretKey: 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
+  accessKey: AKIA4YKHWLEWWWZ5CPNP
+  secretKey: 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
   bucketName: upload-image-shoppingcart
 spring:
   main:
