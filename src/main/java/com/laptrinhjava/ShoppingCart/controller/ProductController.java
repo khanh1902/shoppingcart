@@ -192,22 +192,44 @@ public class ProductController {
         String email = getUsername();
         Users user = userService.findByEmail(email);
 
-        if (category != null) {
-            Products product = null;
-            if (quantity == null) {
-                product = new Products(name, imageUrl.toString(), category, description, user, price, null, discountPercent);
-            } else {
-                product = new Products(name, imageUrl.toString(), category, description, user, price, quantity, discountPercent);
-            }
-            return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject("OK", "Save Successfully!", productService.save(product))
-            );
-        } else {
+        Products product = new Products();
+        product.setName(name);
+        product.setImageUrl(imageUrl.toString());
+        product.setDescription(description);
+        product.setPrice(price);
+
+        if (category != null) product.setCategory(category);
+        else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     new ResponseObject("Failed", "Category not exists!", null)
             );
         }
+
+        if (quantity == null) product.setQuantity(null);
+        else product.setQuantity(quantity);
+
+
+        if (discountPercent != null) product.setDiscountPercent(discountPercent);
+        else product.setDiscountPercent(null);
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject("OK", "Save Successfully!", productService.save(product))
+        );
+
+//        if (category != null) {
+//            Products product = null;
+//            if (quantity == null) {
+//                product = new Products(name, imageUrl.toString(), category, description, user, price, null, discountPercent);
+//            } else {
+//                product = new Products(name, imageUrl.toString(), category, description, user, price, quantity, discountPercent);
+//            }
+//            return ResponseEntity.status(HttpStatus.OK).body(
+//                    new ResponseObject("OK", "Save Successfully!", productService.save(product))
+//            );
+
     }
+
+
 
     /**
      * Method: Update product
@@ -271,7 +293,7 @@ public class ProductController {
                 if (newPrice != null) findProduct.setPrice(newPrice);
                 if (newQuantity != null) findProduct.setQuantity(newQuantity);
 
-                if(newDiscountPercent != null) findProduct.setDiscountPercent(newDiscountPercent);
+                if (newDiscountPercent != null) findProduct.setDiscountPercent(newDiscountPercent);
                 else findProduct.setDiscountPercent(null);
                 findProduct.setUsers(user);
                 return ResponseEntity.status(HttpStatus.OK).body(
