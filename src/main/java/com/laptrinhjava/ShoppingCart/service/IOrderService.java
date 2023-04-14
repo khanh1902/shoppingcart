@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 public interface IOrderService {
     Order findOrderById(Long id);
     Order findByUsers_Id(Long userId);
-    OrderResponse save(OrderRequest orderRequest);
+    Long save(OrderRequest orderRequest);
+
+
+
     void deleteById(Long id);
 }

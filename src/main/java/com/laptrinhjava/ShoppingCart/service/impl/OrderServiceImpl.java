@@ -41,7 +41,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public OrderResponse save(OrderRequest orderRequest) {
+    public Long save(OrderRequest orderRequest) {
         String email = getUsername();
         Users findUser = userRepository.findByEmail(email);
         String status = "Pending";
@@ -58,8 +58,7 @@ public class OrderServiceImpl implements IOrderService {
         order.setTotalPrice(totalPrice);
         orderRepository.save(order);
 
-        return new OrderResponse(order.getId(), findUser.getId(), order.getEmail(), order.getFullName(), order.getAddress(),
-                order.getPhoneNumber(), order.getStatus(), orderItemsResponses, order.getTotalPrice());
+        return order.getId();
     }
 
     @Override

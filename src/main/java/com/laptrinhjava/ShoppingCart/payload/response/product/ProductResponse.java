@@ -12,11 +12,13 @@ public class ProductResponse {
     private String name;
     private String imageUrl;
     private Double price;
+    private Long discountPercent;
 
-    public ProductResponse(Long id, String name, String imageUrl, Double price) {
+    public ProductResponse(Long id, String name, String imageUrl, Double price, Long discountPercent) {
         this.id = id;
         this.name = name;
         this.imageUrl = imageUrl;
         this.price = price;
+        this.discountPercent = discountPercent;
     }
 }

@@ -160,11 +160,11 @@ public class ProductsServiceImpl implements IProductService {
                     if (minPrice >= productVariants.get(i).getPrice()) minPrice = productVariants.get(i).getPrice();
                 }
                 ProductResponse productResponse = new ProductResponse(product.getId(), product.getName()
-                        , product.getImageUrl(), minPrice);
+                        , product.getImageUrl(), minPrice, product.getDiscountPercent());
                 productResponses.add(productResponse);
             } else {
                 ProductResponse productResponse = new ProductResponse(product.getId(), product.getName()
-                        , product.getImageUrl(), product.getPrice());
+                        , product.getImageUrl(), product.getPrice(), product.getDiscountPercent());
                 productResponses.add(productResponse);
             }
         }

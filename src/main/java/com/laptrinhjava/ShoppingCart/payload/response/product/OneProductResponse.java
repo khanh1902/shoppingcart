@@ -19,5 +19,6 @@ public class OneProductResponse {
     private List<Map<String, Object>> options;
     private Double price;
     private Long quantity;
+    private Long discountPercent;
 
 }

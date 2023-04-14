@@ -136,6 +136,7 @@ public class ProductController {
             productResponse.setImageUrl(product.getImageUrl());
             productResponse.setName(product.getName());
             productResponse.setPrice(product.getPrice()); // làm tròn 2 số thập phân
+            productResponse.setDiscountPercent(product.getDiscountPercent());
 
             List<ProductVariants> productVariants = productVariantsService.findByProducts_Id(product.getId());
             for (ProductVariants productVariant : productVariants) {
