@@ -270,7 +270,9 @@ public class ProductController {
                 if (newDescription != null) findProduct.setDescription(newDescription);
                 if (newPrice != null) findProduct.setPrice(newPrice);
                 if (newQuantity != null) findProduct.setQuantity(newQuantity);
+
                 if(newDiscountPercent != null) findProduct.setDiscountPercent(newDiscountPercent);
+                else findProduct.setDiscountPercent(null);
                 findProduct.setUsers(user);
                 return ResponseEntity.status(HttpStatus.OK).body(
                         new ResponseObject("OK", "Save Successfully!", productService.save(findProduct)
@@ -282,7 +284,7 @@ public class ProductController {
                 );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                    new ResponseObject("FAILED", "Error!", null)
+                    new ResponseObject("FAILED", "Error!", e.getMessage())
             );
         }
     }

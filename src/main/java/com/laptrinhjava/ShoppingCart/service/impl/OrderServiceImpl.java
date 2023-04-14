@@ -3,10 +3,13 @@ package com.laptrinhjava.ShoppingCart.service.impl;
 import com.laptrinhjava.ShoppingCart.entity.Order;
 import com.laptrinhjava.ShoppingCart.entity.Users;
 import com.laptrinhjava.ShoppingCart.payload.request.order.OrderRequest;
+import com.laptrinhjava.ShoppingCart.payload.request.order.UpdateStatusRequest;
 import com.laptrinhjava.ShoppingCart.payload.response.order.OrderItemsResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.order.OrderResponse;
+import com.laptrinhjava.ShoppingCart.payload.response.order.UpdateStatusResponse;
 import com.laptrinhjava.ShoppingCart.reponsitory.IOrderRepository;
 import com.laptrinhjava.ShoppingCart.reponsitory.IUserRepository;
+import com.laptrinhjava.ShoppingCart.service.IEmailSenderService;
 import com.laptrinhjava.ShoppingCart.service.IOrderService;
 import com.laptrinhjava.ShoppingCart.service.productService.IOrderItemsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,11 @@ public class OrderServiceImpl implements IOrderService {
     @Qualifier("orderItemsServiceImpl")
     @Autowired
     private IOrderItemsService orderItemsService;
+
+
+    @Qualifier("emailSenderServiceImpl")
+    @Autowired
+    private IEmailSenderService emailSenderService;
 
     @Override
     public Order findOrderById(Long id) {
@@ -59,6 +67,13 @@ public class OrderServiceImpl implements IOrderService {
         orderRepository.save(order);
 
         return order.getId();
+    }
+
+    @Override
+    public UpdateStatusResponse updateStatusOrder(Long orderId, String newStatus) {
+        Order findOrder = orderRepository.findOrderById(orderId);
+
+        return null;
     }
 
     @Override
