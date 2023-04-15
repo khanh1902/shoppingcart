@@ -10,7 +10,7 @@ import java.util.Map;
 @Getter
 @NoArgsConstructor
 public class OrderItemsResponse {
-    private Long cartItemId;
+    private Long orderItemId;
     private Long productId;
     private String productName;
     private String imageUrl;

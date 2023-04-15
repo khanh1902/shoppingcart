@@ -104,12 +104,6 @@ public class ProductController {
             int start = (int) pageRequest.getOffset();
             int end = Math.min(start + pageRequest.getPageSize(), products.size());
             Page<Products> pageProducts = new PageImpl<>(products.subList(start, end), pageRequest, products.size());
-            if (products.size() < offset * limit) {
-                Page<Products> page = new PageImpl<>(products.subList(start, end), pageRequest, products.size());
-                return ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject("OK", "Successfully!", page)
-                );
-            }
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("OK", "Successfully!", pageProducts)
             );

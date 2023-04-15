@@ -5,11 +5,9 @@ import com.laptrinhjava.ShoppingCart.payload.response.cart.CartItemsResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.order.OrderItemsResponse;
 import com.laptrinhjava.ShoppingCart.reponsitory.ICartItemsRepository;
 import com.laptrinhjava.ShoppingCart.reponsitory.IOrderItemsRepository;
-import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.IOptionValuesRepository;
-import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.IOptionsRepository;
-import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.IProductRepository;
-import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.IVariantValuesRepository;
+import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.*;
 import com.laptrinhjava.ShoppingCart.service.productService.IOrderItemsService;
+import com.laptrinhjava.ShoppingCart.service.productService.IProductVariantsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +38,15 @@ public class OrderItemsServiceImpl implements IOrderItemsService {
     @Autowired
     private IOrderItemsRepository orderItemsRepository;
 
+    @Autowired
+    private IProductVariantsRepository productVariantsRepository;
+
+    public Double discount(Long discountPercent, Double price) {
+        if (discountPercent != null) return (Double) price - price * discountPercent / 100L;
+        // neu khong co disount percent thi tra ve gia ban dau
+        return price;
+    }
+
     @Override
     public List<OrderItemsResponse> addProductsToOrder(Order order, List<Long> cartItemIds) {
         List<OrderItemsResponse> orderItemsResponses = new ArrayList<>();
@@ -47,12 +54,26 @@ public class OrderItemsServiceImpl implements IOrderItemsService {
             CartItems findCartItem = cartItemsRepository.findCartItemsById(cartItemId);
             if(findCartItem != null){
                 // luu item vao db
-                OrderItems orderItem = new OrderItems(order, findCartItem.getProductVariants(), findCartItem.getProductId(), findCartItem.getQuantity(), findCartItem.getPrice());
+                Products findProduct = productRepository.findProductById(findCartItem.getProductId());
+                OrderItems orderItem = new OrderItems(order, findCartItem.getProductVariants(), findCartItem.getProductId(),
+                         findCartItem.getQuantity(), findCartItem.getQuantity() * discount(findProduct.getDiscountPercent(), findCartItem.getPrice()));
                 orderItemsRepository.save(orderItem);
+                // cập nhật số lượng sản phẩm trong kho sau khi order
+                if(findCartItem.getProductVariants() != null) {
+                    ProductVariants findProductVariant = productVariantsRepository.findProductVariantsById(findCartItem.getProductVariants().getId());
+                    findProductVariant.setQuantity(findProduct.getQuantity() - findCartItem.getQuantity());
+                    findProduct.setQuantity(findProduct.getQuantity() - findCartItem.getQuantity());
+                    productVariantsRepository.save(findProductVariant);
+                    productRepository.save(findProduct);
+                }
+                else {
+                    findProduct.setQuantity(findProduct.getQuantity() - findCartItem.getQuantity());
+                    productRepository.save(findProduct);
+                }
                 OrderItemsResponse orderItemsResponse = new OrderItemsResponse();
                 Products product = productRepository.findProductById(orderItem.getProductId());
 
-                orderItemsResponse.setCartItemId(orderItem.getId());
+                orderItemsResponse.setOrderItemId(orderItem.getId());
                 orderItemsResponse.setProductId(orderItem.getProductId());
                 orderItemsResponse.setQuantity(orderItem.getQuantity());
                 orderItemsResponse.setPrice(orderItem.getPrice());
