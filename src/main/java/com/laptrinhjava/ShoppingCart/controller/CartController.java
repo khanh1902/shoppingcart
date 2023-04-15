@@ -39,17 +39,6 @@ public class CartController {
     private IProductVariantsService productVariantsService;
 
     /**
-     * method: save cart
-     **/
-//    @PostMapping("/save")
-//    public ResponseEntity<ResponseObject> save(@RequestBody CartRequest cartRequest) {
-//        return ResponseEntity.status(HttpStatus.OK).body(
-//                new ResponseObject("OK", "Save Successfully!", cartService.saveCart(cartRequest))
-//        );
-//    }
-
-
-    /**
      * Method: Find Cart By  cart id
      * Steps: 1: find cart by id form PathVariable
      * 2: save details list of product to CartItemsResponse

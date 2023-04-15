@@ -11,12 +11,10 @@ public class CartResponse {
     private Long id;
     private Long userId;
     private List<CartItemsResponse> cartItems;
-    private Double totalPrice;
 
-    public CartResponse(Long id, Long userId, List<CartItemsResponse> cartItems, Double totalPrice) {
+    public CartResponse(Long id, Long userId, List<CartItemsResponse> cartItems) {
         this.id = id;
         this.userId = userId;
         this.cartItems = cartItems;
-        this.totalPrice = totalPrice;
     }
 }

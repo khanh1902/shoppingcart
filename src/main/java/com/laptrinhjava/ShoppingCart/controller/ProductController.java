@@ -84,14 +84,9 @@ public class ProductController {
     }
 
 
-//    public String getUsername() {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (!(authentication instanceof AnonymousAuthenticationToken)) {
-//            return authentication.getName();
-//        }
-//        return null;
-//    }
-
+    /**
+     * Method: Find Product with paging, sort, filter, name, categoryIds, minPrice, maxPrice
+     **/
     @GetMapping("/filter")
     public ResponseEntity<ResponseObject> filter(@RequestParam(required = false, name = "offset", defaultValue = "0") Integer offset,
                                                  @RequestParam(required = false, name = "limit", defaultValue = "10") Integer limit,
@@ -173,7 +168,7 @@ public class ProductController {
      * Method: Save Product
      **/
     @PostMapping
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Consumes("multipart/form-data")
     public ResponseEntity<ResponseObject> save(@RequestParam(name = "name") String name,
                                                @RequestParam(name = "file") MultipartFile[] files,
@@ -215,26 +210,12 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("OK", "Save Successfully!", productService.save(product))
         );
-
-//        if (category != null) {
-//            Products product = null;
-//            if (quantity == null) {
-//                product = new Products(name, imageUrl.toString(), category, description, user, price, null, discountPercent);
-//            } else {
-//                product = new Products(name, imageUrl.toString(), category, description, user, price, quantity, discountPercent);
-//            }
-//            return ResponseEntity.status(HttpStatus.OK).body(
-//                    new ResponseObject("OK", "Save Successfully!", productService.save(product))
-//            );
-
     }
-
-
 
     /**
      * Method: Update product
      **/
-//    @Consumes("multipart/form-data")
+    @Consumes("multipart/form-data")
     @PutMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> updateProduct(@RequestParam(name = "id") Long productId,

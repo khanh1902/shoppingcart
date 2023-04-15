@@ -17,8 +17,10 @@ public class CartItemsResponse {
     private Map<String, Object> option;
     private Long quantity;
     private Double price;
+    private Long discountPercent;
 
-    public CartItemsResponse(Long cartItemId, Long productId, String productName, String imageUrl, Map<String, Object> option, Long quantity, Double price) {
+    public CartItemsResponse(Long cartItemId, Long productId, String productName, String imageUrl, Map<String,
+            Object> option, Long quantity, Double price, Long discountPercent) {
         this.cartItemId = cartItemId;
         this.productId = productId;
         this.productName = productName;
@@ -26,5 +28,6 @@ public class CartItemsResponse {
         this.option = option;
         this.quantity = quantity;
         this.price = price;
+        this.discountPercent = discountPercent;
     }
 }

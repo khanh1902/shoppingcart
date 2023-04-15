@@ -23,9 +23,6 @@ public class Cart {
     @Column(name = "userid")
     private Long userId;
 
-    @Column(name = "total_price")
-    private Double totalPrice;
-
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "createddate", nullable = false)
     private Date createdDate;
@@ -45,9 +42,8 @@ public class Cart {
 //            inverseJoinColumns = @JoinColumn(name = "productid"))
 //    private List<Product> products = new ArrayList<>();
 
-    public Cart(Long id, Long userId, Double totalPrice) {
+    public Cart(Long id, Long userId) {
         this.id = id;
         this.userId = userId;
-        this.totalPrice = totalPrice;
     }
 }

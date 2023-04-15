@@ -148,7 +148,7 @@ public class AuthController {
         userService.save(user);
 
         // tao gio hang cho user
-        cartService.save(new Cart(user.getId(), user.getId(), 0D));
+        cartService.save(new Cart(user.getId(), user.getId()));
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("ok", "User registered successfully!", " ")

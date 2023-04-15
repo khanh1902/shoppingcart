@@ -4,6 +4,7 @@ import com.laptrinhjava.ShoppingCart.entity.Order;
 import com.laptrinhjava.ShoppingCart.entity.Users;
 import com.laptrinhjava.ShoppingCart.payload.request.order.OrderRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.order.UpdateStatusRequest;
+import com.laptrinhjava.ShoppingCart.payload.request.sendemail.SendEmailRequest;
 import com.laptrinhjava.ShoppingCart.payload.response.order.OrderItemsResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.order.OrderResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.order.UpdateStatusResponse;
@@ -48,6 +49,11 @@ public class OrderServiceImpl implements IOrderService {
         return orderRepository.findByUsers_Id(userId);
     }
 
+    public Double discount(Long discountPercent, Double price) {
+        if (discountPercent != null) return (Double) price - price * discountPercent / 100L;
+        // neu khong co disount percent thi tra ve gia ban dau
+        return price;
+    }
     @Override
     public Long save(OrderRequest orderRequest) {
         String email = getUsername();
@@ -72,9 +78,25 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public UpdateStatusResponse updateStatusOrder(Long orderId, String newStatus) {
         Order findOrder = orderRepository.findOrderById(orderId);
-        findOrder.setStatus(newStatus);
+        if (newStatus.toLowerCase().equals("successfully")) {
+            findOrder.setStatus(newStatus);
+            orderRepository.save(findOrder);
+            SendEmailRequest sendEmailRequest = new SendEmailRequest();
+            sendEmailRequest.setToEmail(findOrder.getEmail());
+            sendEmailRequest.setSubject("Confirm Order");
 
+            StringBuilder body = new StringBuilder();
+            body.append("Congratulations! Your order has been successful\n");
+            body.append("Order ID: ").append(findOrder.getId()).append("\n");
+            body.append("Total price: ").append(findOrder.getTotalPrice()).append("$\n");
+            body.append("Your order will be delivered to you within 3-5 days").append("\n\n");
+            body.append("Thank You");
+            sendEmailRequest.setBody(body.toString());
+            sendEmailRequest.setBody(sendEmailRequest.getBody());
+            emailSenderService.sendEmail(sendEmailRequest);
+            return new UpdateStatusResponse(findOrder.getId(), findOrder.getStatus());
 
+        }
         return null;
     }
 
