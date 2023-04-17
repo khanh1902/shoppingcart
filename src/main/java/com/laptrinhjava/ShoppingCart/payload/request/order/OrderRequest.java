@@ -11,6 +11,9 @@ public class OrderRequest {
     private List<Long> cartItemIds;
     private String email;
     private String fullName;
-    private String address;
+    private String province;
+    private String district;
+    private String ward;
+    private String addressDetail;
     private String phoneNumber;
 }

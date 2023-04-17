@@ -7,6 +7,7 @@ import com.laptrinhjava.ShoppingCart.payload.request.sendemail.SendEmailRequest;
 import com.laptrinhjava.ShoppingCart.payload.response.order.OrderItemsResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.order.OrderResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.order.UpdateStatusResponse;
+import com.laptrinhjava.ShoppingCart.reponsitory.IAddressRepository;
 import com.laptrinhjava.ShoppingCart.reponsitory.IOrderItemsRepository;
 import com.laptrinhjava.ShoppingCart.reponsitory.IOrderRepository;
 import com.laptrinhjava.ShoppingCart.reponsitory.IUserRepository;
@@ -63,6 +64,9 @@ public class OrderServiceImpl implements IOrderService {
     @Autowired
     private IOptionValuesRepository optionValuesRepository;
 
+    @Autowired
+    private IAddressRepository addressRepository;
+
     @Override
     public Order findOrderById(Long id) {
         return orderRepository.findOrderById(id);
@@ -80,14 +84,52 @@ public class OrderServiceImpl implements IOrderService {
         return price;
     }
 
+    private String address(String addressDetail, String ward, String district, String province){
+        StringBuilder addressStr = new StringBuilder();
+        addressStr.append(addressDetail.toLowerCase()).append(", ")
+                .append(ward.toLowerCase()).append(", ")
+                .append(district.toLowerCase()).append(", ")
+                .append(province.toLowerCase());
+        return addressStr.toString();
+    }
+
     @Override
     public Long save(OrderRequest orderRequest) {
         String email = getUsername();
         Users findUser = userRepository.findByEmail(email);
         String status = "pending";
+
+        Order order = new Order();
+        order.setUsers(findUser);
+        order.setFullName(findUser.getFullName());
+        order.setEmail(orderRequest.getEmail());
+        order.setPhoneNumber(orderRequest.getPhoneNumber());
+        order.setStatus(status);
+        List<Address> findAddresses = addressRepository.findALlByUsers_Id(findUser.getId());
+        String addressRequest = address(orderRequest.getAddressDetail(), orderRequest.getWard(),
+                orderRequest.getDistrict(), orderRequest.getProvince());
+
+        if(findAddresses != null){
+            for(Address address : findAddresses){
+                String addressDefault = address(address.getAddressDetail(), address.getWard(), address.getDistrict(), address.getProvince());
+                if(addressDefault.equals(addressRequest)){
+                    order.setAddressId(address.getId());
+                }
+            }
+            Address newAddress = new Address(orderRequest.getProvince(), orderRequest.getDistrict(), orderRequest.getWard(),
+                    orderRequest.getAddressDetail(), findUser);
+            addressRepository.save(newAddress);
+            order.setAddressId(newAddress.getId());
+        }
+        else {
+            Address newAddress = new Address(orderRequest.getProvince(), orderRequest.getDistrict(), orderRequest.getWard(),
+                    orderRequest.getAddressDetail(), findUser);
+            addressRepository.save(newAddress);
+            order.setAddressId(newAddress.getId());
+        }
         Double totalPrice = 0D;
-        Order order = new Order(findUser, orderRequest.getFullName(), orderRequest.getEmail(), null, orderRequest.getAddress(),
-                orderRequest.getPhoneNumber(), status);
+//        Order order = new Order(findUser, orderRequest.getFullName(), orderRequest.getEmail(), null, orderRequest.getAddress(),
+//                orderRequest.getPhoneNumber(), status);
         orderRepository.save(order);
 
         // luu danh sach san pham
@@ -148,7 +190,9 @@ public class OrderServiceImpl implements IOrderService {
             OrderResponse orderResponse = new OrderResponse();
             orderResponse.setOrderId(order.getId());
             orderResponse.setEmail(order.getEmail());
-            orderResponse.setAddress(order.getAddress());
+            Address findAddress= addressRepository.findAddressById(order.getAddressId());
+            String addressDetail = address(findAddress.getAddressDetail(), findAddress.getWard(), findAddress.getDistrict(), findAddress.getProvince());
+            orderResponse.setAddress(addressDetail);
             orderResponse.setTotalPrice(order.getTotalPrice());
             orderResponse.setFullName(order.getFullName());
             orderResponse.setPhoneNumber(order.getPhoneNumber());
@@ -169,7 +213,9 @@ public class OrderServiceImpl implements IOrderService {
 
         orderResponse.setOrderId(findOrder.getId());
         orderResponse.setEmail(findOrder.getEmail());
-        orderResponse.setAddress(findOrder.getAddress());
+        Address findAddress= addressRepository.findAddressById(findOrder.getAddressId());
+        String addressDetail = address(findAddress.getAddressDetail(), findAddress.getWard(), findAddress.getDistrict(), findAddress.getProvince());
+        orderResponse.setAddress(addressDetail);
         orderResponse.setTotalPrice(findOrder.getTotalPrice());
         orderResponse.setFullName(findOrder.getFullName());
         orderResponse.setPhoneNumber(findOrder.getPhoneNumber());
@@ -194,7 +240,9 @@ public class OrderServiceImpl implements IOrderService {
             OrderResponse orderResponse = new OrderResponse();
             orderResponse.setOrderId(order.getId());
             orderResponse.setEmail(order.getEmail());
-            orderResponse.setAddress(order.getAddress());
+            Address findAddress= addressRepository.findAddressById(order.getAddressId());
+            String addressDetail = address(findAddress.getAddressDetail(), findAddress.getWard(), findAddress.getDistrict(), findAddress.getProvince());
+            orderResponse.setAddress(addressDetail);
             orderResponse.setTotalPrice(order.getTotalPrice());
             orderResponse.setFullName(order.getFullName());
             orderResponse.setPhoneNumber(order.getPhoneNumber());

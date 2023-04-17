@@ -38,6 +38,10 @@ public class Users {
 
     @JsonIgnore
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL)
+    private List<Address> addresses;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL)
     private List<Order> orders;
 
     @JsonIgnore

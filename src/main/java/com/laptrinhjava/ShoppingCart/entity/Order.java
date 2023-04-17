@@ -29,14 +29,13 @@ public class Order {
     @Column(name = "total_price")
     private Double totalPrice;
 
-    @Column(name = "address")
-    private String address;
-
     @Column(name = "fullname")
     private String fullName;
 
     @Column (name = "email")
     private String email;
+
+    private Long addressId;
 
     @Column(name = "phonenumber")
     private String phoneNumber;
@@ -54,12 +53,13 @@ public class Order {
     }
 
 
-    public Order(Users users, String fullName, String email, Double totalPrice, String address, String phoneNumber, String status) {
+
+    public Order(Users users, String fullName, String email, Double totalPrice, Long addressId, String phoneNumber, String status) {
         this.users = users;
         this.fullName = fullName;
         this.email = email;
         this.totalPrice = totalPrice;
-        this.address = address;
+        this.addressId = addressId;
         this.phoneNumber = phoneNumber;
         this.status = status;
     }

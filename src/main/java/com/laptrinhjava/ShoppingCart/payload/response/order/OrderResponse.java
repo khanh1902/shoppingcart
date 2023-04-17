@@ -1,5 +1,6 @@
 package com.laptrinhjava.ShoppingCart.payload.response.order;
 
+import com.laptrinhjava.ShoppingCart.entity.Address;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

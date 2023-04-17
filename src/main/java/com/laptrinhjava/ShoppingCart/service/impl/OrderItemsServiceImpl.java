@@ -94,6 +94,7 @@ public class OrderItemsServiceImpl implements IOrderItemsService {
                     orderItemsResponse.setOption(option);
                 }
                 orderItemsResponses.add(orderItemsResponse);
+                cartItemsRepository.delete(findCartItem);
             }
         }
         return orderItemsResponses;

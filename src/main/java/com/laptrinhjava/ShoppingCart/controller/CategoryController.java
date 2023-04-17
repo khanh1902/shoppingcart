@@ -131,7 +131,7 @@ public class CategoryController {
                 Category findCategory = categoryService.findCategoryById(id);
                 if (findCategory != null) {
                     List<Products> findProductsByCategoryId = productService.findByCategory_Id(findCategory.getId());
-                    if (findProductsByCategoryId != null)
+                    if (!findProductsByCategoryId.isEmpty())
                         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
                                 new ResponseObject("Failed", "Can not remove " + findCategory.getName() +
                                         " because product exists in this!", null)
