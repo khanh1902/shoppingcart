@@ -57,6 +57,10 @@ public class Products {
     private List<ProductVariants> productVariants;
 
     @JsonIgnore
+    @OneToMany(mappedBy = "products")
+    private List<Reviews> reviews;
+
+    @JsonIgnore
     @OneToMany(mappedBy = "products", cascade = CascadeType.ALL)
     private List<ProductOptions> productOptions;
 

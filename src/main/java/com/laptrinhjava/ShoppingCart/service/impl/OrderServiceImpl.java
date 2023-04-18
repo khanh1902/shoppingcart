@@ -117,19 +117,17 @@ public class OrderServiceImpl implements IOrderService {
                 }
             }
             Address newAddress = new Address(orderRequest.getProvince(), orderRequest.getDistrict(), orderRequest.getWard(),
-                    orderRequest.getAddressDetail(), findUser);
+                    orderRequest.getAddressDetail(), findUser, false);
             addressRepository.save(newAddress);
             order.setAddressId(newAddress.getId());
         }
         else {
             Address newAddress = new Address(orderRequest.getProvince(), orderRequest.getDistrict(), orderRequest.getWard(),
-                    orderRequest.getAddressDetail(), findUser);
+                    orderRequest.getAddressDetail(), findUser, false);
             addressRepository.save(newAddress);
             order.setAddressId(newAddress.getId());
         }
         Double totalPrice = 0D;
-//        Order order = new Order(findUser, orderRequest.getFullName(), orderRequest.getEmail(), null, orderRequest.getAddress(),
-//                orderRequest.getPhoneNumber(), status);
         orderRepository.save(order);
 
         // luu danh sach san pham

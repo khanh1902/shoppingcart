@@ -45,6 +45,10 @@ public class Users {
     private List<Order> orders;
 
     @JsonIgnore
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
+    private List<Reviews> reviews;
+
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER)
     // quan hệ n-n với đối tượng ở dưới (Role) (1 user có nhiều quyền)
     // LAZY để tránh việc truy xuất dữ liệu không cần thiết. Lúc nào cần thì mới query
