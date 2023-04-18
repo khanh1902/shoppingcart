@@ -45,7 +45,7 @@ public class Users {
     private List<Order> orders;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL)
     private List<Reviews> reviews;
 
     @JsonIgnore

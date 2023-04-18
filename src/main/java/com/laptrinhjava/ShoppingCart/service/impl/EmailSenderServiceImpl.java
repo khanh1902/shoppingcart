@@ -4,6 +4,7 @@ import com.laptrinhjava.ShoppingCart.entity.Users;
 import com.laptrinhjava.ShoppingCart.payload.request.sendemail.SendEmailRequest;
 import com.laptrinhjava.ShoppingCart.service.IEmailSenderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,7 @@ public class EmailSenderServiceImpl implements IEmailSenderService {
     private JavaMailSender mailSender;
 
     @Override
-    public void sendEmail(SendEmailRequest sendEmailRequest) {
+    public void sendEmail(SendEmailRequest sendEmailRequest) throws MailException {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setFrom("vankhanh.dev@gmail.com");
         mailMessage.setTo(sendEmailRequest.getToEmail());

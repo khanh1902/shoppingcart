@@ -9,6 +9,7 @@ import com.laptrinhjava.ShoppingCart.security.oauth2.OAuth2LoginSuccessHandle;
 import com.laptrinhjava.ShoppingCart.security.service.UserDetailsServiceImpl;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,6 +39,7 @@ public class WebSecurityConfig {
     @Autowired
     private CustomOAuth2UserService oauthUserService;
 
+    @Qualifier("userServiceImpl")
     @Autowired
     private IUserService userService;
 

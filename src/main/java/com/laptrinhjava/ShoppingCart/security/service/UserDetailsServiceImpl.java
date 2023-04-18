@@ -4,6 +4,7 @@ package com.laptrinhjava.ShoppingCart.security.service;
 import com.laptrinhjava.ShoppingCart.entity.Users;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,6 +17,7 @@ Vì vậy, bạn cần tạo ra một class kế thừa lớp UserDetailsService
 */
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
+    @Qualifier("userServiceImpl")
     @Autowired
     private IUserService userService;
 

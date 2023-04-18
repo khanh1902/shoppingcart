@@ -7,6 +7,7 @@ import com.laptrinhjava.ShoppingCart.security.oauth2.CustomOAuth2User;
 import com.laptrinhjava.ShoppingCart.service.IRoleService;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private IUserRepository userRepository;
 
+    @Qualifier("roleServiceImpl")
     @Autowired
     private IRoleService roleService;
 
