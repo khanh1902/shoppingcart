@@ -2,6 +2,8 @@ package com.laptrinhjava.ShoppingCart.service.impl;
 
 import com.laptrinhjava.ShoppingCart.entity.EProvider;
 import com.laptrinhjava.ShoppingCart.entity.Users;
+import com.laptrinhjava.ShoppingCart.payload.request.auth.UserRequest;
+import com.laptrinhjava.ShoppingCart.payload.response.auth.UserResponse;
 import com.laptrinhjava.ShoppingCart.reponsitory.IUserRepository;
 import com.laptrinhjava.ShoppingCart.security.oauth2.CustomOAuth2User;
 import com.laptrinhjava.ShoppingCart.service.IRoleService;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+
+import static com.laptrinhjava.ShoppingCart.common.HandleAuth.getUsername;
 
 @Service
 public class UserServiceImpl implements IUserService {
@@ -71,5 +75,17 @@ public class UserServiceImpl implements IUserService {
     @Override
     public List<Users> findByRoles_Id(Long roles_id) {
         return userRepository.findByRoles_Id(roles_id);
+    }
+
+    @Override
+    public UserResponse update(UserRequest userRequest) {
+        String email = getUsername();
+        Users findUser = userRepository.findByEmail(email);
+        if(userRequest.getFullName() != null) findUser.setFullName(userRequest.getFullName());
+        if(userRequest.getPhoneNumber() != null) findUser.setPhoneNumber(userRequest.getPhoneNumber());
+        if (userRequest.getSex() != null) findUser.setSex(userRequest.getSex());
+        if (userRequest.getDateOfBirth() != null) findUser.setDateOfBirth(userRequest.getDateOfBirth());
+        userRepository.save(findUser);
+        return new UserResponse(findUser.getFullName(), findUser.getPhoneNumber(), findUser.getSex(), findUser.getDateOfBirth());
     }
 }

@@ -70,10 +70,21 @@ public class AddressServiceImpl implements IAddressService {
     public Address save(AddressRequest addressRequest) {
         String email = getUsername();
         Users findUser = userRepository.findByEmail(email);
-        List<Address> addresses = addressRepository.findALlByUsers_Id(findUser.getId());
+//        List<Address> addresses = addressRepository.findALlByUsers_Id(findUser.getId());
         Address address = new Address(addressRequest.getProvince(), addressRequest.getDistrict(), addressRequest.getWard(),
                 addressRequest.getAddressDetail(), findUser, null);
-        if (addressRequest.getIsDefault().toLowerCase().equals("true")) address.setIsDefault(true);
+        if (addressRequest.getIsDefault().toLowerCase().equals("true")) {
+            address.setIsDefault(true);
+            // update isDefault cho cac dia chi khac khi set dia chi da update la true
+
+            List<Address> addresses = addressRepository.findALlByUsers_Id(findUser.getId());
+            if (!addresses.isEmpty()) {
+                for (Address getAddress : addresses) {
+                    getAddress.setIsDefault(false);
+                    addressRepository.save(getAddress);
+                }
+            }
+        }
         else if (addressRequest.getIsDefault().toLowerCase().equals("false")) address.setIsDefault(false);
         return addressRepository.save(address);
     }

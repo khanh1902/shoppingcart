@@ -1,8 +1,9 @@
 package com.laptrinhjava.ShoppingCart.controller;
 
 import com.laptrinhjava.ShoppingCart.entity.Users;
+import com.laptrinhjava.ShoppingCart.payload.request.auth.UserRequest;
 import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
-import com.laptrinhjava.ShoppingCart.payload.response.auth.UserResponse;
+import com.laptrinhjava.ShoppingCart.payload.response.auth.AuthResponse;
 import com.laptrinhjava.ShoppingCart.security.jwt.JwtUtils;
 import com.laptrinhjava.ShoppingCart.security.service.UserDetailsServiceImpl;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
@@ -47,7 +48,7 @@ public class UserController {
                     .collect(Collectors.toList());
             Users user = userService.findByEmail(userDetails.getUsername());
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject("ok", "Successfully!", new UserResponse(
+                    new ResponseObject("ok", "Successfully!", new AuthResponse(
                             user.getId(),
                             user.getFullName(),
                             user.getEmail(),
@@ -69,7 +70,7 @@ public class UserController {
     }
 
     // get all user
-    @GetMapping
+    @GetMapping("/get-all")
     public ResponseEntity<ResponseObject> getAllUser(@RequestParam(name = "roleid") Long roleId){
         try {
             List<Users> users = userService.findByRoles_Id(roleId);
@@ -88,5 +89,12 @@ public class UserController {
                     new ResponseObject("FAILED", "Error from Exception!", e.getMessage())
             );
         }
+    }
+
+    @PutMapping
+    public ResponseEntity<ResponseObject> updateUser(@RequestBody UserRequest userRequest){
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject("OK", "Successfully!", userService.update(userRequest))
+        );
     }
 }

@@ -32,6 +32,15 @@ public class Users {
     @Enumerated(EnumType.STRING)
     private EProvider provider;
 
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    @Column(name = "sex")
+    private String sex;
+
+    @Column(name = "date_of_birth")
+    private String dateOfBirth;
+
     @JsonIgnore
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL)
     private List<Products> products;

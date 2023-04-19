@@ -3,21 +3,18 @@ package com.laptrinhjava.ShoppingCart.payload.response.auth;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
-@Getter
 @Setter
+@Getter
 public class UserResponse {
-    private Long id;
-    private String email;
     private String fullName;
+    private String phoneNumber;
+    private String sex;
+    private String dateOfBirth;
 
-    private List<String> roles;
-
-    public UserResponse(Long id, String fullName, String email, List<String> roles) {
-        this.id = id;
+    public UserResponse(String fullName, String phoneNumber, String sex, String dateOfBirth) {
         this.fullName = fullName;
-        this.email = email;
-        this.roles = roles;
+        this.phoneNumber = phoneNumber;
+        this.sex = sex;
+        this.dateOfBirth = dateOfBirth;
     }
 }

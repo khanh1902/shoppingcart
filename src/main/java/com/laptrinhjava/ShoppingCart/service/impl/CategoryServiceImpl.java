@@ -1,7 +1,6 @@
 package com.laptrinhjava.ShoppingCart.service.impl;
 
 import com.laptrinhjava.ShoppingCart.entity.Category;
-import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
 import com.laptrinhjava.ShoppingCart.reponsitory.ICategoryRepository;
 import com.laptrinhjava.ShoppingCart.service.ICategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,11 +8,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class CategoryServiceImpl implements ICategoryService {
@@ -87,9 +87,9 @@ public class CategoryServiceImpl implements ICategoryService {
 
             Map<String, Object> response = new HashMap<>();
             response.put("categories", pagedResult);
-            response.put("currentPage", pagedResult.getNumber());
-            response.put("totalItems", pagedResult.getTotalElements());
-            response.put("totalPages", pagedResult.getTotalPages());
+            response.put("currentPage", Optional.of(pagedResult.getNumber()));
+            response.put("totalItems", Optional.of(pagedResult.getTotalElements()));
+            response.put("totalPages", Optional.of(pagedResult.getTotalPages()));
             return response;
         } catch (Exception e) {
             Map<String, Object> error = new HashMap<>();
