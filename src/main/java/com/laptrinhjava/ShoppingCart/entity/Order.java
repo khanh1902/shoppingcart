@@ -35,6 +35,7 @@ public class Order {
     @Column (name = "email")
     private String email;
 
+    @Column(name = "address_id")
     private Long addressId;
 
     @Column(name = "phonenumber")
@@ -51,7 +52,6 @@ public class Order {
     private void onCreated(){
         createdDate = new Date();
     }
-
 
 
     public Order(Users users, String fullName, String email, Double totalPrice, Long addressId, String phoneNumber, String status) {
