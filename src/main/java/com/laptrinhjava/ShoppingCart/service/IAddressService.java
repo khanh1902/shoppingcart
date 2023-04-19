@@ -12,6 +12,5 @@ public interface IAddressService {
     Address update(Long id, AddressRequest addressRequest);
     List<Address> findALlByUsers_Id();
     void deleteByAddressId(Long addressId);
-
-
+    Address save(AddressRequest addressRequest);
 }

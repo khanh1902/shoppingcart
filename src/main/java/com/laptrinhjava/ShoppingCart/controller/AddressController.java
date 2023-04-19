@@ -29,6 +29,14 @@ public class AddressController {
         );
     }
 
+    @PostMapping
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseObject> save(@RequestBody AddressRequest addressRequest){
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject("OK", "Successfully!", addressService.save(addressRequest))
+        );
+    }
+
     @GetMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> getAllForUser(){
