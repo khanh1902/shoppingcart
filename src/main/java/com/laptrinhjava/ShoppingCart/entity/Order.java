@@ -35,8 +35,10 @@ public class Order {
     @Column (name = "email")
     private String email;
 
-    @Column(name = "address_id")
-    private Long addressId;
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "address_id")
+    private Address address;
 
     @Column(name = "phonenumber")
     private String phoneNumber;
@@ -54,12 +56,12 @@ public class Order {
     }
 
 
-    public Order(Users users, String fullName, String email, Double totalPrice, Long addressId, String phoneNumber, String status) {
+    public Order(Users users, String fullName, String email, Double totalPrice, Address address, String phoneNumber, String status) {
         this.users = users;
         this.fullName = fullName;
         this.email = email;
         this.totalPrice = totalPrice;
-        this.addressId = addressId;
+        this.address = address;
         this.phoneNumber = phoneNumber;
         this.status = status;
     }

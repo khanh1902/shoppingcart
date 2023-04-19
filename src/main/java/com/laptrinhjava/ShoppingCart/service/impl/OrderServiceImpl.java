@@ -105,27 +105,29 @@ public class OrderServiceImpl implements IOrderService {
         order.setEmail(orderRequest.getEmail());
         order.setPhoneNumber(orderRequest.getPhoneNumber());
         order.setStatus(status);
-        List<Address> findAddresses = addressRepository.findALlByUsers_Id(findUser.getId());
-        String addressRequest = address(orderRequest.getAddressDetail(), orderRequest.getWard(),
-                orderRequest.getDistrict(), orderRequest.getProvince());
-
-        if (findAddresses != null) {
-            for (Address address : findAddresses) {
-                String addressDefault = address(address.getAddressDetail(), address.getWard(), address.getDistrict(), address.getProvince());
-                if (addressDefault.equals(addressRequest)) {
-                    order.setAddressId(address.getId());
-                }
-            }
-            Address newAddress = new Address(orderRequest.getProvince(), orderRequest.getDistrict(), orderRequest.getWard(),
-                    orderRequest.getAddressDetail(), findUser, false);
-            addressRepository.save(newAddress);
-            order.setAddressId(newAddress.getId());
-        } else {
-            Address newAddress = new Address(orderRequest.getProvince(), orderRequest.getDistrict(), orderRequest.getWard(),
-                    orderRequest.getAddressDetail(), findUser, false);
-            addressRepository.save(newAddress);
-            order.setAddressId(newAddress.getId());
-        }
+//        List<Address> findAddresses = addressRepository.findALlByUsers_Id(findUser.getId());
+//        String addressRequest = address(orderRequest.getAddressDetail(), orderRequest.getWard(),
+//                orderRequest.getDistrict(), orderRequest.getProvince());
+//
+//        if (findAddresses != null) {
+//            for (Address address : findAddresses) {
+//                String addressDefault = address(address.getAddressDetail(), address.getWard(), address.getDistrict(), address.getProvince());
+//                if (addressDefault.equals(addressRequest)) {
+//                    order.setAddressId(address.getId());
+//                }
+//            }
+//            Address newAddress = new Address(orderRequest.getProvince(), orderRequest.getDistrict(), orderRequest.getWard(),
+//                    orderRequest.getAddressDetail(), findUser, false);
+//            addressRepository.save(newAddress);
+//            order.setAddressId(newAddress.getId());
+//        } else {
+//            Address newAddress = new Address(orderRequest.getProvince(), orderRequest.getDistrict(), orderRequest.getWard(),
+//                    orderRequest.getAddressDetail(), findUser, false);
+//            addressRepository.save(newAddress);
+//            order.setAddressId(newAddress.getId());
+//        }
+        Address findAddress = addressRepository.findAddressById(orderRequest.getAddressId());
+        order.setAddress(findAddress);
         Double totalPrice = 0D;
         orderRepository.save(order);
 
@@ -187,7 +189,7 @@ public class OrderServiceImpl implements IOrderService {
             OrderResponse orderResponse = new OrderResponse();
             orderResponse.setOrderId(order.getId());
             orderResponse.setEmail(order.getEmail());
-            Address findAddress = addressRepository.findAddressById(order.getAddressId());
+            Address findAddress = addressRepository.findAddressById(order.getAddress().getId());
             String addressDetail = address(findAddress.getAddressDetail(), findAddress.getWard(), findAddress.getDistrict(), findAddress.getProvince());
             orderResponse.setAddress(addressDetail);
             orderResponse.setTotalPrice(order.getTotalPrice());
@@ -210,7 +212,7 @@ public class OrderServiceImpl implements IOrderService {
 
         orderResponse.setOrderId(findOrder.getId());
         orderResponse.setEmail(findOrder.getEmail());
-        Address findAddress = addressRepository.findAddressById(findOrder.getAddressId());
+        Address findAddress = addressRepository.findAddressById(findOrder.getAddress().getId());
         String addressDetail = address(findAddress.getAddressDetail(), findAddress.getWard(), findAddress.getDistrict(), findAddress.getProvince());
         orderResponse.setAddress(addressDetail);
         orderResponse.setTotalPrice(findOrder.getTotalPrice());
@@ -237,7 +239,7 @@ public class OrderServiceImpl implements IOrderService {
             OrderResponse orderResponse = new OrderResponse();
             orderResponse.setOrderId(order.getId());
             orderResponse.setEmail(order.getEmail());
-            Address findAddress = addressRepository.findAddressById(order.getAddressId());
+            Address findAddress = addressRepository.findAddressById(order.getAddress().getId());
             String addressDetail = address(findAddress.getAddressDetail(), findAddress.getWard(), findAddress.getDistrict(), findAddress.getProvince());
             orderResponse.setAddress(addressDetail);
             orderResponse.setTotalPrice(order.getTotalPrice());
