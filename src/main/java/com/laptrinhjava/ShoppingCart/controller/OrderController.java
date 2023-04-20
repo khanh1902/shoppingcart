@@ -33,9 +33,16 @@ public class OrderController {
     @GetMapping("/get-one")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> getOneOrderForUser(@RequestParam(name = "orderId") Long orderId) {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("OK", "Update successfully!", orderService.getOneOrderForUser(orderId))
-        );
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("OK", "Update successfully!", orderService.getOneOrderForUser(orderId))
+            );
+        }
+        catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+                    new ResponseObject("FAILED", "Error!", e.getMessage())
+            );
+        }
     }
 
     @GetMapping("/get-all")

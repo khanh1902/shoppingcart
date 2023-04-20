@@ -204,15 +204,16 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public OrderResponse getOneOrderForUser(Long orderId) {
+    public OrderResponse getOneOrderForUser(Long orderId) throws Exception {
         String email = getUsername();
         Users findUser = userRepository.findByEmail(email);
         Order findOrder = orderRepository.findOrderById(orderId);
+        if (findOrder == null) throw new Exception("Order does not exists!");
         OrderResponse orderResponse = new OrderResponse();
-
         orderResponse.setOrderId(findOrder.getId());
         orderResponse.setEmail(findOrder.getEmail());
         Address findAddress = addressRepository.findAddressById(findOrder.getAddress().getId());
+        if(findAddress == null) throw new Exception("Address does not exist!");
         String addressDetail = address(findAddress.getAddressDetail(), findAddress.getWard(), findAddress.getDistrict(), findAddress.getProvince());
         orderResponse.setAddress(addressDetail);
         orderResponse.setTotalPrice(findOrder.getTotalPrice());
@@ -220,13 +221,15 @@ public class OrderServiceImpl implements IOrderService {
         orderResponse.setPhoneNumber(findOrder.getPhoneNumber());
         orderResponse.setStatus(findOrder.getStatus());
         orderResponse.setUserId(findUser.getId());
-        orderResponse.setOrderItemsResponses(convertOrderItemToOrderItemResponse(orderItemsRepository.findByOrder_Id(findUser.getId())));
+        List<OrderItems> orderItemsList = orderItemsRepository.findByOrder_Id(findUser.getId());
+        if (orderItemsList.isEmpty()) throw new Exception("Order Items does not exists!");
+        orderResponse.setOrderItemsResponses(convertOrderItemToOrderItemResponse(orderItemsList));
 
         return orderResponse;
     }
 
     @Override
-    public List<OrderResponse> getAllOrderForAdmin(String sortBy, String status) {
+    public List<OrderResponse> getAllOrderForAdmin(String sortBy, String status) throws Exception {
         Sort sort = Sort.by(sortBy).ascending();
         List<Order> orders = null;
         if (status != null) {
@@ -240,6 +243,7 @@ public class OrderServiceImpl implements IOrderService {
             orderResponse.setOrderId(order.getId());
             orderResponse.setEmail(order.getEmail());
             Address findAddress = addressRepository.findAddressById(order.getAddress().getId());
+            if(findAddress == null) throw new Exception("Address does not exist!");
             String addressDetail = address(findAddress.getAddressDetail(), findAddress.getWard(), findAddress.getDistrict(), findAddress.getProvince());
             orderResponse.setAddress(addressDetail);
             orderResponse.setTotalPrice(order.getTotalPrice());

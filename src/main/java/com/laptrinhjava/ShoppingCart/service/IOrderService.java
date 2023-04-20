@@ -20,8 +20,8 @@ public interface IOrderService {
 
     List<OrderResponse> getAllOrderForUser(String sortBy, String status);
 
-    OrderResponse getOneOrderForUser(Long orderId);
+    OrderResponse getOneOrderForUser(Long orderId) throws Exception;
 
-    List<OrderResponse> getAllOrderForAdmin(String sortBy, String status);
+    List<OrderResponse> getAllOrderForAdmin(String sortBy, String status) throws Exception;
 
 }
