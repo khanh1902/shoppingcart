@@ -21,4 +21,5 @@ public interface IUserService {
     void processOAuthPostLogin(CustomOAuth2User user);
     List<Users> findByRoles_Id(Long roles_id);
     UserResponse update(UserRequest userRequest);
+    List<UserResponse> getAllUser(List<Users> users);
 }

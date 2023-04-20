@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,8 +71,6 @@ public class UserServiceImpl implements IUserService {
 
             //set role for gg api
             userRepository.save(newUser);
-//            cartService.save(new Cart(newUser.getId(), newUser.getId(), null));
-
         }
     }
 
@@ -89,6 +88,16 @@ public class UserServiceImpl implements IUserService {
         if (userRequest.getSex() != null) findUser.setSex(userRequest.getSex());
         if (userRequest.getDateOfBirth() != null) findUser.setDateOfBirth(userRequest.getDateOfBirth());
         userRepository.save(findUser);
-        return new UserResponse(findUser.getFullName(), findUser.getPhoneNumber(), findUser.getSex(), findUser.getDateOfBirth());
+        return new UserResponse(findUser.getId(), findUser.getEmail(),findUser.getFullName(), findUser.getPhoneNumber(), findUser.getSex(), findUser.getDateOfBirth());
+    }
+
+    @Override
+    public List<UserResponse> getAllUser(List<Users> users) {
+        List<UserResponse> userResponses = new ArrayList<>();
+        for(Users user : users){
+            UserResponse userResponse = new UserResponse(user.getId(), user.getEmail(), user.getFullName(), user.getPhoneNumber(), user.getSex(), user.getDateOfBirth());
+            userResponses.add(userResponse);
+        }
+        return userResponses;
     }
 }

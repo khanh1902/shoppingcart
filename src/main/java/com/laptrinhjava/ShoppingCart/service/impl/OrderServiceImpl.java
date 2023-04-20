@@ -176,6 +176,7 @@ public class OrderServiceImpl implements IOrderService {
             orderResponse.setPhoneNumber(order.getPhoneNumber());
             orderResponse.setStatus(order.getStatus());
             orderResponse.setUserId(order.getId());
+            orderResponse.setCreatedDate(order.getCreatedDate());
 
             List<OrderItems> orderItemsList = orderItemsRepository.findByOrder_Id(order.getId());
             if (orderItemsList.isEmpty()) throw new Exception("Order Items does not exists!");
@@ -205,6 +206,7 @@ public class OrderServiceImpl implements IOrderService {
         orderResponse.setPhoneNumber(findOrder.getPhoneNumber());
         orderResponse.setStatus(findOrder.getStatus());
         orderResponse.setUserId(findUser.getId());
+        orderResponse.setCreatedDate(findOrder.getCreatedDate());
         List<OrderItems> orderItemsList = orderItemsRepository.findByOrder_Id(findOrder.getId());
         if (orderItemsList.isEmpty()) throw new Exception("Order Items does not exists!");
         orderResponse.setOrderItemsResponses(convertOrderItemToOrderItemResponse(orderItemsList));

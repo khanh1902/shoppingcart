@@ -1,10 +1,12 @@
 package com.laptrinhjava.ShoppingCart.payload.response.order;
 
 import com.laptrinhjava.ShoppingCart.entity.Address;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
 import java.util.List;
 
 @Setter
@@ -20,9 +22,10 @@ public class OrderResponse {
     private String status;
     private List<OrderItemsResponse> orderItemsResponses;
     private Double totalPrice;
+    private Date createdDate;
 
     public OrderResponse(Long orderId, Long userId, String email, String fullName, String address, String phoneNumber, String status,
-                         List<OrderItemsResponse> orderItemsResponses, Double totalPrice) {
+                         List<OrderItemsResponse> orderItemsResponses, Double totalPrice, Date createdDate) {
         this.orderId = orderId;
         this.userId = userId;
         this.email = email;
@@ -32,5 +35,6 @@ public class OrderResponse {
         this.status = status;
         this.orderItemsResponses = orderItemsResponses;
         this.totalPrice = totalPrice;
+        this.createdDate = createdDate;
     }
 }

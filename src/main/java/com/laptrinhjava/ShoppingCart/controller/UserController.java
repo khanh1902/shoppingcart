@@ -1,6 +1,7 @@
 package com.laptrinhjava.ShoppingCart.controller;
 
 import com.laptrinhjava.ShoppingCart.entity.PasswordResetToken;
+import com.laptrinhjava.ShoppingCart.entity.Role;
 import com.laptrinhjava.ShoppingCart.entity.Users;
 import com.laptrinhjava.ShoppingCart.payload.request.auth.ChangePasswordRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.auth.SavePasswordRequest;
@@ -11,6 +12,7 @@ import com.laptrinhjava.ShoppingCart.security.jwt.JwtUtils;
 import com.laptrinhjava.ShoppingCart.security.service.UserDetailsServiceImpl;
 import com.laptrinhjava.ShoppingCart.service.IEmailSenderService;
 import com.laptrinhjava.ShoppingCart.service.IPasswordResetTokenService;
+import com.laptrinhjava.ShoppingCart.service.IRoleService;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +63,10 @@ public class UserController {
     @Autowired
     private PasswordEncoder encoder;
 
+    @Qualifier("roleServiceImpl")
+    @Autowired
+    private IRoleService roleService;
+
     @GetMapping("/get-me")
     public ResponseEntity<ResponseObject> getInformation(@RequestHeader(name = "Authorization") String jwt) {
         try {
@@ -100,10 +106,12 @@ public class UserController {
     @GetMapping("/get-all")
     public ResponseEntity<ResponseObject> getAllUser(@RequestParam(name = "roleid") Long roleId) {
         try {
+            Role role = roleService.findRoleById(roleId);
+            if(role == null) throw new Exception("Role dose not exists!");
             List<Users> users = userService.findByRoles_Id(roleId);
-            if (users != null) {
+            if (!users.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject("OK", "Successfully!", users)
+                        new ResponseObject("OK", "Successfully!", userService.getAllUser(users))
                 );
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
@@ -117,6 +125,9 @@ public class UserController {
         }
     }
 
+    /**
+     * Update Information User
+     **/
     @PutMapping
     public ResponseEntity<ResponseObject> updateUser(@RequestBody UserRequest userRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -169,7 +180,7 @@ public class UserController {
             findUser.setPassword(encoder.encode(savePasswordRequest.getPassword()));
             userService.save(findUser);
             passwordResetTokenService.deleteById(passwordResetToken.getId());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+            return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("OK", "Update new password successfully!", null)
             );
         } else {
