@@ -2,6 +2,7 @@ package com.laptrinhjava.ShoppingCart.controller;
 
 import com.laptrinhjava.ShoppingCart.entity.PasswordResetToken;
 import com.laptrinhjava.ShoppingCart.entity.Users;
+import com.laptrinhjava.ShoppingCart.payload.request.auth.ChangePasswordRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.auth.SavePasswordRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.auth.UserRequest;
 import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
@@ -28,6 +30,8 @@ import java.security.SecureRandom;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static com.laptrinhjava.ShoppingCart.common.HandleAuth.getUsername;
 
 @RestController
 @RequestMapping("/api/user")
@@ -120,9 +124,9 @@ public class UserController {
         );
     }
 
-    /*
-     * Forgot password
-     * */
+    /**
+     * Send Email Forgot password
+     **/
     @PostMapping("/resetPassword")
     public ResponseEntity<ResponseObject> resetPassword(HttpServletRequest request,
                                                         @RequestParam(name = "email") String email) throws MessagingException {
@@ -136,25 +140,28 @@ public class UserController {
             passwordResetTokenService.createPasswordResetTokenForUser(findUser, token);
             emailSenderService.constructResetTokenEmail(request.getContextPath(),
                     request.getLocale(), token, findUser);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+            return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("OK", "Send Successfully!", request.getLocale())
             );
         }
     }
 
+    /**
+     * Save New Password After Enter New Password
+     **/
     @PostMapping("/savePassword")
     public ResponseEntity<ResponseObject> savePassword(@RequestParam(name = "token") String token,
-                                                       @RequestBody SavePasswordRequest savePasswordRequest){
+                                                       @RequestBody SavePasswordRequest savePasswordRequest) {
         PasswordResetToken passwordResetToken = passwordResetTokenService.findByToken(token);
-        if(passwordResetToken != null){
+        if (passwordResetToken != null) {
             String checkToken = passwordResetTokenService.validatePasswordResetToken(passwordResetToken.getToken());
-            if(checkToken != null){
+            if (checkToken != null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                         new ResponseObject("FAILED", "Error!", checkToken)
                 );
             }
             Users findUser = userService.findUsersById(passwordResetToken.getUser().getId());
-            if(!savePasswordRequest.getPassword().equals(savePasswordRequest.getConfirmPassword())){
+            if (!savePasswordRequest.getPassword().equals(savePasswordRequest.getConfirmPassword())) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                         new ResponseObject("FAILED", "Password confirm not match!", null)
                 );
@@ -165,12 +172,35 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     new ResponseObject("OK", "Update new password successfully!", null)
             );
-        }
-        else {
+        } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     new ResponseObject("FAILED", "Token does not exists!", null)
             );
         }
     }
 
+
+    /**
+     * Change Password For User
+     **/
+    @PutMapping("/changePassword")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseObject> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+        try {
+            String email = getUsername();
+        Users findUser = userService.findByEmail(email);
+        if(!encoder.matches(changePasswordRequest.getOldPassword(), findUser.getPassword())) throw new Exception("Old Password does not match!");
+        if(!changePasswordRequest.getNewPassword().equals(changePasswordRequest.getConfirmNewPassword())) throw new Exception("Confirm password does not match!");
+        if(changePasswordRequest.getOldPassword().equals(changePasswordRequest.getNewPassword())) throw new Exception("The new password must be different from the old password!");
+        findUser.setPassword(encoder.encode(changePasswordRequest.getNewPassword()));
+        userService.save(findUser);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("OK", "Change password successfully!", null)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    new ResponseObject("FAILED", "Error!", e.getMessage())
+            );
+        }
+    }
 }

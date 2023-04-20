@@ -2,6 +2,7 @@ package com.laptrinhjava.ShoppingCart.service.impl;
 
 import com.laptrinhjava.ShoppingCart.entity.EProvider;
 import com.laptrinhjava.ShoppingCart.entity.Users;
+import com.laptrinhjava.ShoppingCart.payload.request.auth.ChangePasswordRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.auth.UserRequest;
 import com.laptrinhjava.ShoppingCart.payload.response.auth.UserResponse;
 import com.laptrinhjava.ShoppingCart.reponsitory.IUserRepository;
@@ -10,6 +11,7 @@ import com.laptrinhjava.ShoppingCart.service.IRoleService;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,10 +27,6 @@ public class UserServiceImpl implements IUserService {
     @Qualifier("roleServiceImpl")
     @Autowired
     private IRoleService roleService;
-
-//    @Autowired
-//    private ICartService cartService;
-
 
     @Override
     public Users findByEmail(String email) {

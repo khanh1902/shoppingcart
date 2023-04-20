@@ -1,6 +1,7 @@
 package com.laptrinhjava.ShoppingCart.service;
 
 import com.laptrinhjava.ShoppingCart.entity.Users;
+import com.laptrinhjava.ShoppingCart.payload.request.auth.ChangePasswordRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.auth.UserRequest;
 import com.laptrinhjava.ShoppingCart.payload.response.auth.UserResponse;
 import com.laptrinhjava.ShoppingCart.security.oauth2.CustomOAuth2User;
@@ -19,6 +20,5 @@ public interface IUserService {
     Users save(Users user);
     void processOAuthPostLogin(CustomOAuth2User user);
     List<Users> findByRoles_Id(Long roles_id);
-    UserResponse update (UserRequest userRequest);
-
+    UserResponse update(UserRequest userRequest);
 }
