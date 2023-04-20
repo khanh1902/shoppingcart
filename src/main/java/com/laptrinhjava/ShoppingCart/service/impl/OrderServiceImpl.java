@@ -173,7 +173,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public List<OrderResponse> getAllOrderForUser(String sortBy, String status) {
+    public List<OrderResponse> getAllOrderForUser(String sortBy, String status) throws Exception {
         String email = getUsername();
         Users findUser = userRepository.findByEmail(email);
         Sort sort = Sort.by(sortBy).ascending();
@@ -197,7 +197,10 @@ public class OrderServiceImpl implements IOrderService {
             orderResponse.setPhoneNumber(order.getPhoneNumber());
             orderResponse.setStatus(order.getStatus());
             orderResponse.setUserId(order.getId());
-            orderResponse.setOrderItemsResponses(convertOrderItemToOrderItemResponse(orderItemsRepository.findByOrder_Id(order.getId())));
+
+            List<OrderItems> orderItemsList = orderItemsRepository.findByOrder_Id(order.getId());
+            if (orderItemsList.isEmpty()) throw new Exception("Order Items does not exists!");
+            orderResponse.setOrderItemsResponses(convertOrderItemToOrderItemResponse(orderItemsList));
             orderResponses.add(orderResponse);
         }
         return orderResponses;
@@ -207,8 +210,10 @@ public class OrderServiceImpl implements IOrderService {
     public OrderResponse getOneOrderForUser(Long orderId) throws Exception {
         String email = getUsername();
         Users findUser = userRepository.findByEmail(email);
+
         Order findOrder = orderRepository.findOrderById(orderId);
         if (findOrder == null) throw new Exception("Order does not exists!");
+
         OrderResponse orderResponse = new OrderResponse();
         orderResponse.setOrderId(findOrder.getId());
         orderResponse.setEmail(findOrder.getEmail());
@@ -221,7 +226,7 @@ public class OrderServiceImpl implements IOrderService {
         orderResponse.setPhoneNumber(findOrder.getPhoneNumber());
         orderResponse.setStatus(findOrder.getStatus());
         orderResponse.setUserId(findUser.getId());
-        List<OrderItems> orderItemsList = orderItemsRepository.findByOrder_Id(findUser.getId());
+        List<OrderItems> orderItemsList = orderItemsRepository.findByOrder_Id(findOrder.getId());
         if (orderItemsList.isEmpty()) throw new Exception("Order Items does not exists!");
         orderResponse.setOrderItemsResponses(convertOrderItemToOrderItemResponse(orderItemsList));
 

@@ -18,7 +18,7 @@ public interface IOrderService {
 
     void deleteById(Long id);
 
-    List<OrderResponse> getAllOrderForUser(String sortBy, String status);
+    List<OrderResponse> getAllOrderForUser(String sortBy, String status) throws Exception;
 
     OrderResponse getOneOrderForUser(Long orderId) throws Exception;
 
