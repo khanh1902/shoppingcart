@@ -94,7 +94,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public Long save(OrderRequest orderRequest) {
+    public Long save(OrderRequest orderRequest) throws Exception {
         String email = getUsername();
         Users findUser = userRepository.findByEmail(email);
         String status = "pending";
@@ -105,27 +105,6 @@ public class OrderServiceImpl implements IOrderService {
         order.setEmail(orderRequest.getEmail());
         order.setPhoneNumber(orderRequest.getPhoneNumber());
         order.setStatus(status);
-//        List<Address> findAddresses = addressRepository.findALlByUsers_Id(findUser.getId());
-//        String addressRequest = address(orderRequest.getAddressDetail(), orderRequest.getWard(),
-//                orderRequest.getDistrict(), orderRequest.getProvince());
-//
-//        if (findAddresses != null) {
-//            for (Address address : findAddresses) {
-//                String addressDefault = address(address.getAddressDetail(), address.getWard(), address.getDistrict(), address.getProvince());
-//                if (addressDefault.equals(addressRequest)) {
-//                    order.setAddressId(address.getId());
-//                }
-//            }
-//            Address newAddress = new Address(orderRequest.getProvince(), orderRequest.getDistrict(), orderRequest.getWard(),
-//                    orderRequest.getAddressDetail(), findUser, false);
-//            addressRepository.save(newAddress);
-//            order.setAddressId(newAddress.getId());
-//        } else {
-//            Address newAddress = new Address(orderRequest.getProvince(), orderRequest.getDistrict(), orderRequest.getWard(),
-//                    orderRequest.getAddressDetail(), findUser, false);
-//            addressRepository.save(newAddress);
-//            order.setAddressId(newAddress.getId());
-//        }
         Address findAddress = addressRepository.findAddressById(orderRequest.getAddressId());
         order.setAddress(findAddress);
         Double totalPrice = 0D;

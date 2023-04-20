@@ -48,13 +48,14 @@ public class OrderItemsServiceImpl implements IOrderItemsService {
     }
 
     @Override
-    public List<OrderItemsResponse> addProductsToOrder(Order order, List<Long> cartItemIds) {
+    public List<OrderItemsResponse> addProductsToOrder(Order order, List<Long> cartItemIds) throws Exception {
         List<OrderItemsResponse> orderItemsResponses = new ArrayList<>();
         for(Long cartItemId : cartItemIds){
             CartItems findCartItem = cartItemsRepository.findCartItemsById(cartItemId);
             if(findCartItem != null){
                 // luu item vao db
                 Products findProduct = productRepository.findProductById(findCartItem.getProductId());
+                if(findProduct == null) throw new Exception("Product does not exists!");
                 OrderItems orderItem = new OrderItems(order, findCartItem.getProductVariants(), findCartItem.getProductId(),
                          findCartItem.getQuantity(), findCartItem.getQuantity() * discount(findProduct.getDiscountPercent(), findCartItem.getPrice()));
                 orderItemsRepository.save(orderItem);

@@ -8,5 +8,5 @@ import java.util.List;
 
 @Service
 public interface IOrderItemsService {
-    List<OrderItemsResponse> addProductsToOrder(Order order, List<Long> cartItemId);
+    List<OrderItemsResponse> addProductsToOrder(Order order, List<Long> cartItemId) throws Exception;
 }

@@ -12,7 +12,7 @@ import java.util.List;
 public interface IOrderService {
     Order findOrderById(Long id);
     Order findByUsers_Id(Long userId);
-    Long save(OrderRequest orderRequest);
+    Long save(OrderRequest orderRequest) throws Exception;
 
     UpdateStatusResponse updateStatusOrder(Long orderId, String newStatus);
 

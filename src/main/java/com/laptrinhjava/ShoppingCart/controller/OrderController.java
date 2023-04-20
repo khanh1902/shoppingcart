@@ -26,15 +26,14 @@ public class OrderController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> getAllOrderForUser(@RequestParam(name = "status", required = false) String status) {
         try {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("OK", "Update successfully!", orderService.getAllOrderForUser("createdDate", status))
-        );
-    }
-        catch (Exception e){
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                new ResponseObject("FAILED", "Error!", e.getMessage())
-        );
-    }
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("OK", "Update successfully!", orderService.getAllOrderForUser("createdDate", status))
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+                    new ResponseObject("FAILED", "Error!", e.getMessage())
+            );
+        }
     }
 
     @GetMapping("/get-one")
@@ -44,8 +43,7 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("OK", "Update successfully!", orderService.getOneOrderForUser(orderId))
             );
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
                     new ResponseObject("FAILED", "Error!", e.getMessage())
             );
@@ -68,7 +66,7 @@ public class OrderController {
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                    new ResponseObject("FAILED", "Error!", e.getCause())
+                    new ResponseObject("FAILED", "Error!", e.getMessage())
             );
         }
 
@@ -76,9 +74,15 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<ResponseObject> save(@RequestBody OrderRequest orderRequest) {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("OK", "Your order is being confirmed!", orderService.save(orderRequest))
-        );
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("OK", "Your order is being confirmed!", orderService.save(orderRequest))
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+                    new ResponseObject("FAILED", "Error!", e.getMessage())
+            );
+        }
     }
 
     @PutMapping
