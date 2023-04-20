@@ -7,11 +7,12 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import java.util.Locale;
 
 @Service
 public interface IEmailSenderService {
     void sendEmail(SendEmailRequest sendEmailRequest) throws MailException;
-    SimpleMailMessage constructResetTokenEmail(String contextPath, Locale locale, String token, Users user);
-    SimpleMailMessage constructEmail(String subject, String body, Users user);
+    void constructResetTokenEmail(String contextPath, Locale locale, String token, Users user) throws MessagingException;
 }

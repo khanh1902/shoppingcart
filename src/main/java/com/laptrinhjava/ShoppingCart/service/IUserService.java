@@ -12,6 +12,7 @@ import java.util.Optional;
 @Service
 public interface IUserService {
     Users findByEmail(String email);
+    Users findUsersById(Long id);
     Optional<Users> findEmail(String email);
     List<Users> findALlByEmail(String email);
     Boolean existsByEmail(String email);

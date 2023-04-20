@@ -48,7 +48,7 @@ public class AuthController {
     private IRoleService roleService;
 
     @Autowired
-    PasswordEncoder encoder;
+    private PasswordEncoder encoder;
 
     @Autowired
     private JwtUtils jwtUtils;
