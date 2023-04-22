@@ -31,7 +31,7 @@ public class OrderController {
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                    new ResponseObject("FAILED", "Error!", e.getMessage())
+                    new ResponseObject("FAILED", e.getMessage(), null)
             );
         }
     }
@@ -45,7 +45,7 @@ public class OrderController {
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                    new ResponseObject("FAILED", "Error!", e.getMessage())
+                    new ResponseObject("FAILED", e.getMessage(), null)
             );
         }
     }
@@ -66,13 +66,14 @@ public class OrderController {
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                    new ResponseObject("FAILED", "Error!", e.getMessage())
+                    new ResponseObject("FAILED", e.getMessage(), null)
             );
         }
 
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> save(@RequestBody OrderRequest orderRequest) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(
@@ -80,17 +81,24 @@ public class OrderController {
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                    new ResponseObject("FAILED", "Error!", e.getMessage())
+                    new ResponseObject("FAILED", e.getMessage(), null)
             );
         }
     }
 
     @PutMapping
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> updateStatusOrder(@RequestParam(name = "orderId") Long orderId,
                                                             @RequestParam(name = "status") String newStatus) {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("OK", "Update successfully!", orderService.updateStatusOrder(orderId, newStatus))
-        );
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("OK", "Update successfully!", orderService.updateStatusOrder(orderId, newStatus))
+            );
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+                    new ResponseObject("FAILED", e.getMessage(), null)
+            );
+        }
     }
 
 }

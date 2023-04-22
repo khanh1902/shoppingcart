@@ -7,10 +7,7 @@ import com.laptrinhjava.ShoppingCart.payload.request.sendemail.SendEmailRequest;
 import com.laptrinhjava.ShoppingCart.payload.response.order.OrderItemsResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.order.OrderResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.order.UpdateStatusResponse;
-import com.laptrinhjava.ShoppingCart.reponsitory.IAddressRepository;
-import com.laptrinhjava.ShoppingCart.reponsitory.IOrderItemsRepository;
-import com.laptrinhjava.ShoppingCart.reponsitory.IOrderRepository;
-import com.laptrinhjava.ShoppingCart.reponsitory.IUserRepository;
+import com.laptrinhjava.ShoppingCart.reponsitory.*;
 import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.IOptionValuesRepository;
 import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.IOptionsRepository;
 import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.IProductRepository;
@@ -67,6 +64,9 @@ public class OrderServiceImpl implements IOrderService {
     @Autowired
     private IAddressRepository addressRepository;
 
+    @Autowired
+    private IReviewsRepository reviewsRepository;
+
     @Override
     public Order findOrderById(Long id) {
         return orderRepository.findOrderById(id);
@@ -122,15 +122,17 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public UpdateStatusResponse updateStatusOrder(Long orderId, String newStatus) {
+    public UpdateStatusResponse updateStatusOrder(Long orderId, String newStatus) throws Exception {
         Order findOrder = orderRepository.findOrderById(orderId);
-        if (newStatus.equalsIgnoreCase("successfully")) {
+        if (findOrder == null) throw new Exception("Order does not exists!");
+        if (newStatus.equalsIgnoreCase("success")) {
             findOrder.setStatus(newStatus.toLowerCase());
             orderRepository.save(findOrder);
+
+            // send email confirm
             SendEmailRequest sendEmailRequest = new SendEmailRequest();
             sendEmailRequest.setToEmail(findOrder.getEmail());
             sendEmailRequest.setSubject("Confirm Order");
-
             StringBuilder body = new StringBuilder();
             body.append("Congratulations! Your order has been successful\n");
             body.append("Order ID: ").append(findOrder.getId()).append("\n");
@@ -140,10 +142,27 @@ public class OrderServiceImpl implements IOrderService {
             sendEmailRequest.setBody(body.toString());
             sendEmailRequest.setBody(sendEmailRequest.getBody());
             emailSenderService.sendEmail(sendEmailRequest);
-            return new UpdateStatusResponse(findOrder.getId(), findOrder.getStatus());
 
+            return new UpdateStatusResponse(findOrder.getId(), findOrder.getStatus());
+        } else if (newStatus.equalsIgnoreCase("received")) {
+            findOrder.setStatus(newStatus.toLowerCase());
+            orderRepository.save(findOrder);
+            List<OrderItems> findOrderItems = orderItemsRepository.findByOrder_Id(findOrder.getId());
+            for (OrderItems orderItem : findOrderItems){
+                Reviews reviews = new Reviews(null, null, findOrder.getUsers(), orderItem.getOrder(), productRepository.findProductById(orderItem.getProductId()), false);
+                reviewsRepository.save(reviews);
+            }
+        } else if (newStatus.equalsIgnoreCase("delivering")) {
+            if(!findOrder.getStatus().equalsIgnoreCase("success")) throw new Exception("Orders must be in confirmed status!");
+            findOrder.setStatus(newStatus.toLowerCase());
+            orderRepository.save(findOrder);
         }
-        return null;
+        else if (newStatus.equalsIgnoreCase("cancel")) {
+            if(findOrder.getStatus().equalsIgnoreCase("delivering")) throw new Exception("Can not cancel the order because the order is in delivering!");
+            findOrder.setStatus(newStatus.toLowerCase());
+            orderRepository.save(findOrder);
+        }
+        return new UpdateStatusResponse(findOrder.getId(), findOrder.getStatus());
     }
 
     @Override
@@ -198,7 +217,7 @@ public class OrderServiceImpl implements IOrderService {
         orderResponse.setOrderId(findOrder.getId());
         orderResponse.setEmail(findOrder.getEmail());
         Address findAddress = addressRepository.findAddressById(findOrder.getAddress().getId());
-        if(findAddress == null) throw new Exception("Address does not exist!");
+        if (findAddress == null) throw new Exception("Address does not exist!");
         String addressDetail = address(findAddress.getAddressDetail(), findAddress.getWard(), findAddress.getDistrict(), findAddress.getProvince());
         orderResponse.setAddress(addressDetail);
         orderResponse.setTotalPrice(findOrder.getTotalPrice());
@@ -223,13 +242,14 @@ public class OrderServiceImpl implements IOrderService {
         } else {
             orders = orderRepository.findAll(sort);
         }
+        if(orders.isEmpty()) throw new Exception("Orders is empty!");
         List<OrderResponse> orderResponses = new ArrayList<>();
         for (Order order : orders) {
             OrderResponse orderResponse = new OrderResponse();
             orderResponse.setOrderId(order.getId());
             orderResponse.setEmail(order.getEmail());
             Address findAddress = addressRepository.findAddressById(order.getAddress().getId());
-            if(findAddress == null) throw new Exception("Address does not exist!");
+            if (findAddress == null) throw new Exception("Address does not exist!");
             String addressDetail = address(findAddress.getAddressDetail(), findAddress.getWard(), findAddress.getDistrict(), findAddress.getProvince());
             orderResponse.setAddress(addressDetail);
             orderResponse.setTotalPrice(order.getTotalPrice());

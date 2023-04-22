@@ -44,7 +44,7 @@ public class EmailSenderServiceImpl implements IEmailSenderService {
     private MimeMessage constructEmail(String subject, String body, Users user) throws MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
-        helper.setText(body, true); // Use this or above line.
+        helper.setText(body, true);
         helper.setTo(user.getEmail());
         helper.setSubject(subject);
         helper.setFrom("vankhanh.dev@gmail.com");

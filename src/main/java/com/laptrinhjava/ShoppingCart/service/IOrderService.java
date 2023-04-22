@@ -12,7 +12,7 @@ public interface IOrderService {
     Order findByUsers_Id(Long userId);
     Long save(OrderRequest orderRequest) throws Exception;
 
-    UpdateStatusResponse updateStatusOrder(Long orderId, String newStatus);
+    UpdateStatusResponse updateStatusOrder(Long orderId, String newStatus) throws Exception;
 
     void deleteById(Long id);
 

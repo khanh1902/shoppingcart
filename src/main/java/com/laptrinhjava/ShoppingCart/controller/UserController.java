@@ -140,19 +140,27 @@ public class UserController {
      **/
     @PostMapping("/resetPassword")
     public ResponseEntity<ResponseObject> resetPassword(HttpServletRequest request,
-                                                        @RequestParam(name = "email") String email) throws MessagingException {
-        Users findUser = userService.findByEmail(email);
-        if (findUser == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    new ResponseObject("FAILED", "Email does not exists!", null)
-            );
-        } else {
-            String token = UUID.randomUUID().toString();
-            passwordResetTokenService.createPasswordResetTokenForUser(findUser, token);
-            emailSenderService.constructResetTokenEmail(request.getContextPath(),
-                    request.getLocale(), token, findUser);
-            return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject("OK", "Send Successfully!", request.getLocale())
+                                                        @RequestParam(name = "email") String email) {
+        try {
+
+
+            Users findUser = userService.findByEmail(email);
+            if (findUser == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                        new ResponseObject("FAILED", "Email does not exists!", null)
+                );
+            } else {
+                String token = UUID.randomUUID().toString();
+                passwordResetTokenService.createPasswordResetTokenForUser(findUser, token);
+                emailSenderService.constructResetTokenEmail(request.getContextPath(),
+                        request.getLocale(), token, findUser);
+                return ResponseEntity.status(HttpStatus.OK).body(
+                        new ResponseObject("OK", "Send Successfully!", request.getLocale())
+                );
+            }
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+                    new ResponseObject("FAILED", e.getMessage(), null)
             );
         }
     }
@@ -209,8 +217,8 @@ public class UserController {
                     new ResponseObject("OK", "Change password successfully!", null)
             );
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    new ResponseObject("FAILED", "Error!", e.getMessage())
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+                    new ResponseObject("FAILED", e.getMessage(), null)
             );
         }
     }

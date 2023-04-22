@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Calendar;
 import java.util.Date;
 
 @Entity
@@ -25,18 +26,26 @@ public class Reviews {
     private String description;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "createddate", nullable = false)
+    @Column(name = "createddate", nullable = true)
     private Date createdDate;
 
-    @PrePersist
-    private void onCreated() {
-        createdDate = new Date();
-    }
+//    @PrePersist
+//    private void onCreated() {
+//        Date date = new Date();
+//        Calendar cal = Calendar.getInstance();
+//        cal.setTime(date);
+//        createdDate = cal.getTime();
+//    }
 
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
     private Users users;
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
 
     @JsonIgnore
     @ManyToOne
@@ -46,11 +55,11 @@ public class Reviews {
     @Column(name = "is_review")
     private Boolean isReview;
 
-    public Reviews(Integer rating, String description, Date createdDate, Users users, Products products, Boolean isReview) {
+    public Reviews(Integer rating, String description,  Users users, Order order, Products products, Boolean isReview) {
         this.rating = rating;
         this.description = description;
-        this.createdDate = createdDate;
         this.users = users;
+        this.order = order;
         this.products = products;
         this.isReview = isReview;
     }

@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -54,6 +55,10 @@ public class Order {
     private void onCreated(){
         createdDate = new Date();
     }
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<Reviews> reviews;
 
 
     public Order(Users users, String fullName, String email, Double totalPrice, Address address, String phoneNumber, String status) {
