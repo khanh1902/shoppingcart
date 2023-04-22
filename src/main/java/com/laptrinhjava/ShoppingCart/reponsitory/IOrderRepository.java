@@ -13,12 +13,6 @@ import java.util.List;
 @Repository
 public interface IOrderRepository extends JpaRepository<Order, Long> {
     Order findOrderById(Long id);
-
-    @Override
-    @NotNull
-    @Transactional
-    @Modifying
-    List<Order> findAll(@NotNull Sort sort);
     Order findByUsers_Id(Long userId);
     List<Order> findAllByUsers_Id(Long id, Sort sort);
     List<Order> findAllByUsers_IdAndStatusContainingIgnoreCase(Long userId, String status, Sort sort);

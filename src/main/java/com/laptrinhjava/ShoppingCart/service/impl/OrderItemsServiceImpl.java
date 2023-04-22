@@ -1,13 +1,11 @@
 package com.laptrinhjava.ShoppingCart.service.impl;
 
 import com.laptrinhjava.ShoppingCart.entity.*;
-import com.laptrinhjava.ShoppingCart.payload.response.cart.CartItemsResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.order.OrderItemsResponse;
 import com.laptrinhjava.ShoppingCart.reponsitory.ICartItemsRepository;
 import com.laptrinhjava.ShoppingCart.reponsitory.IOrderItemsRepository;
 import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.*;
 import com.laptrinhjava.ShoppingCart.service.productService.IOrderItemsService;
-import com.laptrinhjava.ShoppingCart.service.productService.IProductVariantsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

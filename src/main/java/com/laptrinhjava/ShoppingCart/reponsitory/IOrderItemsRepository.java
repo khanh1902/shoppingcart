@@ -11,8 +11,6 @@ import java.util.List;
 
 @Repository
 public interface IOrderItemsRepository extends JpaRepository<OrderItems, Long> {
-    OrderItems findByProductIdAndProductVariantsId(Long productId, Long productVariantsId);
     OrderItems findByProductIdAndOrder_Id(Long productId, Long orderId);
     List<OrderItems> findByOrder_Id(Long cartId);
-    OrderItems findCartItemsById(Long id);
 }
