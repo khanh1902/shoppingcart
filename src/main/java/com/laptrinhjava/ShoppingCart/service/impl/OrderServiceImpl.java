@@ -143,26 +143,35 @@ public class OrderServiceImpl implements IOrderService {
             sendEmailRequest.setBody(sendEmailRequest.getBody());
             emailSenderService.sendEmail(sendEmailRequest);
 
-            return new UpdateStatusResponse(findOrder.getId(), findOrder.getStatus());
         } else if (newStatus.equalsIgnoreCase("received")) {
             findOrder.setStatus(newStatus.toLowerCase());
             orderRepository.save(findOrder);
             List<OrderItems> findOrderItems = orderItemsRepository.findByOrder_Id(findOrder.getId());
             for (OrderItems orderItem : findOrderItems){
-                Reviews reviews = new Reviews(null, null, findOrder.getUsers(), orderItem.getOrder(), productRepository.findProductById(orderItem.getProductId()), false);
+                Reviews reviews = new Reviews();
+                reviews.setOrder(findOrder);
+                reviews.setIsReview(false);
+                reviews.setUsers(findOrder.getUsers());
+
+                Products findProduct = productRepository.findProductById(orderItem.getProductId());
+                if(findProduct == null) throw new Exception("Product does not exists!");
+                reviews.setProducts(findProduct);
                 reviewsRepository.save(reviews);
             }
         } else if (newStatus.equalsIgnoreCase("delivering")) {
             if(!findOrder.getStatus().equalsIgnoreCase("success")) throw new Exception("Orders must be in confirmed status!");
             findOrder.setStatus(newStatus.toLowerCase());
             orderRepository.save(findOrder);
+
         }
         else if (newStatus.equalsIgnoreCase("cancel")) {
             if(findOrder.getStatus().equalsIgnoreCase("delivering")) throw new Exception("Can not cancel the order because the order is in delivering!");
             findOrder.setStatus(newStatus.toLowerCase());
             orderRepository.save(findOrder);
+
         }
         return new UpdateStatusResponse(findOrder.getId(), findOrder.getStatus());
+
     }
 
     @Override
@@ -240,7 +249,7 @@ public class OrderServiceImpl implements IOrderService {
         if (status != null) {
             orders = orderRepository.findALlByStatusContainingIgnoreCase(status.toLowerCase(), sort);
         } else {
-            orders = orderRepository.findAll(sort);
+            orders = orderRepository.findAll();
         }
         if(orders.isEmpty()) throw new Exception("Orders is empty!");
         List<OrderResponse> orderResponses = new ArrayList<>();
