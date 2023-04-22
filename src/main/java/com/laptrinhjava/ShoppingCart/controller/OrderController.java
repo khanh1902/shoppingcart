@@ -51,7 +51,7 @@ public class OrderController {
     }
 
     @GetMapping("/get-all")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> getAllOrderForAdmin(@RequestParam(required = false, name = "offset", defaultValue = "0") Integer offset,
                                                               @RequestParam(required = false, name = "limit", defaultValue = "10") Integer limit,
                                                               @RequestParam(name = "status", required = false) String status) {
