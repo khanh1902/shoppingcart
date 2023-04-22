@@ -1,15 +1,24 @@
 package com.laptrinhjava.ShoppingCart.reponsitory;
 
 import com.laptrinhjava.ShoppingCart.entity.Order;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Repository
 public interface IOrderRepository extends JpaRepository<Order, Long> {
     Order findOrderById(Long id);
+
+    @Override
+    @NotNull
+    @Transactional
+    @Modifying
+    List<Order> findAll(@NotNull Sort sort);
     Order findByUsers_Id(Long userId);
     List<Order> findAllByUsers_Id(Long id, Sort sort);
     List<Order> findAllByUsers_IdAndStatusContainingIgnoreCase(Long userId, String status, Sort sort);
