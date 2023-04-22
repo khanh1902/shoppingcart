@@ -12,6 +12,7 @@ import com.laptrinhjava.ShoppingCart.service.IRoleService;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -80,18 +81,20 @@ public class AuthController {
             Users user = userService.findByEmail(loginRequest.getEmail());
 
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+            ResponseCookie jwtCookie = jwtUtils.generateJWTCookie(userDetails);
             List<String> roles = userDetails.getAuthorities().stream()
                     .map(item -> item.getAuthority())
                     .collect(Collectors.toList());
 
-            ResponseCookie resCookie = ResponseCookie.from("auth_token", jwt)
-                    .httpOnly(true)
-                    .sameSite("None")
-                    .secure(true)
-                    .path("/")
-                    .maxAge(24 * 60 * 60)
-                    .build();
-            response.addHeader("Set-Cookie", resCookie.toString());
+//            ResponseCookie resCookie = ResponseCookie.from("auth_token", jwt)
+//                    .httpOnly(true)
+//                    .sameSite("None")
+//                    .secure(true)
+//                    .path("/")
+//                    .maxAge(24 * 60 * 60)
+//                    .build();
+            response.addHeader("Set-Cookie", jwtCookie.toString());
 
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("ok", "Login successfully!", new JwtResponse(jwt,
@@ -157,4 +160,12 @@ public class AuthController {
                 new ResponseObject("ok", "User registered successfully!", " ")
         );
     }
+    @PostMapping("/signout")
+    public ResponseEntity<ResponseObject> logoutUser() {
+        ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject("ok", "You've been signed out!", null)
+        );
+    }
+
 }
