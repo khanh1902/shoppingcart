@@ -272,8 +272,9 @@ public class OrderServiceImpl implements IOrderService {
         return orderResponses;
     }
 
-    public List<OrderItemsResponse> convertOrderItemToOrderItemResponse(List<OrderItems> orderItems) {
+    public List<OrderItemsResponse> convertOrderItemToOrderItemResponse(List<OrderItems> orderItems) throws Exception {
         List<OrderItemsResponse> orderItemsResponses = new ArrayList<>();
+        if(orderItems.isEmpty()) throw new Exception("Order is empty!");
         for (OrderItems orderItem : orderItems) {
             OrderItemsResponse orderItemsResponse = new OrderItemsResponse();
             Products findProduct = productRepository.findProductById(orderItem.getProductId());

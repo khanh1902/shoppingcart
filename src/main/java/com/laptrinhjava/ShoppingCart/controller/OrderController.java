@@ -58,6 +58,7 @@ public class OrderController {
         try {
             PageRequest pageRequest = PageRequest.of(offset, limit);
             List<OrderResponse> orderResponses = orderService.getAllOrderForAdmin(status);
+            if(orderResponses.isEmpty()) throw new Exception("List order is empty!");
             int start = (int) pageRequest.getOffset();
             int end = Math.min(start + pageRequest.getPageSize(), orderResponses.size());
             Page<OrderResponse> orderResponsePage = new PageImpl<>(orderResponses.subList(start, end), pageRequest, orderResponses.size());
