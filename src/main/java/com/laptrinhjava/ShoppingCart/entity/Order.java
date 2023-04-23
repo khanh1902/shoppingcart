@@ -60,6 +60,10 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<Reviews> reviews;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderItems> orderItems;
+
 
     public Order(Users users, String fullName, String email, Double totalPrice, Address address, String phoneNumber, String status) {
         this.users = users;
