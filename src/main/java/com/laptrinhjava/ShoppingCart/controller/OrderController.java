@@ -53,11 +53,10 @@ public class OrderController {
     @GetMapping("/get-all")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> getAllOrderForAdmin(@RequestParam(required = false, name = "offset", defaultValue = "0") Integer offset,
-                                                              @RequestParam(required = false, name = "limit", defaultValue = "10") Integer limit,
-                                                              @RequestParam(name = "status", required = false) String status) {
+                                                              @RequestParam(required = false, name = "limit", defaultValue = "10") Integer limit) {
         try {
             PageRequest pageRequest = PageRequest.of(offset, limit);
-            List<OrderResponse> orderResponses = orderService.getAllOrderForAdmin(status);
+            List<OrderResponse> orderResponses = orderService.getAllOrderForAdmin();
             if(orderResponses.isEmpty()) throw new Exception("List order is empty!");
             int start = (int) pageRequest.getOffset();
             int end = Math.min(start + pageRequest.getPageSize(), orderResponses.size());

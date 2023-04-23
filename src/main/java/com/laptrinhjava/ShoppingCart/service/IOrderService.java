@@ -20,6 +20,6 @@ public interface IOrderService {
 
     OrderResponse getOneOrderForUser(Long orderId) throws Exception;
 
-    List<OrderResponse> getAllOrderForAdmin(String status) throws Exception;
+    List<OrderResponse> getAllOrderForAdmin() throws Exception;
 
 }

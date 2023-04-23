@@ -183,8 +183,7 @@ public class OrderServiceImpl implements IOrderService {
     public List<OrderResponse> getAllOrderForUser(String status) throws Exception {
         String email = getUsername();
         Users findUser = userRepository.findByEmail(email);
-//        Sort sort = Sort.by(sortBy).ascending();
-        List<Order> orders = null;
+        List<Order> orders;
         if (status != null) {
             orders = orderRepository.findAllByUsers_IdAndStatusContainingIgnoreCase(findUser.getId(), status.toLowerCase());
         } else {
@@ -243,14 +242,9 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public List<OrderResponse> getAllOrderForAdmin(String status) throws Exception {
-//        Sort sort = Sort.by(sortBy).ascending();
-        List<Order> orders = null;
-        if (status != null) {
-            orders = orderRepository.findALlByStatusContainingIgnoreCase(status.toLowerCase());
-        } else {
-            orders = orderRepository.findAll();
-        }
+    public List<OrderResponse> getAllOrderForAdmin() throws Exception {
+        List<Order> orders = orderRepository.findAll();
+
         if(orders.isEmpty()) throw new Exception("Orders is empty!");
         List<OrderResponse> orderResponses = new ArrayList<>();
         for (Order order : orders) {
