@@ -190,7 +190,7 @@ public class OrderServiceImpl implements IOrderService {
         } else {
             orders = orderRepository.findAllByUsers_Id(findUser.getId(), sort);
         }
-
+        if(orders.isEmpty()) throw new Exception("Orders is empty!");
         List<OrderResponse> orderResponses = new ArrayList<>();
         for (Order order : orders) {
             OrderResponse orderResponse = new OrderResponse();
