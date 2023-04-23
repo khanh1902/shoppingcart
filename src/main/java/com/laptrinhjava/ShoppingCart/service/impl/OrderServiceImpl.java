@@ -180,15 +180,15 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public List<OrderResponse> getAllOrderForUser(String sortBy, String status) throws Exception {
+    public List<OrderResponse> getAllOrderForUser(String status) throws Exception {
         String email = getUsername();
         Users findUser = userRepository.findByEmail(email);
-        Sort sort = Sort.by(sortBy).ascending();
+//        Sort sort = Sort.by(sortBy).ascending();
         List<Order> orders = null;
         if (status != null) {
-            orders = orderRepository.findAllByUsers_IdAndStatusContainingIgnoreCase(findUser.getId(), status.toLowerCase(), sort);
+            orders = orderRepository.findAllByUsers_IdAndStatusContainingIgnoreCase(findUser.getId(), status.toLowerCase());
         } else {
-            orders = orderRepository.findAllByUsers_Id(findUser.getId(), sort);
+            orders = orderRepository.findAllByUsers_Id(findUser.getId());
         }
         if(orders.isEmpty()) throw new Exception("Orders is empty!");
         List<OrderResponse> orderResponses = new ArrayList<>();
@@ -243,11 +243,11 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public List<OrderResponse> getAllOrderForAdmin(String sortBy, String status) throws Exception {
-        Sort sort = Sort.by(sortBy).ascending();
+    public List<OrderResponse> getAllOrderForAdmin(String status) throws Exception {
+//        Sort sort = Sort.by(sortBy).ascending();
         List<Order> orders = null;
         if (status != null) {
-            orders = orderRepository.findALlByStatusContainingIgnoreCase(status.toLowerCase(), sort);
+            orders = orderRepository.findALlByStatusContainingIgnoreCase(status.toLowerCase());
         } else {
             orders = orderRepository.findAll();
         }

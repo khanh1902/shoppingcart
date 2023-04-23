@@ -16,10 +16,10 @@ public interface IOrderService {
 
     void deleteById(Long id);
 
-    List<OrderResponse> getAllOrderForUser(String sortBy, String status) throws Exception;
+    List<OrderResponse> getAllOrderForUser(String status) throws Exception;
 
     OrderResponse getOneOrderForUser(Long orderId) throws Exception;
 
-    List<OrderResponse> getAllOrderForAdmin(String sortBy, String status) throws Exception;
+    List<OrderResponse> getAllOrderForAdmin(String status) throws Exception;
 
 }

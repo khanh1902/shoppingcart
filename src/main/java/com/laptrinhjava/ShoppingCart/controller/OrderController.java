@@ -27,7 +27,7 @@ public class OrderController {
     public ResponseEntity<ResponseObject> getAllOrderForUser(@RequestParam(name = "status", required = false) String status) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject("OK", "Update successfully!", orderService.getAllOrderForUser("createdDate", status))
+                    new ResponseObject("OK", "Update successfully!", orderService.getAllOrderForUser(status))
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
@@ -57,7 +57,7 @@ public class OrderController {
                                                               @RequestParam(name = "status", required = false) String status) {
         try {
             PageRequest pageRequest = PageRequest.of(offset, limit);
-            List<OrderResponse> orderResponses = orderService.getAllOrderForAdmin("createdDate", status);
+            List<OrderResponse> orderResponses = orderService.getAllOrderForAdmin(status);
             int start = (int) pageRequest.getOffset();
             int end = Math.min(start + pageRequest.getPageSize(), orderResponses.size());
             Page<OrderResponse> orderResponsePage = new PageImpl<>(orderResponses.subList(start, end), pageRequest, orderResponses.size());
