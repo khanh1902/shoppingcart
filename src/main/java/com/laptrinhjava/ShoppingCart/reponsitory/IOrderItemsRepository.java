@@ -11,6 +11,10 @@ import java.util.List;
 
 @Repository
 public interface IOrderItemsRepository extends JpaRepository<OrderItems, Long> {
+    @Transactional
+    @Modifying
     OrderItems findByProductIdAndOrder_Id(Long productId, Long orderId);
+    @Transactional
+    @Modifying
     List<OrderItems> findByOrder_Id(Long cartId);
 }
