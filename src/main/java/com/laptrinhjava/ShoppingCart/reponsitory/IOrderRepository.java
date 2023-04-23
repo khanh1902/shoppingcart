@@ -15,13 +15,10 @@ public interface IOrderRepository extends JpaRepository<Order, Long> {
     Order findOrderById(Long id);
     Order findByUsers_Id(Long userId);
     @Transactional
-    @Modifying
     List<Order> findAllByUsers_Id(Long id, Sort sort);
     @Transactional
-    @Modifying
     List<Order> findAllByUsers_IdAndStatusContainingIgnoreCase(Long userId, String status, Sort sort);
     @Transactional
-    @Modifying
     List<Order> findALlByStatusContainingIgnoreCase(String status, Sort sort);
 
 
