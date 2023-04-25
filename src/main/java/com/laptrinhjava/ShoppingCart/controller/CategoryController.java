@@ -2,7 +2,7 @@ package com.laptrinhjava.ShoppingCart.controller;
 
 import com.laptrinhjava.ShoppingCart.entity.Category;
 import com.laptrinhjava.ShoppingCart.entity.Products;
-import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
+import com.laptrinhjava.ShoppingCart.payload.ResponseObject;
 import com.laptrinhjava.ShoppingCart.reponsitory.ICategoryRepository;
 import com.laptrinhjava.ShoppingCart.service.IAmazonClient;
 import com.laptrinhjava.ShoppingCart.service.ICategoryService;

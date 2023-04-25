@@ -2,9 +2,8 @@ package com.laptrinhjava.ShoppingCart.controller;
 
 import com.laptrinhjava.ShoppingCart.entity.Address;
 import com.laptrinhjava.ShoppingCart.payload.request.address.AddressRequest;
-import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
+import com.laptrinhjava.ShoppingCart.payload.ResponseObject;
 import com.laptrinhjava.ShoppingCart.service.IAddressService;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;

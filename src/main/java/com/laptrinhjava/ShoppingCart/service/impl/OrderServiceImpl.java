@@ -8,13 +8,11 @@ import com.laptrinhjava.ShoppingCart.payload.response.order.OrderItemsResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.order.OrderResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.order.UpdateStatusResponse;
 import com.laptrinhjava.ShoppingCart.reponsitory.*;
-import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.IOptionValuesRepository;
-import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.IOptionsRepository;
-import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.IProductRepository;
-import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.IVariantValuesRepository;
+import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.*;
 import com.laptrinhjava.ShoppingCart.service.IEmailSenderService;
 import com.laptrinhjava.ShoppingCart.service.IOrderService;
 import com.laptrinhjava.ShoppingCart.service.productService.IOrderItemsService;
+import com.laptrinhjava.ShoppingCart.service.productService.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
@@ -66,6 +64,9 @@ public class OrderServiceImpl implements IOrderService {
 
     @Autowired
     private IReviewsRepository reviewsRepository;
+
+    @Autowired
+    private IProductVariantsRepository productVariantsRepository;
 
     @Override
     public Order findOrderById(Long id) {
@@ -166,6 +167,22 @@ public class OrderServiceImpl implements IOrderService {
         }
         else if (newStatus.equalsIgnoreCase("cancel")) {
             if(findOrder.getStatus().equalsIgnoreCase("delivering")) throw new Exception("Can not cancel the order because the order is in delivering!");
+
+            // cap nhat lai so luong cua product khi cancel order;
+            List<OrderItems> findOrderItems = orderItemsRepository.findByOrder_Id(findOrder.getId());
+            for (OrderItems orderItem : findOrderItems){
+                Products findProduct = productRepository.findProductById(orderItem.getProductId());
+                if(orderItem.getProductVariants() == null){
+                    findProduct.setQuantity(findProduct.getQuantity() + orderItem.getQuantity());
+                }
+                else {
+                    ProductVariants findProductVariant = productVariantsRepository.findProductVariantsById(orderItem.getProductVariants().getId());
+                    findProductVariant.setQuantity(findProductVariant.getQuantity() + orderItem.getQuantity());
+                    findProduct.setQuantity(findProduct.getQuantity() + orderItem.getQuantity());
+                    productVariantsRepository.save(findProductVariant);
+                }
+                productRepository.save(findProduct);
+            }
             findOrder.setStatus(newStatus.toLowerCase());
             orderRepository.save(findOrder);
 

@@ -2,14 +2,21 @@ package com.laptrinhjava.ShoppingCart.controller;
 
 import com.laptrinhjava.ShoppingCart.entity.Reviews;
 import com.laptrinhjava.ShoppingCart.payload.request.reviews.UpdateReviewRequest;
-import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
+import com.laptrinhjava.ShoppingCart.payload.ResponseObject;
+import com.laptrinhjava.ShoppingCart.payload.response.order.OrderResponse;
+import com.laptrinhjava.ShoppingCart.payload.response.reviews.ReviewDetailResponse;
 import com.laptrinhjava.ShoppingCart.service.IReviewsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/review")
@@ -49,10 +56,28 @@ public class ReviewsController {
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<ResponseObject> getAllReviewsByProductId(@RequestParam(name = "productId") Long productId) {
+    public ResponseEntity<ResponseObject> getAllReviewsByProductId(@RequestParam(name = "productId") Long productId,
+                                                                   @RequestParam(required = false, name = "offset", defaultValue = "0") Integer offset,
+                                                                   @RequestParam(required = false, name = "limit", defaultValue = "10") Integer limit) {
+//        try {
+//            return ResponseEntity.status(HttpStatus.OK).body(
+//                    new ResponseObject("OK", "Successfully!", reviewsService.findAllByProductId(productId))
+//            );
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+//                    new ResponseObject("FAILED", e.getMessage(), null)
+//            );
+//        }
+
         try {
+            PageRequest pageRequest = PageRequest.of(offset, limit);
+            List<ReviewDetailResponse> reviewDetailResponseList = reviewsService.findAllByProductId(productId);
+            if(reviewDetailResponseList.isEmpty()) throw new Exception("List order is empty!");
+            int start = (int) pageRequest.getOffset();
+            int end = Math.min(start + pageRequest.getPageSize(), reviewDetailResponseList.size());
+            Page<ReviewDetailResponse> reviewDetailResponses = new PageImpl<>(reviewDetailResponseList.subList(start, end), pageRequest, reviewDetailResponseList.size());
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject("OK", "Successfully!", reviewsService.findAllByProductId(productId))
+                    new ResponseObject("OK", "Successfully!", reviewDetailResponses)
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(

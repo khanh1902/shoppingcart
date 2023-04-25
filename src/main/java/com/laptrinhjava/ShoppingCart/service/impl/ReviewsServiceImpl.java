@@ -86,7 +86,7 @@ public class ReviewsServiceImpl implements IReviewsService {
     @Override
     public List<ReviewDetailResponse> findAllByProductId(Long productId) throws Exception {
         List<ReviewDetailResponse> reviewResponses = new ArrayList<>();
-        List<Reviews> findReviews = reviewsRepository.findAllByProducts_Id(productId);
+        List<Reviews> findReviews = reviewsRepository.findAllByIsReviewAndProducts_Id(true, productId);
         if(findReviews.isEmpty()) throw new Exception("Review does not found!");
         for(Reviews review : findReviews){
             Users findUser = userRepository.findUsersById(review.getUsers().getId());

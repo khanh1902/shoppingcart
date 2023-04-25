@@ -6,7 +6,7 @@ import com.laptrinhjava.ShoppingCart.entity.Users;
 import com.laptrinhjava.ShoppingCart.payload.request.auth.ChangePasswordRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.auth.SavePasswordRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.auth.UserRequest;
-import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
+import com.laptrinhjava.ShoppingCart.payload.ResponseObject;
 import com.laptrinhjava.ShoppingCart.payload.response.auth.AuthResponse;
 import com.laptrinhjava.ShoppingCart.security.jwt.JwtUtils;
 import com.laptrinhjava.ShoppingCart.security.service.UserDetailsServiceImpl;
@@ -26,9 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;

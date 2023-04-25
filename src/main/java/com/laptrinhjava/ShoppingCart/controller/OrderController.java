@@ -1,7 +1,7 @@
 package com.laptrinhjava.ShoppingCart.controller;
 
 import com.laptrinhjava.ShoppingCart.payload.request.order.OrderRequest;
-import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
+import com.laptrinhjava.ShoppingCart.payload.ResponseObject;
 import com.laptrinhjava.ShoppingCart.payload.response.order.OrderResponse;
 import com.laptrinhjava.ShoppingCart.service.IOrderService;
 import org.springframework.beans.factory.annotation.Autowired;

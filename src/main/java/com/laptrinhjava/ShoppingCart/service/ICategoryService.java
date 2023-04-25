@@ -1,9 +1,7 @@
 package com.laptrinhjava.ShoppingCart.service;
 
 import com.laptrinhjava.ShoppingCart.entity.Category;
-import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
 import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Map;

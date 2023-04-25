@@ -1,9 +1,8 @@
 package com.laptrinhjava.ShoppingCart.controller;
 
 import com.laptrinhjava.ShoppingCart.payload.request.cart.CartItemsRequest;
-import com.laptrinhjava.ShoppingCart.payload.request.cart.CartRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.cart.UpdateCartItemRequest;
-import com.laptrinhjava.ShoppingCart.payload.response.ResponseObject;
+import com.laptrinhjava.ShoppingCart.payload.ResponseObject;
 import com.laptrinhjava.ShoppingCart.service.ICartItemsService;
 import com.laptrinhjava.ShoppingCart.service.ICartService;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
