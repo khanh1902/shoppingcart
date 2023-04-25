@@ -68,6 +68,9 @@ public class OrderServiceImpl implements IOrderService {
     @Autowired
     private IProductVariantsRepository productVariantsRepository;
 
+    @Autowired
+    private IPaymentRepository paymentRepository;
+
     @Override
     public Order findOrderById(Long id) {
         return orderRepository.findOrderById(id);
@@ -108,8 +111,15 @@ public class OrderServiceImpl implements IOrderService {
         order.setStatus(status);
         Address findAddress = addressRepository.findAddressById(orderRequest.getAddressId());
         order.setAddress(findAddress);
+        Payment findPayment = paymentRepository.findPaymentById(orderRequest.getPaymentId());
+        order.setPayment(findPayment);
+        if (findPayment == null) throw new Exception("Payment does not found!");
+        if (findPayment.getCode().equalsIgnoreCase("COD")) order.setIsPayment(false);
+        else order.setIsPayment(true);
+
         Double totalPrice = 0D;
-        orderRepository.save(order);
+        orderRepository.save(order); // luu order de luu orderId vao orderItem
+
 
         // luu danh sach san pham
         List<OrderItemsResponse> orderItemsResponses = orderItemsService.addProductsToOrder(order, orderRequest.getCartItemIds());
@@ -118,7 +128,7 @@ public class OrderServiceImpl implements IOrderService {
         }
 
         // neu order tren 200$ thi free ship, nho hon thi cong them 5$
-        if(totalPrice < 200D) order.setTotalPrice(totalPrice + 5D);
+        if (totalPrice < 200D) order.setTotalPrice(totalPrice + 5D);
         else order.setTotalPrice(totalPrice);
 
         orderRepository.save(order);
@@ -152,34 +162,34 @@ public class OrderServiceImpl implements IOrderService {
             findOrder.setStatus(newStatus.toLowerCase());
             orderRepository.save(findOrder);
             List<OrderItems> findOrderItems = orderItemsRepository.findByOrder_Id(findOrder.getId());
-            for (OrderItems orderItem : findOrderItems){
+            for (OrderItems orderItem : findOrderItems) {
                 Reviews reviews = new Reviews();
                 reviews.setOrder(findOrder);
                 reviews.setIsReview(false);
                 reviews.setUsers(findOrder.getUsers());
 
                 Products findProduct = productRepository.findProductById(orderItem.getProductId());
-                if(findProduct == null) throw new Exception("Product does not exists!");
+                if (findProduct == null) throw new Exception("Product does not exists!");
                 reviews.setProducts(findProduct);
                 reviewsRepository.save(reviews);
             }
         } else if (newStatus.equalsIgnoreCase("delivering")) {
-            if(!findOrder.getStatus().equalsIgnoreCase("success")) throw new Exception("Orders must be in confirmed status!");
+            if (!findOrder.getStatus().equalsIgnoreCase("success"))
+                throw new Exception("Orders must be in confirmed status!");
             findOrder.setStatus(newStatus.toLowerCase());
             orderRepository.save(findOrder);
 
-        }
-        else if (newStatus.equalsIgnoreCase("cancel")) {
-            if(findOrder.getStatus().equalsIgnoreCase("delivering")) throw new Exception("Can not cancel the order because the order is in delivering!");
+        } else if (newStatus.equalsIgnoreCase("cancel")) {
+            if (findOrder.getStatus().equalsIgnoreCase("delivering"))
+                throw new Exception("Can not cancel the order because the order is in delivering!");
 
             // cap nhat lai so luong cua product khi cancel order;
             List<OrderItems> findOrderItems = orderItemsRepository.findByOrder_Id(findOrder.getId());
-            for (OrderItems orderItem : findOrderItems){
+            for (OrderItems orderItem : findOrderItems) {
                 Products findProduct = productRepository.findProductById(orderItem.getProductId());
-                if(orderItem.getProductVariants() == null){
+                if (orderItem.getProductVariants() == null) {
                     findProduct.setQuantity(findProduct.getQuantity() + orderItem.getQuantity());
-                }
-                else {
+                } else {
                     ProductVariants findProductVariant = productVariantsRepository.findProductVariantsById(orderItem.getProductVariants().getId());
                     findProductVariant.setQuantity(findProductVariant.getQuantity() + orderItem.getQuantity());
                     findProduct.setQuantity(findProduct.getQuantity() + orderItem.getQuantity());
@@ -210,7 +220,7 @@ public class OrderServiceImpl implements IOrderService {
         } else {
             orders = orderRepository.findAllByUsers_Id(findUser.getId());
         }
-        if(orders.isEmpty()) throw new Exception("Orders is empty!");
+        if (orders.isEmpty()) throw new Exception("Orders is empty!");
         List<OrderResponse> orderResponses = new ArrayList<>();
         for (Order order : orders) {
             OrderResponse orderResponse = new OrderResponse();
@@ -266,7 +276,7 @@ public class OrderServiceImpl implements IOrderService {
     public List<OrderResponse> getAllOrderForAdmin() throws Exception {
         List<Order> orders = orderRepository.findAll();
 
-        if(orders.isEmpty()) throw new Exception("Orders is empty!");
+        if (orders.isEmpty()) throw new Exception("Orders is empty!");
         List<OrderResponse> orderResponses = new ArrayList<>();
         for (Order order : orders) {
             OrderResponse orderResponse = new OrderResponse();
@@ -289,7 +299,7 @@ public class OrderServiceImpl implements IOrderService {
 
     public List<OrderItemsResponse> convertOrderItemToOrderItemResponse(List<OrderItems> orderItems) throws Exception {
         List<OrderItemsResponse> orderItemsResponses = new ArrayList<>();
-        if(orderItems.isEmpty()) throw new Exception("Order is empty!");
+        if (orderItems.isEmpty()) throw new Exception("Order is empty!");
         for (OrderItems orderItem : orderItems) {
             OrderItemsResponse orderItemsResponse = new OrderItemsResponse();
             Products findProduct = productRepository.findProductById(orderItem.getProductId());

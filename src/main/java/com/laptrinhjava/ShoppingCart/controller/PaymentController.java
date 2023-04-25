@@ -62,7 +62,6 @@ public class PaymentController {
         vnp_params.put("vnp_OrderType", PaymentConfig.vnp_OrderType);
         vnp_params.put("vnp_ReturnUrl", PaymentConfig.vnp_ReturnUrl);
         vnp_params.put("vnp_TxnRef", PaymentConfig.getOTP(8));
-//		vnp_params.put("vnp_SecureHash",PaymentConfig.vnp_SecureHash);
 
         List fieldName = new ArrayList(vnp_params.keySet());
         Collections.sort(fieldName);
