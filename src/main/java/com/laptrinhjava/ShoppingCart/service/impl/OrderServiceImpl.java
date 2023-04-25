@@ -281,7 +281,6 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public List<OrderResponse> getAllOrderForAdmin() throws Exception {
         List<Order> orders = orderRepository.findAll();
-
         if (orders.isEmpty()) throw new Exception("Orders is empty!");
         List<OrderResponse> orderResponses = new ArrayList<>();
         for (Order order : orders) {

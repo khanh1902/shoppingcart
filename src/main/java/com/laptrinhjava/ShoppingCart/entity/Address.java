@@ -31,7 +31,7 @@ public class Address {
     private String addressDetail;
 
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private Users users;
 

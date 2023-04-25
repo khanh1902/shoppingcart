@@ -23,7 +23,7 @@ public class Order {
     private Long id;
 
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private Users users;
 
@@ -33,11 +33,11 @@ public class Order {
     @Column(name = "fullname")
     private String fullName;
 
-    @Column (name = "email")
+    @Column(name = "email")
     private String email;
 
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id")
     private Address address;
 
@@ -52,7 +52,7 @@ public class Order {
     private Date createdDate;
 
     @PrePersist
-    private void onCreated(){
+    private void onCreated() {
         createdDate = new Date();
     }
 
@@ -65,7 +65,7 @@ public class Order {
     private List<OrderItems> orderItems;
 
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_id")
     private Payment payment;
 
