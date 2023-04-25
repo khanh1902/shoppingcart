@@ -20,7 +20,6 @@ class ProductOptionsKey implements Serializable {
     @Column(name = "option_id")
     private Long optionId;
 
-
     public ProductOptionsKey(Long productId, Long optionId) {
         this.productId = productId;
         this.optionId = optionId;

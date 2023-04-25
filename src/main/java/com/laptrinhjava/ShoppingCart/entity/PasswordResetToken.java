@@ -20,7 +20,7 @@ public class PasswordResetToken {
 
     private String token;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private Users user;
 
