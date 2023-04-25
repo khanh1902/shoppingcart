@@ -82,6 +82,11 @@ public class OrderServiceImpl implements IOrderService {
         return orderRepository.findByUsers_Id(userId);
     }
 
+    @Override
+    public Order saveOrder(Order order) {
+        return orderRepository.save(order);
+    }
+
     public Double discount(Long discountPercent, Double price) {
         if (discountPercent != null) return (Double) price - price * discountPercent / 100L;
         // neu khong co disount percent thi tra ve gia ban dau
@@ -160,6 +165,7 @@ public class OrderServiceImpl implements IOrderService {
 
         } else if (newStatus.equalsIgnoreCase("received")) {
             findOrder.setStatus(newStatus.toLowerCase());
+            findOrder.setIsPayment(true);
             orderRepository.save(findOrder);
             List<OrderItems> findOrderItems = orderItemsRepository.findByOrder_Id(findOrder.getId());
             for (OrderItems orderItem : findOrderItems) {

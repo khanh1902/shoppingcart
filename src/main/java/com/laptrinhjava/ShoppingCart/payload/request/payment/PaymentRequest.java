@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Data
 public class PaymentRequest {
-    int amount;
-    String description;
-    String bankCode;
+    private int amount;
+    private String description;
+    private String bankCode;
 }

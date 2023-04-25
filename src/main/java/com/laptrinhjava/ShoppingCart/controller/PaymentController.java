@@ -1,8 +1,10 @@
 package com.laptrinhjava.ShoppingCart.controller;
 
 import com.laptrinhjava.ShoppingCart.config.PaymentConfig;
+import com.laptrinhjava.ShoppingCart.entity.Order;
 import com.laptrinhjava.ShoppingCart.payload.ResponseObject;
 import com.laptrinhjava.ShoppingCart.payload.request.payment.PaymentRequest;
+import com.laptrinhjava.ShoppingCart.service.IOrderService;
 import com.laptrinhjava.ShoppingCart.service.IPaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,6 +28,9 @@ public class PaymentController {
     @Autowired
     private IPaymentService paymentService;
 
+    @Autowired
+    private IOrderService orderService;
+
     @GetMapping("/getAll")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> getAll(){
@@ -35,10 +40,11 @@ public class PaymentController {
     }
 
     @PostMapping("/create-pay")
-    public ResponseEntity<ResponseObject> createPayment(@RequestBody PaymentRequest requestParams,
+    public ResponseEntity<ResponseObject> createPayment(@RequestParam(name = "orderId") Long orderId,
+                                                        @RequestBody PaymentRequest requestParams,
                                                         HttpServletRequest request) throws IOException {
 
-        int amount = requestParams.getAmount() * 100;
+        int amount = requestParams.getAmount() * 100 * 24000;
 
         Map<String, String> vnp_params = new HashMap<>();
         vnp_params.put("vnp_Version", PaymentConfig.vnp_Version);
@@ -93,6 +99,11 @@ public class PaymentController {
         String vnp_SecureHash = PaymentConfig.hmacSHA512(PaymentConfig.vnp_HashSecret, hashData.toString());
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
         String paymentUrl = PaymentConfig.vnp_PayUrl + "?" + queryUrl;
+
+        // update isPayment for order
+        Order findOrder = orderService.findOrderById(orderId);
+        findOrder.setIsPayment(true);
+        orderService.saveOrder(findOrder);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("OK", "Successfully!", paymentUrl)
