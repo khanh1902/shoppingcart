@@ -3,6 +3,7 @@ package com.laptrinhjava.ShoppingCart.controller;
 import com.laptrinhjava.ShoppingCart.payload.request.order.OrderRequest;
 import com.laptrinhjava.ShoppingCart.payload.ResponseObject;
 import com.laptrinhjava.ShoppingCart.payload.response.order.OrderResponse;
+import com.laptrinhjava.ShoppingCart.payload.response.order.UpdateStatusResponse;
 import com.laptrinhjava.ShoppingCart.service.IOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,8 +27,10 @@ public class OrderController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> getAllOrderForUser(@RequestParam(name = "status", required = false) String status) {
         try {
+            List<OrderResponse> orderResponses = orderService.getAllOrderForUser(status);
+            if(orderResponses.isEmpty()) throw new Exception("orders is null!");
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject("OK", "Update successfully!", orderService.getAllOrderForUser(status))
+                    new ResponseObject("OK", "Update successfully!", orderResponses)
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
@@ -40,8 +43,10 @@ public class OrderController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> getOneOrderForUser(@RequestParam(name = "orderId") Long orderId) {
         try {
+            OrderResponse orderResponse = orderService.getOneOrderForUser(orderId);
+            if(orderResponse == null) throw new Exception("Order is null");
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject("OK", "Update successfully!", orderService.getOneOrderForUser(orderId))
+                    new ResponseObject("OK", "Update successfully!", orderResponse)
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
@@ -91,8 +96,10 @@ public class OrderController {
     public ResponseEntity<ResponseObject> updateStatusOrder(@RequestParam(name = "orderId") Long orderId,
                                                             @RequestParam(name = "status") String newStatus) {
         try {
+            UpdateStatusResponse updateStatus = orderService.updateStatusOrder(orderId, newStatus);
+            if(updateStatus == null) throw new Exception("Update failed");
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject("OK", "Update successfully!", orderService.updateStatusOrder(orderId, newStatus))
+                    new ResponseObject("OK", "Update successfully!", updateStatus)
             );
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
