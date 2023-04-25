@@ -146,7 +146,7 @@ public class OrderServiceImpl implements IOrderService {
             body.append("Thank You");
             sendEmailRequest.setBody(body.toString());
             sendEmailRequest.setBody(sendEmailRequest.getBody());
-            emailSenderService.sendEmail(sendEmailRequest);
+//            emailSenderService.sendEmail(sendEmailRequest);
 
         } else if (newStatus.equalsIgnoreCase("received")) {
             findOrder.setStatus(newStatus.toLowerCase());
