@@ -72,7 +72,7 @@ public class ReviewsController {
         try {
             PageRequest pageRequest = PageRequest.of(offset, limit);
             List<ReviewDetailResponse> reviewDetailResponseList = reviewsService.findAllByProductId(productId);
-            if(reviewDetailResponseList.isEmpty()) throw new Exception("List order is empty!");
+            if(reviewDetailResponseList.isEmpty()) throw new Exception("List review is empty!");
             int start = (int) pageRequest.getOffset();
             int end = Math.min(start + pageRequest.getPageSize(), reviewDetailResponseList.size());
             Page<ReviewDetailResponse> reviewDetailResponses = new PageImpl<>(reviewDetailResponseList.subList(start, end), pageRequest, reviewDetailResponseList.size());
@@ -80,7 +80,7 @@ public class ReviewsController {
                     new ResponseObject("OK", "Successfully!", reviewDetailResponses)
             );
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     new ResponseObject("FAILED", e.getMessage(), null)
             );
         }

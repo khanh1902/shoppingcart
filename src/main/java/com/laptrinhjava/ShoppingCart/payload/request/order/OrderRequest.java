@@ -13,4 +13,5 @@ public class OrderRequest {
     private String fullName;
     private Long addressId;
     private String phoneNumber;
+    private Long paymentId;
 }

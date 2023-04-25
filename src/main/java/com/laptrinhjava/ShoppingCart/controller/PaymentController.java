@@ -3,12 +3,13 @@ package com.laptrinhjava.ShoppingCart.controller;
 import com.laptrinhjava.ShoppingCart.config.PaymentConfig;
 import com.laptrinhjava.ShoppingCart.payload.ResponseObject;
 import com.laptrinhjava.ShoppingCart.payload.request.payment.PaymentRequest;
+import com.laptrinhjava.ShoppingCart.service.IPaymentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -21,7 +22,19 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/payment")
 public class PaymentController {
-    @PostMapping("create-pay")
+    @Qualifier("paymentServiceImpl")
+    @Autowired
+    private IPaymentService paymentService;
+
+    @GetMapping("/getAll")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseObject> getAll(){
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject("OK", "Successfully!", paymentService.findAll())
+        );
+    }
+
+    @PostMapping("/create-pay")
     public ResponseEntity<ResponseObject> createPayment(@RequestBody PaymentRequest requestParams,
                                                         HttpServletRequest request) throws IOException {
 

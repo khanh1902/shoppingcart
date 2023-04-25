@@ -87,7 +87,7 @@ public class ReviewsServiceImpl implements IReviewsService {
     public List<ReviewDetailResponse> findAllByProductId(Long productId) throws Exception {
         List<ReviewDetailResponse> reviewResponses = new ArrayList<>();
         List<Reviews> findReviews = reviewsRepository.findAllByIsReviewAndProducts_Id(true, productId);
-        if(findReviews.isEmpty()) throw new Exception("Review does not found!");
+        if(findReviews.isEmpty()) throw new Exception("No reviews yet");
         for(Reviews review : findReviews){
             Users findUser = userRepository.findUsersById(review.getUsers().getId());
             if(findUser == null) throw new Exception("User does not found!");

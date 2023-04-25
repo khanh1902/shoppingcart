@@ -116,7 +116,11 @@ public class OrderServiceImpl implements IOrderService {
         for (OrderItemsResponse orderItemsResponse : orderItemsResponses) {
             totalPrice += orderItemsResponse.getPrice();
         }
-        order.setTotalPrice(totalPrice);
+
+        // neu order tren 200$ thi free ship, nho hon thi cong them 5$
+        if(totalPrice < 200D) order.setTotalPrice(totalPrice + 5D);
+        else order.setTotalPrice(totalPrice);
+
         orderRepository.save(order);
 
         return order.getId();

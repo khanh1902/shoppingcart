@@ -64,6 +64,14 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItems> orderItems;
 
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
+
+    @Column(name = "is_payment")
+    private Boolean isPayment;
+
 
     public Order(Users users, String fullName, String email, Double totalPrice, Address address, String phoneNumber, String status) {
         this.users = users;
