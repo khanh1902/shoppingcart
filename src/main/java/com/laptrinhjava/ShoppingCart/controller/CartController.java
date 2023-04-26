@@ -58,9 +58,15 @@ public class CartController {
     @PostMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> addItems(@RequestBody CartItemsRequest item) {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("OK", "Add Product Successfully!", cartItemsService.addProductToCartItem(item))
-        );
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("OK", "Add Product Successfully!", cartItemsService.addProductToCartItem(item))
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+                    new ResponseObject("FAILED", e.getMessage(), null)
+            );
+        }
     }
 
     /**

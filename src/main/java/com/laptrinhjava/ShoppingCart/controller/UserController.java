@@ -1,5 +1,6 @@
 package com.laptrinhjava.ShoppingCart.controller;
 
+import com.laptrinhjava.ShoppingCart.entity.ERole;
 import com.laptrinhjava.ShoppingCart.entity.PasswordResetToken;
 import com.laptrinhjava.ShoppingCart.entity.Role;
 import com.laptrinhjava.ShoppingCart.entity.Users;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -102,11 +104,11 @@ public class UserController {
 
     // get all user
     @GetMapping("/get-all")
-    public ResponseEntity<ResponseObject> getAllUser(@RequestParam(name = "roleid") Long roleId) {
+    public ResponseEntity<ResponseObject> getAllUser() {
         try {
-            Role role = roleService.findRoleById(roleId);
-            if(role == null) throw new Exception("Role dose not exists!");
-            List<Users> users = userService.findByRoles_Id(roleId);
+            Optional<Role> role = roleService.findByName(ERole.ROLE_USER);
+            if(role.isEmpty()) throw new Exception("Role dose not exists!");
+            List<Users> users = userService.findByRoles_Id(role.get().getId());
             if (!users.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.OK).body(
                         new ResponseObject("OK", "Successfully!", userService.getAllUser(users))
