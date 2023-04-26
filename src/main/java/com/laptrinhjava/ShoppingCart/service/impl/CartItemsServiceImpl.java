@@ -293,11 +293,9 @@ public class CartItemsServiceImpl implements ICartItemsService {
         String email = getUsername();
         Users findUser = userRepository.findByEmail(email);
         CartItems findCartItem = cartItemsRepository.findCartItemsById(cartItemId);
-        // cập nhật lại tổng giá tiền trong giỏ hàng
-        Cart findCart = cartRepository.findCartById(findCartItem.getCart().getId());
-        if (findCartItem.getCart().getUserId().equals(findUser.getId())) {
+
+        if (findCartItem.getCart().getId().equals(findUser.getId())) {
             cartItemsRepository.deleteById(findCartItem.getId());
-            cartRepository.save(findCart);
         }
     }
 
