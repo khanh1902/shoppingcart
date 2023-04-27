@@ -29,7 +29,7 @@ public class ProductVariants {
     private Long quantity;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "product_id") // thông qua khóa ngoại address_id
     private Products products;
 

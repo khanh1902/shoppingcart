@@ -22,7 +22,7 @@ public class OptionValues implements Serializable {
     private String name;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne
     @JoinColumn(name = "option_id")
     private Options option;
 
