@@ -33,7 +33,7 @@ public class OrderController {
                     new ResponseObject("OK", "Update successfully!", orderResponses)
             );
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     new ResponseObject("FAILED", e.getMessage(), null)
             );
         }
@@ -49,7 +49,7 @@ public class OrderController {
                     new ResponseObject("OK", "Update successfully!", orderResponse)
             );
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     new ResponseObject("FAILED", e.getMessage(), null)
             );
         }
@@ -70,7 +70,7 @@ public class OrderController {
                     new ResponseObject("OK", "Successfully!", orderResponsePage)
             );
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     new ResponseObject("FAILED", e.getMessage(), null)
             );
         }
@@ -102,7 +102,7 @@ public class OrderController {
                     new ResponseObject("OK", "Update successfully!", updateStatus)
             );
         } catch (Exception e){
-            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     new ResponseObject("FAILED", e.getMessage(), null)
             );
         }

@@ -183,6 +183,7 @@ public class ProductController {
         product.setImageUrl(imageUrl.toString());
         product.setDescription(description);
         product.setPrice(price);
+        product.setIsDelete(false);
 
         if (category != null) product.setCategory(category);
         else {
@@ -381,7 +382,6 @@ public class ProductController {
 
             if (productVariant.getQuantity() == null) optionMap.put("quantity", null);
             else optionMap.put("quantity", productVariant.getQuantity());
-//            optionMap.entrySet().stream().sorted();
             optionList.add(optionMap);
         }
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -394,7 +394,7 @@ public class ProductController {
      **/
     @PutMapping("/options")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseObject> updatePriceProduct(@RequestParam(name = "productId") Long productId,
+    public ResponseEntity<ResponseObject> updatePriceAnhQuantityProduct(@RequestParam(name = "productId") Long productId,
                                                              @RequestBody List<Map<String, String>> options) {
         try {
             Products product = productService.findProductById(productId);
@@ -446,35 +446,37 @@ public class ProductController {
             for (Long id : ids) {
                 Products product = productService.findProductById(id);
                 if (product != null) {
-                    // delete variant values if exists
-                    List<VariantValues> variantValuesList = variantValuesService.findById_ProductId(product.getId());
-                    if (variantValuesList != null) {
-                        for (VariantValues variantValue : variantValuesList) {
-                            variantValuesService.deleteById_ProductId(variantValue.getId().getProductId());
-                        }
-                    }
-
-                    // delete product variant if exists
-                    List<ProductVariants> productVariantsList = productVariantsService.findByProducts_Id(product.getId());
-                    if (productVariantsList != null) {
-                        for (ProductVariants productVariant : productVariantsList) {
-                            productVariantsService.deleteById(productVariant.getId());
-                        }
-                    }
-
-                    // delete product options if exists
-                    List<ProductOptions> productOptionsList = productOptionsService.findByProducts_Id(product.getId());
-                    if (productOptionsList != null) {
-                        for (ProductOptions productOption : productOptionsList) {
-                            productOptionsService.deleteById_ProductId(productOption.getId().getProductId());
-                        }
-                    }
-
-                    // delete image on aws
-                    amazonClient.deleteFile(product.getImageUrl());
-
-                    // delete product
-                    productService.delete(product.getId());
+//                    // delete variant values if exists
+//                    List<VariantValues> variantValuesList = variantValuesService.findById_ProductId(product.getId());
+//                    if (variantValuesList != null) {
+//                        for (VariantValues variantValue : variantValuesList) {
+//                            variantValuesService.deleteById_ProductId(variantValue.getId().getProductId());
+//                        }
+//                    }
+//
+//                    // delete product variant if exists
+//                    List<ProductVariants> productVariantsList = productVariantsService.findByProducts_Id(product.getId());
+//                    if (productVariantsList != null) {
+//                        for (ProductVariants productVariant : productVariantsList) {
+//                            productVariantsService.deleteById(productVariant.getId());
+//                        }
+//                    }
+//
+//                    // delete product options if exists
+//                    List<ProductOptions> productOptionsList = productOptionsService.findByProducts_Id(product.getId());
+//                    if (productOptionsList != null) {
+//                        for (ProductOptions productOption : productOptionsList) {
+//                            productOptionsService.deleteById_ProductId(productOption.getId().getProductId());
+//                        }
+//                    }
+//
+//                    // delete image on aws
+//                    amazonClient.deleteFile(product.getImageUrl());
+//
+//                    // delete product
+//                    productService.delete(product.getId());
+                    product.setIsDelete(true);
+                    productService.save(product);
                 } else
                     return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
                             new ResponseObject("FAILED", "Product not exists!", null)

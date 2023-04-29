@@ -27,7 +27,10 @@ public class PasswordResetTokenServiceImpl implements IPasswordResetTokenService
             return "invalidToken";
         }
         else {
-            if(isTokenExpired(passToken)) return "expired";
+            if(isTokenExpired(passToken)) {
+                passwordResetTokenRepository.deleteById(passToken.getId());
+                return "expired";
+            }
             else return null;
         }
     }

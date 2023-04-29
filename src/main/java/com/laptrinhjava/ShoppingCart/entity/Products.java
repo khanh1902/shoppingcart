@@ -37,6 +37,9 @@ public class Products {
     @Column(name = "discount_percent")
     private Long discountPercent;
 
+    @Column(name = "is_delete")
+    private Boolean isDelete;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "createddate", nullable = false)
     private Date createdDate;
