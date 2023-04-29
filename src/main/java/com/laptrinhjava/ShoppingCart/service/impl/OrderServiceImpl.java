@@ -177,7 +177,7 @@ public class OrderServiceImpl implements IOrderService {
                 Products findProduct = productRepository.findProductById(orderItem.getProductId());
                 if (findProduct == null) throw new Exception("Product does not exists!");
                 reviews.setProducts(findProduct);
-                reviewsRepository.save(reviews);
+                if(findProduct.getIsDelete().equals(false)) reviewsRepository.save(reviews);
             }
         } else if (newStatus.equalsIgnoreCase("delivering")) {
             if (!findOrder.getStatus().equalsIgnoreCase("success"))

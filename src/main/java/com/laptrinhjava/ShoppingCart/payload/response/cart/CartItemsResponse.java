@@ -18,6 +18,7 @@ public class CartItemsResponse {
     private Long quantity;
     private Double price;
     private Long discountPercent;
+    private Boolean isDelete;
 
     public CartItemsResponse(Long cartItemId, Long productId, String productName, String imageUrl, Map<String,
             Object> option, Long quantity, Double price, Long discountPercent) {

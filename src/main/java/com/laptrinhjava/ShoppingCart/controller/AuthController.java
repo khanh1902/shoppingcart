@@ -12,6 +12,7 @@ import com.laptrinhjava.ShoppingCart.service.IRoleService;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -162,9 +163,8 @@ public class AuthController {
     @PostMapping("/signout")
     public ResponseEntity<ResponseObject> logoutUser() {
         ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("ok", "You've been signed out!", null)
-        );
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(new ResponseObject("OK", "You've been signed out!", null));
     }
 
 }

@@ -9,6 +9,8 @@ import com.laptrinhjava.ShoppingCart.payload.request.auth.SavePasswordRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.auth.UserRequest;
 import com.laptrinhjava.ShoppingCart.payload.ResponseObject;
 import com.laptrinhjava.ShoppingCart.payload.response.auth.AuthResponse;
+import com.laptrinhjava.ShoppingCart.payload.response.auth.UserResponse;
+import com.laptrinhjava.ShoppingCart.payload.response.order.OrderResponse;
 import com.laptrinhjava.ShoppingCart.security.jwt.JwtUtils;
 import com.laptrinhjava.ShoppingCart.security.service.UserDetailsServiceImpl;
 import com.laptrinhjava.ShoppingCart.service.IEmailSenderService;
@@ -18,6 +20,9 @@ import com.laptrinhjava.ShoppingCart.service.IUserService;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -28,6 +33,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -104,23 +110,31 @@ public class UserController {
 
     // get all user
     @GetMapping("/get-all")
-    public ResponseEntity<ResponseObject> getAllUser() {
+    public ResponseEntity<ResponseObject> getAllUser(@RequestParam(required = false, name = "offset", defaultValue = "0") Integer offset,
+                                                     @RequestParam(required = false, name = "limit", defaultValue = "10") Integer limit) {
         try {
             Optional<Role> role = roleService.findByName(ERole.ROLE_USER);
             if(role.isEmpty()) throw new Exception("Role dose not exists!");
-            List<Users> users = userService.findByRoles_Id(role.get().getId());
-            if (!users.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject("OK", "Successfully!", userService.getAllUser(users))
-                );
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                        new ResponseObject("FAILED", "User is not exists!", null)
-                );
+            List<Users> findUsers = userService.findByRoles_Id(role.get().getId());
+            if (findUsers.isEmpty()) throw new Exception("List user is empty!");
+
+            List<UserResponse> userResponses = new ArrayList<>();
+            for(Users user : findUsers) {
+                UserResponse userResponse = new UserResponse(user.getId(), user.getEmail(), user.getFullName(), user.getPhoneNumber(),
+                        user.getSex(), user.getDateOfBirth());
+                userResponses.add(userResponse);
             }
+
+            PageRequest pageRequest = PageRequest.of(offset, limit);
+            int start = (int) pageRequest.getOffset();
+            int end = Math.min(start + pageRequest.getPageSize(), userResponses.size());
+            Page<UserResponse> usersResponsePage = new PageImpl<>(userResponses.subList(start, end), pageRequest, userResponses.size());
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("OK", "Successfully!", usersResponsePage)
+            );
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                    new ResponseObject("FAILED", "Error from Exception!", e.getMessage())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    new ResponseObject("FAILED", e.getMessage(), null)
             );
         }
     }

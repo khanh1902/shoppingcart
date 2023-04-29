@@ -150,6 +150,7 @@ public class CartItemsServiceImpl implements ICartItemsService {
                 cartItemsResponse.setImageUrl(product.getImageUrl());
                 cartItemsResponse.setPrice(cartItem.getPrice());
                 cartItemsResponse.setQuantity(cartItem.getQuantity());
+                cartItemsResponse.setIsDelete(product.getIsDelete());
 
                 // nếu product không có option => option null
                 if (cartItem.getProductVariants() == null) {
