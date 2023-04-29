@@ -60,7 +60,7 @@ public class OrderItemsServiceImpl implements IOrderItemsService {
                 // cập nhật số lượng sản phẩm trong kho sau khi order
                 if(findCartItem.getProductVariants() != null) {
                     ProductVariants findProductVariant = productVariantsRepository.findProductVariantsById(findCartItem.getProductVariants().getId());
-                    findProductVariant.setQuantity(findProduct.getQuantity() - findCartItem.getQuantity());
+                    findProductVariant.setQuantity(findProductVariant.getQuantity() - findCartItem.getQuantity());
                     findProduct.setQuantity(findProduct.getQuantity() - findCartItem.getQuantity());
                     productVariantsRepository.save(findProductVariant);
                     productRepository.save(findProduct);
