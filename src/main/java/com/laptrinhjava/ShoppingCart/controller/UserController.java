@@ -80,7 +80,7 @@ public class UserController {
 //        String jwt = parseJwt(request); // Lấy jwt từ request
             String token = jwt.substring(7, jwt.length());
             // Lấy email từ chuỗi jwt
-            String email = Jwts.parser().setSigningKey("khanh").parseClaimsJws(token).getBody().getSubject();
+            String email = Jwts.parser().setSigningKey("khanhSecret").parseClaimsJws(token).getBody().getSubject();
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
             List<String> roles = userDetails.getAuthorities().stream()
                     .map(item -> item.getAuthority())

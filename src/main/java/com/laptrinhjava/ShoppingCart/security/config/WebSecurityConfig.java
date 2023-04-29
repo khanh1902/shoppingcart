@@ -93,34 +93,34 @@ public class WebSecurityConfig {
         http.cors().and().csrf().disable()
                 .authorizeRequests().antMatchers("/api/auth/**", "/login").permitAll()
                 .antMatchers("/api/**").permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().authenticated();
 
-                .and()
-
-                .oauth2Login()
-                .authorizationEndpoint()
-                    .baseUri("/oauth2/authorize")
-                    .and()
-
-                .redirectionEndpoint()
-                    .baseUri("/oauth2/callback/*")
-                    .and()
-
-                .userInfoEndpoint()
-                    .userService(oauthUserService)
-                    .and()
-
-                .successHandler(oAuth2LoginSuccessHandle)
-                .failureHandler(auth2AuthenticationFailureHandler).and()
-                .exceptionHandling()
-                    .defaultAuthenticationEntryPointFor(new CustomOAuth2AuthenticationEntryPoint(), new AntPathRequestMatcher("/oauth2/**"));
-
-        http
-                .logout(l -> l
-                        .logoutSuccessUrl("/").permitAll()
-                );
-
-        http.authenticationProvider(authenticationProvider());
+//                .and()
+//
+//                .oauth2Login()
+//                .authorizationEndpoint()
+//                    .baseUri("/oauth2/authorize")
+//                    .and()
+//
+//                .redirectionEndpoint()
+//                    .baseUri("/oauth2/callback/*")
+//                    .and()
+//
+//                .userInfoEndpoint()
+//                    .userService(oauthUserService)
+//                    .and()
+//
+//                .successHandler(oAuth2LoginSuccessHandle)
+//                .failureHandler(auth2AuthenticationFailureHandler).and()
+//                .exceptionHandling()
+//                    .defaultAuthenticationEntryPointFor(new CustomOAuth2AuthenticationEntryPoint(), new AntPathRequestMatcher("/oauth2/**"));
+//
+//        http
+//                .logout(l -> l
+//                        .logoutSuccessUrl("/").permitAll()
+//                );
+//
+//        http.authenticationProvider(authenticationProvider());
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
