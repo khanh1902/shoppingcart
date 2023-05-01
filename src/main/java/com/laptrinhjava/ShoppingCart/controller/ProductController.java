@@ -69,23 +69,6 @@ public class ProductController {
     @Autowired
     private IReviewsService reviewsService;
 
-    private static final DecimalFormat df = new DecimalFormat("0.00");
-
-    /**
-     * Method: Find All Product with paging, sort and filter
-     **/
-    @GetMapping
-    public ResponseEntity<ResponseObject> searchWithFilter(@RequestParam(required = false, name = "offset", defaultValue = "0") Integer offset,
-                                                           @RequestParam(required = false, name = "limit", defaultValue = "10") Integer limit,
-                                                           @RequestParam(required = false, name = "sortBy", defaultValue = "id") String sortBy,
-                                                           @RequestParam(required = false, name = "asc", defaultValue = "true") Boolean asc,
-                                                           @RequestParam(required = false, name = "name") String name) {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("OK", "Successfully!",
-                        productService.findWithFilterAndPageAndSort(offset, limit, sortBy, asc, name)));
-    }
-
-
     /**
      * Method: Find Product with paging, sort, filter, name, categoryIds, minPrice, maxPrice
      **/
@@ -402,7 +385,7 @@ public class ProductController {
     @PutMapping("/options")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> updatePriceAnhQuantityProduct(@RequestParam(name = "productId") Long productId,
-                                                             @RequestBody List<Map<String, String>> options) {
+                                                                        @RequestBody List<Map<String, String>> options) {
         try {
             Products product = productService.findProductById(productId);
             Long totalQuantity = 0L;
@@ -540,7 +523,7 @@ public class ProductController {
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                    new ResponseObject("Failed", "Error!", e.getMessage())
+                    new ResponseObject("Failed", e.getMessage(), null)
             );
         }
     }

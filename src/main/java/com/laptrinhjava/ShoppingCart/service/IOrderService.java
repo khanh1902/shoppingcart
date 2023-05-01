@@ -22,5 +22,6 @@ public interface IOrderService {
     OrderResponse getOneOrderForUser(Long orderId) throws Exception;
 
     List<OrderResponse> getAllOrderForAdmin() throws Exception;
+    Long totalOrderOfDay();
 
 }

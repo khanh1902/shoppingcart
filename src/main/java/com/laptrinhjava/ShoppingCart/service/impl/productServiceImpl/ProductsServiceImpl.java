@@ -64,24 +64,6 @@ public class ProductsServiceImpl implements IProductService {
     }
 
     @Override
-    public Page<Products> findWithFilterAndPageAndSort(Integer offset, Integer limit, String sortBy, Boolean asc, String name) {
-//        Pageable paging = PageRequest.of(offset, limit, Sort.by(sortBy).descending());
-        PageRequest paging = null;
-        if (asc) paging = PageRequest.of(offset, limit, Sort.by(sortBy).ascending());
-        else paging = PageRequest.of(offset, limit, Sort.by(sortBy).descending());
-
-        Page<Products> pageProduct = null;
-        if (name == null) {
-            pageProduct = productRepository.findAll(paging);
-        } else {
-            pageProduct = productRepository.findByNameContainingIgnoreCase(name, paging);
-        }
-        List<ProductResponse> productResponses = covertProductsToProductResponse(pageProduct);
-//        return new PageImpl<>(productResponses, paging, pageProduct.getTotalElements());
-        return null;
-    }
-
-    @Override
     public List<Map<String, String>> convertOptionsRequestToMap(OptionsRequest optionsRequests) {
         List<Map<String, String>> options = new ArrayList<>();
         for (int i = 0; i < optionsRequests.getOptions().size(); i++) {
@@ -107,12 +89,6 @@ public class ProductsServiceImpl implements IProductService {
     }
 
     @Override
-    public List<Products> findByNameContainingIgnoreCase(String name) {
-//        return productRepository.findByNameContainingIgnoreCase(name);
-        return null;
-    }
-
-    @Override
     public List<Products> filer(String sortBy, Boolean asc, String name, List<Long> categoryIds, Long minPrice, Long maxPrice) {
         List<Products> filterWithCategory = new ArrayList<>();
         List<Products> filerWithPrice = new ArrayList<>();
@@ -122,8 +98,8 @@ public class ProductsServiceImpl implements IProductService {
         else sort = sort.descending();
 
         List<Products> products = null;
-        if (name == null) products = productRepository.findAll(sort);
-        else products = productRepository.findByNameContainingIgnoreCase(name, sort);
+        if (name == null) products = productRepository.findAllByIsDelete(false, sort);
+        else products = productRepository.findByIsDeleteAndNameContainingIgnoreCase(false, name, sort);
 
         if (categoryIds != null) {
             for (Products product : products) {

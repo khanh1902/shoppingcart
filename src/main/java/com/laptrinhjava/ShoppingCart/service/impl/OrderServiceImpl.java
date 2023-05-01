@@ -18,10 +18,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.laptrinhjava.ShoppingCart.common.HandleAuth.getUsername;
 import static com.laptrinhjava.ShoppingCart.common.HandleChar.upperFirstString;
@@ -300,6 +297,35 @@ public class OrderServiceImpl implements IOrderService {
             orderResponses.add(orderResponse);
         }
         return orderResponses;
+    }
+
+    @Override
+    public Long totalOrderOfDay() {
+        // lấy thời gian đầu ngày
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Date startOfDay = cal.getTime();
+
+        cal.clear();
+
+        // lấy thời gian cuối ngày
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND, 999);
+        Date endOfDay = cal.getTime();
+
+        Long totalOrder = 0L;
+        List<Order> orders = orderRepository.findAll();
+        for (Order order : orders){
+            if(order.getCreatedDate().before(startOfDay) &&order.getCreatedDate().after(endOfDay)){
+                totalOrder ++;
+            }
+        }
+        return totalOrder;
     }
 
     public List<OrderItemsResponse> convertOrderItemToOrderItemResponse(List<OrderItems> orderItems) throws Exception {

@@ -35,9 +35,6 @@ public class ReviewsServiceImpl implements IReviewsService {
     @Autowired
     private IOrderItemsRepository orderItemsRepository;
 
-    @Autowired
-    private IProductRepository productRepository;
-
     @Override
     public Reviews findReviewsById(Long id) {
         return reviewsRepository.findReviewsById(id);
@@ -124,6 +121,6 @@ public class ReviewsServiceImpl implements IReviewsService {
             totalRating += review.getRating();
         }
         if(findReviews.isEmpty()) return null;
-        return (double) (totalRating / findReviews.size());
+        return (Double) (double) (Math.round((double) (totalRating / findReviews.size()) * 10) / 10); // lam tron 1 so thap phan
     }
 }
