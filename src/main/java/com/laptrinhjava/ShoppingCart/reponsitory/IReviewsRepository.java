@@ -14,4 +14,5 @@ public interface IReviewsRepository extends JpaRepository<Reviews, Long> {
     List<Reviews> findAllByIsReviewAndUsers_Id(Boolean isReview, Long userId);
     @Transactional
     List<Reviews> findAllByIsReviewAndProducts_Id(Boolean isReview, Long productId);
+    List<Reviews> findAllByProducts_Id(Long productId);
 }

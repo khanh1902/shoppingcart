@@ -20,5 +20,7 @@ public class OneProductResponse {
     private Double price;
     private Long quantity;
     private Long discountPercent;
+    private Double averageRating;
+    private Long countReviews;
 
 }

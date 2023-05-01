@@ -28,7 +28,7 @@ public class JwtUtils {
     private  String jwtCookie = "auth-token";
 
     // Thời gian có hiệu lực của chuỗi jwt
-    private final long jwtExpiration = 86400000L;  //hạn chuỗi jwt 1 ngay
+    private final long jwtExpiration = 86400000L * 2L;  //hạn chuỗi jwt 1 ngay
 
     // Tạo jwt
     public String generateToken(Authentication authentication) {

@@ -1,5 +1,6 @@
 package com.laptrinhjava.ShoppingCart.controller;
 
+import com.google.gson.JsonObject;
 import com.laptrinhjava.ShoppingCart.config.PaymentConfig;
 import com.laptrinhjava.ShoppingCart.entity.Order;
 import com.laptrinhjava.ShoppingCart.payload.ResponseObject;
@@ -40,7 +41,7 @@ public class PaymentController {
     }
 
     @PostMapping("/create-pay")
-    public ResponseEntity<ResponseObject> createPayment(@RequestParam(name = "orderId") Long orderId,
+    public ResponseEntity<ResponseObject> createPayment(@RequestParam(name = "orderId", required = false) Long orderId,
                                                         @RequestBody PaymentRequest requestParams,
                                                         HttpServletRequest request) throws IOException {
 
@@ -101,9 +102,9 @@ public class PaymentController {
         String paymentUrl = PaymentConfig.vnp_PayUrl + "?" + queryUrl;
 
         // update isPayment for order
-        Order findOrder = orderService.findOrderById(orderId);
-        findOrder.setIsPayment(true);
-        orderService.saveOrder(findOrder);
+//        Order findOrder = orderService.findOrderById(orderId);
+//        findOrder.setIsPayment(true);
+//        orderService.saveOrder(findOrder);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("OK", "Successfully!", paymentUrl)

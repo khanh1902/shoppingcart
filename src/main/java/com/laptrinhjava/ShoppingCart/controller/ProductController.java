@@ -6,6 +6,7 @@ import com.laptrinhjava.ShoppingCart.payload.response.product.OneProductResponse
 import com.laptrinhjava.ShoppingCart.payload.ResponseObject;
 import com.laptrinhjava.ShoppingCart.service.IAmazonClient;
 import com.laptrinhjava.ShoppingCart.service.ICategoryService;
+import com.laptrinhjava.ShoppingCart.service.IReviewsService;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
 import com.laptrinhjava.ShoppingCart.service.productService.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +64,10 @@ public class ProductController {
     @Qualifier("userServiceImpl")
     @Autowired
     private IUserService userService;
+
+    @Qualifier("reviewsServiceImpl")
+    @Autowired
+    private IReviewsService reviewsService;
 
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
@@ -146,6 +151,8 @@ public class ProductController {
             productResponse.setCategoryId(product.getCategory().getId());
             productResponse.setQuantity(product.getQuantity());
             productResponse.setOptions(optionList);
+            productResponse.setAverageRating(reviewsService.averageRating(product.getId()));
+            productResponse.setCountReviews(reviewsService.countReviews(product.getId()));
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("OK", "Successfully!", productResponse)
             );

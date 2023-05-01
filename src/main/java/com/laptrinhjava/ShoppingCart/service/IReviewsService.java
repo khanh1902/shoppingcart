@@ -15,5 +15,7 @@ public interface IReviewsService {
     List<ReviewResponse> findAllByIsReviewAndUserId(String isReview) throws Exception;
     List<ReviewDetailResponse> findAllByProductId(Long productId) throws Exception;
     void DeleteById(Long reviewId) throws Exception;
+    Long countReviews(Long productId);
+    Double averageRating(Long productId);
 
 }
