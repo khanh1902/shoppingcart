@@ -159,7 +159,7 @@ public class OrderServiceImpl implements IOrderService {
             body.append("Thank You");
             sendEmailRequest.setBody(body.toString());
             sendEmailRequest.setBody(sendEmailRequest.getBody());
-//            emailSenderService.sendEmail(sendEmailRequest);
+            emailSenderService.sendEmail(sendEmailRequest);
 
         } else if (newStatus.equalsIgnoreCase("received")) {
             findOrder.setStatus(newStatus.toLowerCase());
@@ -249,10 +249,8 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public List<OrderForUserResponse> getAllOrderForUser() throws Exception {
-        String email = getUsername();
-        Users findUser = userRepository.findByEmail(email);
-
+    public List<OrderForUserResponse> getAllOrderUserForAdmin(Long userId) throws Exception {
+        Users findUser = userRepository.findUsersById(userId);
         List<OrderForUserResponse> orderList = new ArrayList<>();
         List<Order> orders = orderRepository.findAllByUsers_IdAndStatusContainingIgnoreCase(findUser.getId(), "received");
         if(orders.isEmpty()) throw new Exception("Order is empty!");

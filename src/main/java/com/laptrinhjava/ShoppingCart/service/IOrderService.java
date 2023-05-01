@@ -19,7 +19,7 @@ public interface IOrderService {
     void deleteById(Long id);
 
     List<OrderResponse> getAllOrderForUserByStatus(String status) throws Exception;
-    List<OrderForUserResponse> getAllOrderForUser() throws Exception;
+    List<OrderForUserResponse> getAllOrderUserForAdmin(Long userId) throws Exception;
 
     OrderResponse getOneOrderForUser(Long orderId) throws Exception;
 

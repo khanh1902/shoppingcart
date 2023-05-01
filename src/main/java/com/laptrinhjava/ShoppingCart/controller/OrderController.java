@@ -41,10 +41,10 @@ public class OrderController {
 
     @GetMapping("/get-all-user")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<ResponseObject> getAllOrderForUser(){
+    public ResponseEntity<ResponseObject> getAllOrderForUser(@RequestParam(name = "userId") Long userId){
         try {
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject("OK", "Update successfully!", orderService.getAllOrderForUser())
+                    new ResponseObject("OK", "Update successfully!", orderService.getAllOrderUserForAdmin(userId))
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
