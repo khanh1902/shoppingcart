@@ -63,7 +63,7 @@ public class CartController {
                     new ResponseObject("OK", "Add Product Successfully!", cartItemsService.addProductToCartItem(item))
             );
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     new ResponseObject("FAILED", e.getMessage(), null)
             );
         }

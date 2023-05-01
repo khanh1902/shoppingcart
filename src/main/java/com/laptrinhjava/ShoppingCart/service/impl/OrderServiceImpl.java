@@ -4,6 +4,7 @@ import com.laptrinhjava.ShoppingCart.entity.*;
 import com.laptrinhjava.ShoppingCart.payload.request.order.OrderRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.order.UpdateStatusRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.sendemail.SendEmailRequest;
+import com.laptrinhjava.ShoppingCart.payload.response.order.OrderForUserResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.order.OrderItemsResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.order.OrderResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.order.UpdateStatusResponse;
@@ -214,7 +215,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public List<OrderResponse> getAllOrderForUser(String status) throws Exception {
+    public List<OrderResponse> getAllOrderForUserByStatus(String status) throws Exception {
         String email = getUsername();
         Users findUser = userRepository.findByEmail(email);
         List<Order> orders;
@@ -245,6 +246,22 @@ public class OrderServiceImpl implements IOrderService {
             orderResponses.add(orderResponse);
         }
         return orderResponses;
+    }
+
+    @Override
+    public List<OrderForUserResponse> getAllOrderForUser() throws Exception {
+        String email = getUsername();
+        Users findUser = userRepository.findByEmail(email);
+
+        List<OrderForUserResponse> orderList = new ArrayList<>();
+        List<Order> orders = orderRepository.findAllByUsers_IdAndStatusContainingIgnoreCase(findUser.getId(), "received");
+        if(orders.isEmpty()) throw new Exception("Order is empty!");
+        for(Order order : orders){
+            List<OrderItems> orderItems = orderItemsRepository.findByOrder_Id(order.getId());
+            OrderForUserResponse orderForUserResponse = new OrderForUserResponse(order.getId(), orderItems.stream().count(), order.getTotalPrice());
+            orderList.add(orderForUserResponse);
+        }
+        return orderList;
     }
 
     @Override

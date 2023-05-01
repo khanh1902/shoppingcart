@@ -68,13 +68,13 @@ public class CartItemsServiceImpl implements ICartItemsService {
     }
 
 
-
     @Override
     public CartItemsResponse addProductToCartItem(CartItemsRequest item) throws Exception {
         String email = getUsername();
         Users findUser = userRepository.findByEmail(email);
         Cart cart = cartRepository.findByUserId(findUser.getId());
         Products product = productRepository.findProductById(item.getProductId());
+        if (product == null) throw new Exception("Product does not exists!");
         StringBuilder skuId = new StringBuilder();
         skuId.append("P").append(product.getId());
         for (Map.Entry<String, Object> option : item.getOption().entrySet()) {
@@ -86,9 +86,10 @@ public class CartItemsServiceImpl implements ICartItemsService {
             //nếu sản phẩm đã tồn tại trong giỏ hàng thì update lại số lượng
             for (CartItems cartItem : cartItemsList) {
                 if (cartItem.getProductVariants() == null) {
-                    if ((cartItem.getQuantity() + item.getQuantity()) > product.getQuantity()) throw new Exception("Not enough quantity!");
+                    if ((cartItem.getQuantity() + item.getQuantity()) > product.getQuantity())
+                        throw new Exception("Not enough quantity!");
                     cartItem.setQuantity(cartItem.getQuantity() + item.getQuantity());
-                    cartItem.setPrice( product.getPrice());
+                    cartItem.setPrice(product.getPrice());
                     cartItemsRepository.save(cartItem);
 
                     return new CartItemsResponse(cartItem.getId(), product.getId(), product.getName(),
@@ -96,7 +97,8 @@ public class CartItemsServiceImpl implements ICartItemsService {
 
                 } else if (cartItem.getProductVariants().getSkuId().toUpperCase().equals(skuId.toString())) {
                     ProductVariants productVariant = productVariantsRepository.findBySkuId(skuId.toString());
-                    if ((cartItem.getQuantity() + item.getQuantity()) > productVariant.getQuantity()) throw new Exception("Not enough quantity!");
+                    if ((cartItem.getQuantity() + item.getQuantity()) > productVariant.getQuantity())
+                        throw new Exception("Not enough quantity!");
                     cartItem.setQuantity(cartItem.getQuantity() + item.getQuantity());
                     cartItem.setPrice(cartItem.getPrice() + cartItem.getProductVariants().getPrice());
                     cartItemsRepository.save(cartItem);
@@ -108,7 +110,7 @@ public class CartItemsServiceImpl implements ICartItemsService {
             }
             // nếu sản phẩm tồn tại nhưng có skuid khác
             ProductVariants productVariant = productVariantsRepository.findBySkuId(skuId.toString());
-            if(item.getQuantity() > productVariant.getQuantity()) throw new Exception("Not enough quantity!");
+            if (item.getQuantity() > productVariant.getQuantity()) throw new Exception("Not enough quantity!");
             cartItems = new CartItems(cart, product.getId(), item.getQuantity(), productVariant.getPrice(), productVariant);
             cartItemsRepository.save(cartItems);
             cartRepository.save(cart);
@@ -122,8 +124,8 @@ public class CartItemsServiceImpl implements ICartItemsService {
 
 
             } else {
-                if(item.getQuantity() > product.getQuantity()) throw new Exception("Not enough quantity!");
-                cartItems = new CartItems(cart, product.getId(), item.getQuantity(),  product.getPrice(), null);
+                if (item.getQuantity() > product.getQuantity()) throw new Exception("Not enough quantity!");
+                cartItems = new CartItems(cart, product.getId(), item.getQuantity(), product.getPrice(), null);
                 cartItemsRepository.save(cartItems);
 
             }

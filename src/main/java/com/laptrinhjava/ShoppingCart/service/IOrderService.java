@@ -2,6 +2,7 @@ package com.laptrinhjava.ShoppingCart.service;
 
 import com.laptrinhjava.ShoppingCart.entity.Order;
 import com.laptrinhjava.ShoppingCart.payload.request.order.OrderRequest;
+import com.laptrinhjava.ShoppingCart.payload.response.order.OrderForUserResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.order.OrderResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.order.UpdateStatusResponse;
 
@@ -17,7 +18,8 @@ public interface IOrderService {
 
     void deleteById(Long id);
 
-    List<OrderResponse> getAllOrderForUser(String status) throws Exception;
+    List<OrderResponse> getAllOrderForUserByStatus(String status) throws Exception;
+    List<OrderForUserResponse> getAllOrderForUser() throws Exception;
 
     OrderResponse getOneOrderForUser(Long orderId) throws Exception;
 

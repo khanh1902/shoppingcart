@@ -25,12 +25,26 @@ public class OrderController {
 
     @GetMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<ResponseObject> getAllOrderForUser(@RequestParam(name = "status", required = false) String status) {
+    public ResponseEntity<ResponseObject> getAllOrderForUserByStatus(@RequestParam(name = "status", required = false) String status) {
         try {
-            List<OrderResponse> orderResponses = orderService.getAllOrderForUser(status);
+            List<OrderResponse> orderResponses = orderService.getAllOrderForUserByStatus(status);
             if(orderResponses.isEmpty()) throw new Exception("orders is null!");
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("OK", "Update successfully!", orderResponses)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    new ResponseObject("FAILED", e.getMessage(), null)
+            );
+        }
+    }
+
+    @GetMapping("/get-all-user")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseObject> getAllOrderForUser(){
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("OK", "Update successfully!", orderService.getAllOrderForUser())
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
@@ -54,6 +68,8 @@ public class OrderController {
             );
         }
     }
+
+
 
     @GetMapping("/get-all")
     @PreAuthorize("hasRole('ADMIN')")
