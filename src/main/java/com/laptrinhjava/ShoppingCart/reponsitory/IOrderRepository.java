@@ -13,6 +13,7 @@ import java.util.List;
 @Repository
 public interface IOrderRepository extends JpaRepository<Order, Long> {
     Order findOrderById(Long id);
+    Long countByUsers_Id(Long userId);
     Order findByUsers_Id(Long userId);
     @Transactional
     List<Order> findAllByUsers_Id(Long id);

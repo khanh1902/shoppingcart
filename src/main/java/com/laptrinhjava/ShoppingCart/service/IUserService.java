@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @Service
 public interface IUserService {
+    List<Users> findAll();
     Users findByEmail(String email);
     Users findUsersById(Long id);
     Optional<Users> findEmail(String email);

@@ -30,6 +30,11 @@ public class UserServiceImpl implements IUserService {
     private IRoleService roleService;
 
     @Override
+    public List<Users> findAll() {
+        return userRepository.findAll();
+    }
+
+    @Override
     public Users findByEmail(String email) {
         return userRepository.findByEmail(email);
     }

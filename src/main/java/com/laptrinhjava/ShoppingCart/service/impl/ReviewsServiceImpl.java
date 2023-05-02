@@ -1,7 +1,6 @@
 package com.laptrinhjava.ShoppingCart.service.impl;
 
 import com.laptrinhjava.ShoppingCart.entity.OrderItems;
-import com.laptrinhjava.ShoppingCart.entity.Products;
 import com.laptrinhjava.ShoppingCart.entity.Reviews;
 import com.laptrinhjava.ShoppingCart.entity.Users;
 import com.laptrinhjava.ShoppingCart.payload.request.reviews.UpdateReviewRequest;
@@ -10,9 +9,7 @@ import com.laptrinhjava.ShoppingCart.payload.response.reviews.ReviewResponse;
 import com.laptrinhjava.ShoppingCart.reponsitory.IOrderItemsRepository;
 import com.laptrinhjava.ShoppingCart.reponsitory.IReviewsRepository;
 import com.laptrinhjava.ShoppingCart.reponsitory.IUserRepository;
-import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.IProductRepository;
 import com.laptrinhjava.ShoppingCart.service.IReviewsService;
-import com.laptrinhjava.ShoppingCart.service.productService.IOrderItemsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

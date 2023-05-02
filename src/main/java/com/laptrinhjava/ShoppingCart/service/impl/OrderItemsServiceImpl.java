@@ -5,7 +5,7 @@ import com.laptrinhjava.ShoppingCart.payload.response.order.OrderItemsResponse;
 import com.laptrinhjava.ShoppingCart.reponsitory.ICartItemsRepository;
 import com.laptrinhjava.ShoppingCart.reponsitory.IOrderItemsRepository;
 import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.*;
-import com.laptrinhjava.ShoppingCart.service.productService.IOrderItemsService;
+import com.laptrinhjava.ShoppingCart.service.IOrderItemsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +43,11 @@ public class OrderItemsServiceImpl implements IOrderItemsService {
         if (discountPercent != null) return (Double) price - price * discountPercent / 100L;
         // neu khong co disount percent thi tra ve gia ban dau
         return price;
+    }
+
+    @Override
+    public List<OrderItems> findAll() {
+        return orderItemsRepository.findAll();
     }
 
     @Override
@@ -97,5 +102,20 @@ public class OrderItemsServiceImpl implements IOrderItemsService {
             }
         }
         return orderItemsResponses;
+    }
+
+    @Override
+    public List<OrderItems> findByOrder_Id(Long orderId) {
+        return orderItemsRepository.findByOrder_Id(orderId);
+    }
+
+    @Override
+    public Long countByProductId(Long productId) {
+        return orderItemsRepository.countByProductId(productId);
+    }
+
+    @Override
+    public List<OrderItems> findByProductId(Long productId) {
+        return orderItemsRepository.findByProductId(productId);
     }
 }

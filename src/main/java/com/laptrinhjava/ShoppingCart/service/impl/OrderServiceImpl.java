@@ -2,8 +2,8 @@ package com.laptrinhjava.ShoppingCart.service.impl;
 
 import com.laptrinhjava.ShoppingCart.entity.*;
 import com.laptrinhjava.ShoppingCart.payload.request.order.OrderRequest;
-import com.laptrinhjava.ShoppingCart.payload.request.order.UpdateStatusRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.sendemail.SendEmailRequest;
+import com.laptrinhjava.ShoppingCart.payload.response.dashboard.DashboardResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.order.OrderForUserResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.order.OrderItemsResponse;
 import com.laptrinhjava.ShoppingCart.payload.response.order.OrderResponse;
@@ -11,12 +11,10 @@ import com.laptrinhjava.ShoppingCart.payload.response.order.UpdateStatusResponse
 import com.laptrinhjava.ShoppingCart.reponsitory.*;
 import com.laptrinhjava.ShoppingCart.reponsitory.productRepository.*;
 import com.laptrinhjava.ShoppingCart.service.IEmailSenderService;
+import com.laptrinhjava.ShoppingCart.service.IOrderItemsService;
 import com.laptrinhjava.ShoppingCart.service.IOrderService;
-import com.laptrinhjava.ShoppingCart.service.productService.IOrderItemsService;
-import com.laptrinhjava.ShoppingCart.service.productService.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -83,6 +81,16 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public Order saveOrder(Order order) {
         return orderRepository.save(order);
+    }
+
+    @Override
+    public List<Order> findAll() {
+        return orderRepository.findAll();
+    }
+
+    @Override
+    public List<Order> findAllByUsers_Id(Long userId) {
+        return orderRepository.findAllByUsers_Id(userId);
     }
 
     public Double discount(Long discountPercent, Double price) {
@@ -175,7 +183,7 @@ public class OrderServiceImpl implements IOrderService {
                 Products findProduct = productRepository.findProductById(orderItem.getProductId());
                 if (findProduct == null) throw new Exception("Product does not exists!");
                 reviews.setProducts(findProduct);
-                if(findProduct.getIsDelete().equals(false)) reviewsRepository.save(reviews);
+                if (findProduct.getIsDelete().equals(false)) reviewsRepository.save(reviews);
             }
         } else if (newStatus.equalsIgnoreCase("delivering")) {
             if (!findOrder.getStatus().equalsIgnoreCase("success"))
@@ -253,8 +261,8 @@ public class OrderServiceImpl implements IOrderService {
         Users findUser = userRepository.findUsersById(userId);
         List<OrderForUserResponse> orderList = new ArrayList<>();
         List<Order> orders = orderRepository.findAllByUsers_IdAndStatusContainingIgnoreCase(findUser.getId(), "received");
-        if(orders.isEmpty()) throw new Exception("Order is empty!");
-        for(Order order : orders){
+        if (orders.isEmpty()) throw new Exception("Order is empty!");
+        for (Order order : orders) {
             List<OrderItems> orderItems = orderItemsRepository.findByOrder_Id(order.getId());
             OrderForUserResponse orderForUserResponse = new OrderForUserResponse(order.getId(), orderItems.stream().count(), order.getTotalPrice());
             orderList.add(orderForUserResponse);
@@ -315,7 +323,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public Long totalOrderOfDay() {
+    public DashboardResponse totalOrderOfDay() {
         // lấy thời gian đầu ngày
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.HOUR_OF_DAY, 0);
@@ -323,8 +331,6 @@ public class OrderServiceImpl implements IOrderService {
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
         Date startOfDay = cal.getTime();
-
-        cal.clear();
 
         // lấy thời gian cuối ngày
         cal.set(Calendar.HOUR_OF_DAY, 23);
@@ -334,13 +340,50 @@ public class OrderServiceImpl implements IOrderService {
         Date endOfDay = cal.getTime();
 
         Long totalOrder = 0L;
+        Long totalProduct = 0L;
+        Double totalPrice = 0D;
+        Long orderReceived = 0L;
+        Long orderPending = 0L;
+        Long orderDelivering = 0L;
+        Long orderSuccess = 0L;
+        DashboardResponse dashboard = new DashboardResponse();
         List<Order> orders = orderRepository.findAll();
-        for (Order order : orders){
-            if(order.getCreatedDate().before(startOfDay) &&order.getCreatedDate().after(endOfDay)){
-                totalOrder ++;
+        for (Order order : orders) {
+            if (order.getCreatedDate().after(startOfDay) && order.getCreatedDate().before(endOfDay)) {
+                totalOrder++;
+                if (order.getStatus().equalsIgnoreCase("pending")) orderPending++;
+                else if (order.getStatus().equalsIgnoreCase("received")) {
+                    orderReceived++;
+                    totalPrice += order.getTotalPrice();
+                    List<OrderItems> findOrderItem = orderItemsRepository.findByOrder_Id(order.getId());
+                    totalProduct += (long) findOrderItem.size();
+                } else if (order.getStatus().equalsIgnoreCase("delivering")) {
+                    orderDelivering++;
+                    totalPrice += order.getTotalPrice();
+                    List<OrderItems> findOrderItem = orderItemsRepository.findByOrder_Id(order.getId());
+                    totalProduct += (long) findOrderItem.size();
+                } else if (order.getStatus().equalsIgnoreCase("success")) {
+                    orderSuccess++;
+                    totalPrice += order.getTotalPrice();
+                    List<OrderItems> findOrderItem = orderItemsRepository.findByOrder_Id(order.getId());
+                    totalProduct += (long) findOrderItem.size();
+                }
             }
         }
-        return totalOrder;
+        dashboard.setTotalOrder(totalOrder);
+        dashboard.setOrderPending(orderPending);
+        dashboard.setOrderReceived(orderReceived);
+        dashboard.setOrderSuccess(orderSuccess);
+        dashboard.setOrderDelivering(orderDelivering);
+        dashboard.setTotalProduct(totalProduct);
+        dashboard.setTotalPrice(totalPrice);
+        return dashboard;
+
+    }
+
+    @Override
+    public Long countByUsers_Id(Long userId) {
+        return orderRepository.countByUsers_Id(userId);
     }
 
     public List<OrderItemsResponse> convertOrderItemToOrderItemResponse(List<OrderItems> orderItems) throws Exception {

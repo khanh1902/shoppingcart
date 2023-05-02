@@ -10,6 +10,7 @@ import java.util.Map;
 
 @Service
 public interface IProductService {
+    List<Products> findAll();
     Products save(Products product);
     Products findProductById(Long id);
     Products findByName(String name);
