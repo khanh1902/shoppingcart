@@ -103,9 +103,8 @@ public class DashboardController {
                     totalPriceOrder += order.getTotalPrice();
                 }
                 Top5Users topUser = new Top5Users(findUser.getId(), findUser.getFullName(), findUser.getEmail(),
-                        countOrder.getCountOrder(), totalPrice);
+                        countOrder.getCountOrder(), totalPriceOrder);
                 top5User.add(topUser);
-                totalPriceOrder = 0D;
             }
         } else {
             for (int i = 0; i < 5; i++) {
@@ -117,9 +116,8 @@ public class DashboardController {
                     totalPriceOrder += order.getTotalPrice();
                 }
                 Top5Users topUser = new Top5Users(findUser.getId(), findUser.getFullName(), findUser.getEmail(),
-                        countOrders.get(i).getCountOrder(), totalPrice);
+                        countOrders.get(i).getCountOrder(), totalPriceOrder);
                 top5User.add(topUser);
-                totalPriceOrder = 0D;
             }
         }
 
