@@ -194,7 +194,6 @@ public class DashboardController {
                         totalPrice += order.getTotalPrice();
                         List<OrderItems> findOrderItem = orderItemsService.findByOrder_Id(order.getId());
                         totalProduct += (long) findOrderItem.size();
-
                     }
 
                 }
