@@ -105,6 +105,7 @@ public class DashboardController {
                 Top5Users topUser = new Top5Users(findUser.getId(), findUser.getFullName(), findUser.getEmail(),
                         countOrder.getCountOrder(), totalPrice);
                 top5User.add(topUser);
+                totalPriceOrder = 0D;
             }
         } else {
             for (int i = 0; i < 5; i++) {
@@ -118,6 +119,7 @@ public class DashboardController {
                 Top5Users topUser = new Top5Users(findUser.getId(), findUser.getFullName(), findUser.getEmail(),
                         countOrders.get(i).getCountOrder(), totalPrice);
                 top5User.add(topUser);
+                totalPriceOrder = 0D;
             }
         }
 
@@ -200,6 +202,8 @@ public class DashboardController {
             }
             SalesMonthResponse salesMonthResponse = new SalesMonthResponse(month + 1, totalPrice, totalProduct);
             salesMonthResponses.add(salesMonthResponse);
+            totalPrice = 0D;
+            totalProduct = 0L;
         }
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("OK", "Successfully!", salesMonthResponses)
