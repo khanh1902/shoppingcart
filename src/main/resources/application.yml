@@ -8,16 +8,16 @@ spring:
     web-application-type=none:
 
 ## google oauth
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: 69682817150-gsogi2c7kp2ctmd0m7lho189cr991kj3.apps.googleusercontent.com
-            client-secret: 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
-#            redirect-uri: https://shopping-cart-demo.herokuapp.com/oauth2/callback/google
-            redirect-uri: http://localhost:8080/oauth2/callback/google
-
-            scope:
-              - email
-              - profile
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          google:
+#            client-id: 69682817150-gsogi2c7kp2ctmd0m7lho189cr991kj3.apps.googleusercontent.com
+#            client-secret: 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
+##            redirect-uri: https://shopping-cart-demo.herokuapp.com/oauth2/callback/google
+#            redirect-uri: http://localhost:8080/oauth2/callback/google
+#
+#            scope:
+#              - email
+#              - profile

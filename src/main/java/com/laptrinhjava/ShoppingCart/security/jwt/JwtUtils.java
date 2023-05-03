@@ -44,20 +44,6 @@ public class JwtUtils {
                 .compact(); // thực thi
     }
 
-    public String generateTokenForOAuth2(Users user) {
-        Claims claims = Jwts.claims().setSubject(user.getEmail());
-
-        Date now = new Date(); // thời gian tạo
-        Date expiryDate = new Date(now.getTime() + jwtExpiration); // thời gian hết hạn
-
-        return Jwts.builder()
-                .setSubject(user.getEmail()) // cấp phát jwt cho user
-                .setIssuedAt(now) // thời gian cấp
-                .setExpiration(expiryDate) // thời gian hết hạn
-                .signWith(SignatureAlgorithm.HS512, jwtSecret) //ký tên
-                .compact(); // thực thi
-    }
-
     // Lấy thông tin user từ jwt
     public String getUserNameFromJwtToken(String token) {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();

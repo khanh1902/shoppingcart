@@ -1,17 +1,13 @@
 package com.laptrinhjava.ShoppingCart.service.impl;
 
-import com.laptrinhjava.ShoppingCart.entity.EProvider;
 import com.laptrinhjava.ShoppingCart.entity.Users;
-import com.laptrinhjava.ShoppingCart.payload.request.auth.ChangePasswordRequest;
 import com.laptrinhjava.ShoppingCart.payload.request.auth.UserRequest;
 import com.laptrinhjava.ShoppingCart.payload.response.auth.UserResponse;
 import com.laptrinhjava.ShoppingCart.reponsitory.IUserRepository;
-import com.laptrinhjava.ShoppingCart.security.oauth2.CustomOAuth2User;
 import com.laptrinhjava.ShoppingCart.service.IRoleService;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -62,21 +58,6 @@ public class UserServiceImpl implements IUserService {
     @Override
     public Users save(Users user) {
         return userRepository.save(user);
-    }
-
-    @Override
-    public void processOAuthPostLogin(CustomOAuth2User user) {
-        Users existUser = userRepository.findByEmail(user.getEmail());
-
-        if (existUser == null) {
-            Users newUser = new Users();
-            newUser.setEmail(user.getEmail());
-            newUser.setProvider(EProvider.GOOGLE);
-            newUser.setFullName(user.getName());
-
-            //set role for gg api
-            userRepository.save(newUser);
-        }
     }
 
     @Override
