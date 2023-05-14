@@ -47,6 +47,10 @@ public class Users {
 
     @JsonIgnore
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL)
+    private List<WishList> wishLists;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL)
     private List<Address> addresses;
 
     @JsonIgnore

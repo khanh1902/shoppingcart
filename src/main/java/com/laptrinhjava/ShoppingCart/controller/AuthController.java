@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,7 +59,7 @@ public class AuthController {
     @Autowired
     private ICartService cartService;
 
-    // đăng nhập
+    // login
     @PostMapping("/signin")
     public ResponseEntity<ResponseObject> authenticateUser(@Valid @RequestBody SigninRequest loginRequest, HttpServletResponse response) {
 
@@ -84,7 +85,7 @@ public class AuthController {
 
             ResponseCookie jwtCookie = jwtUtils.generateJWTCookie(userDetails);
             List<String> roles = userDetails.getAuthorities().stream()
-                    .map(item -> item.getAuthority())
+                    .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList());
 
 //            ResponseCookie resCookie = ResponseCookie.from("auth_token", jwt)
