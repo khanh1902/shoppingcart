@@ -33,12 +33,11 @@ public class WishListServiceImpl implements IWishListService {
         String email = getUsername();
         Users findUser = userRepository.findByEmail(email);
         Products findProduct = productRepository.findProductById(productId);
-        if(findProduct == null) throw new Exception("Product does not exists!");
+        if (findProduct == null) throw new Exception("Product does not exists!");
 
         // kiem tra xem san pham da duoc them vao wishlist chua
         WishList checkWishList = wishListRepository.findByUsers_IdAndProducts_Id(findUser.getId(), findProduct.getId());
-        if(checkWishList != null) throw new Exception("This product has been added to Your WishList!");
-
+        if (checkWishList != null) throw new Exception("This product has been added to Your WishList!");
 
         WishList wishList = new WishList(findProduct, findUser);
         return wishListRepository.save(wishList);
@@ -51,7 +50,7 @@ public class WishListServiceImpl implements IWishListService {
         List<WishListsResponse> wishListsResponses = new ArrayList<>();
         List<WishList> findAllByUserId = wishListRepository.findAllByUsers_Id(findUser.getId());
         if (findAllByUserId.isEmpty()) throw new Exception("Your Wishlist is Empty!");
-        for (WishList wishList:findAllByUserId){
+        for (WishList wishList : findAllByUserId) {
             Products findProduct = productRepository.findProductById(wishList.getProducts().getId());
             WishListsResponse wishListsResponse = new WishListsResponse(wishList.getId(), findProduct.getId(), findProduct.getImageUrl(), findProduct.getPrice());
             wishListsResponses.add(wishListsResponse);
@@ -64,7 +63,7 @@ public class WishListServiceImpl implements IWishListService {
         String email = getUsername();
         Users findUser = userRepository.findByEmail(email);
         WishList findWishList = wishListRepository.findByIdAndUsers_Id(wishListId, findUser.getId());
-        if(findWishList == null) throw new Exception("WishList does not exists!");
+        if (findWishList == null) throw new Exception("WishList does not exists!");
         wishListRepository.delete(findWishList);
     }
 }
