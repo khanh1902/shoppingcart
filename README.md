@@ -22,7 +22,7 @@
 -   Quản lý người dùng
 -   Quản lý danh mục
 
-## Ngôn ngữ và framework
+## Ngôn ngữ và framework và thư viện
 
  - java, spring boot
  - aws s3 lưu trữ hình ảnh
