@@ -1,4 +1,4 @@
-package com.laptrinhjava.ShoppingCart.service.impl;
+package com.laptrinhjava.ShoppingCart.utils.awss3util;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -7,7 +7,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.laptrinhjava.ShoppingCart.service.IAmazonClient;
+import com.laptrinhjava.ShoppingCart.utils.awss3util.IAmazonClient;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

@@ -78,9 +78,9 @@ public class UserController {
         try {
 
 //        String jwt = parseJwt(request); // Lấy jwt từ request
-            String token = jwt.substring(7, jwt.length());
+            jwt = jwt.substring(7);
             // Lấy email từ chuỗi jwt
-            String email = Jwts.parser().setSigningKey("khanhSecret").parseClaimsJws(token).getBody().getSubject();
+            String email = Jwts.parser().setSigningKey("khanhSecret").parseClaimsJws(jwt).getBody().getSubject();
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
             List<String> roles = userDetails.getAuthorities().stream()
                     .map(item -> item.getAuthority())
@@ -103,7 +103,7 @@ public class UserController {
         String headerAuth = request.getHeader("Authorization");
         // Kiểm tra xem header Authorization có chứa thông tin jwt không
         if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
-            return headerAuth.substring(7, headerAuth.length());
+            return headerAuth.substring(7);
         }
         return null;
     }

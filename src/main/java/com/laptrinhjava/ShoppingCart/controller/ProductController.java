@@ -4,7 +4,7 @@ import com.laptrinhjava.ShoppingCart.entity.*;
 import com.laptrinhjava.ShoppingCart.payload.request.product.OptionsRequest;
 import com.laptrinhjava.ShoppingCart.payload.response.product.OneProductResponse;
 import com.laptrinhjava.ShoppingCart.payload.ResponseObject;
-import com.laptrinhjava.ShoppingCart.service.IAmazonClient;
+import com.laptrinhjava.ShoppingCart.utils.awss3util.IAmazonClient;
 import com.laptrinhjava.ShoppingCart.service.ICategoryService;
 import com.laptrinhjava.ShoppingCart.service.IReviewsService;
 import com.laptrinhjava.ShoppingCart.service.IUserService;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.ws.rs.Consumes;
-import java.text.DecimalFormat;
 import java.util.*;
 
 import static com.laptrinhjava.ShoppingCart.common.HandleAuth.getUsername;
